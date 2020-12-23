@@ -1,0 +1,308 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/Arch Linux) (preloaded format=latex 2020.10.13)  20 DEC 2020 20:14
+entering extended mode
+ restricted \write18 enabled.
+ Source specials enabled.
+ %&-line parsing enabled.
+**RASD.tex
+(./RASD.tex
+LaTeX2e <2020-02-02> patch level 5
+L3 programming layer <2020-06-03>
+(/usr/share/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2019/12/20 v1.4l Standard LaTeX document class
+(/usr/share/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2019/12/20 v1.4l Standard LaTeX file (size option)
+)
+\c@part=\count167
+\c@section=\count168
+\c@subsection=\count169
+\c@subsubsection=\count170
+\c@paragraph=\count171
+\c@subparagraph=\count172
+\c@figure=\count173
+\c@table=\count174
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\bibindent=\dimen134
+)
+(/usr/share/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2019/11/30 v1.2a Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks15
+)
+(/usr/share/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2019/11/30 v1.4a Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(/usr/share/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: dvips.def on input line 105.
+
+(/usr/share/texmf-dist/tex/latex/graphics-def/dvips.def
+File: dvips.def 2017/06/20 v3.1d Graphics/color driver for dvips
+))
+\Gin@req@height=\dimen135
+\Gin@req@width=\dimen136
+)
+(/usr/share/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2016/05/11 v2.12 LaTeX color extensions (UK)
+
+(/usr/share/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: dvips.def on input line 225.
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1348.
+Package xcolor Info: Model `RGB' extended on input line 1364.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1366.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1367.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1368.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
+
+(/usr/share/texmf-dist/tex/latex/graphics/dvipsnam.def
+File: dvipsnam.def 2016/06/17 v3.0m Driver-dependent file (DPC,SPQR)
+))
+(/usr/share/texmf-dist/tex/latex/l3backend/l3backend-dvips.def
+File: l3backend-dvips.def 2020-06-03 L3 backend support: dvips
+\l__pdf_internal_box=\box45
+\g__pdf_backend_object_int=\count175
+\l__pdf_backend_content_box=\box46
+\l__pdf_backend_model_box=\box47
+\g__pdf_backend_annotation_int=\count176
+\g__pdf_backend_link_int=\count177
+\g__pdf_backend_link_sf_int=\count178
+) (./RASD.aux)
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+
+
+! LaTeX Error: File `Logo_Polimi' not found.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.14     \includegraphics[height=5cm]{Logo_Polimi}
+                                                  \\
+I could not locate the file with any of these extensions:
+.eps,.ps,.eps.gz,.ps.gz,.eps.Z,.mps
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+[1
+
+] [1]
+Overfull \hbox (5.0561pt too wide) in paragraph at lines 97--98
+[][]\OT1/cmr/m/n/10 Allow Store-M-an-agers to mon-i-tor en-trances of Phys-i-ca
+l-Cus-tomers when
+ []
+
+
+Overfull \hbox (0.27838pt too wide) in paragraph at lines 115--116
+[][][]\OT1/cmr/m/n/10 LineUpDigitalTicket[]: a Dig-i-tal Ticket that also con-t
+ains the num-ber added
+ []
+
+[2]
+Overfull \hbox (0.22282pt too wide) in paragraph at lines 125--126
+[][][]\OT1/cmr/m/n/10 ExpiredDigitalTicket[]: Dig-i-talTicket that doesn't gran
+t ac-cess to the Build-
+ []
+
+[3] [4]
+Underfull \hbox (badness 10000) in paragraph at lines 166--195
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 166--195
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 166--195
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 166--195
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 166--195
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 166--195
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 166--195
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 166--195
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 166--195
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 166--195
+
+ []
+
+[5]
+
+! LaTeX Error: File `ActorsClassDiagram' not found.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.198 ...egraphics[height=4cm]{ActorsClassDiagram}
+                                                  \\
+I could not locate the file with any of these extensions:
+.eps,.ps,.eps.gz,.ps.gz,.eps.Z,.mps
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: File `ClassDiagram' not found.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.203 	\includegraphics[height=10cm]{ClassDiagram}
+                                                  \\
+I could not locate the file with any of these extensions:
+.eps,.ps,.eps.gz,.ps.gz,.eps.Z,.mps
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: File `StateDiagram' not found.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.207 	\includegraphics[height=6cm]{StateDiagram}
+                                                 \\
+I could not locate the file with any of these extensions:
+.eps,.ps,.eps.gz,.ps.gz,.eps.Z,.mps
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 196--208
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 196--208
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 196--208
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 196--208
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 196--208
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 196--208
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 196--208
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 196--208
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 196--208
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 196--208
+
+ []
+
+[6]
+Overfull \hbox (5.39966pt too wide) in paragraph at lines 243--244
+[][]\OT1/cmr/m/n/12 Allow Ap-p-Cus-tomers to view es-ti-mated Trav-el-Time to r
+each
+ []
+
+[7] [8] [9] [10]
+
+! LaTeX Error: File `ActivityDiagram' not found.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.341 ...ludegraphics[height=4cm]{ActivityDiagram}
+                                                  \\
+I could not locate the file with any of these extensions:
+.eps,.ps,.eps.gz,.ps.gz,.eps.Z,.mps
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 341--342
+
+ []
+
+[11] [12] [13] (./RASD.aux) ) 
+Here is how much of TeX's memory you used:
+ 1329 strings out of 480479
+ 18257 string characters out of 5905984
+ 265247 words of memory out of 5000000
+ 17394 multiletter control sequences out of 15000+600000
+ 535827 words of font info for 35 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 30i,5n,37p,1027b,271s stack positions out of 5000i,500n,10000p,200000b,80000s
+
+Output written on RASD.dvi (14 pages, 42008 bytes).
