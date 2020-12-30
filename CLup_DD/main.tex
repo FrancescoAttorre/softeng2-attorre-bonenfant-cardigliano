@@ -1,0 +1,135 @@
+\input{commandsFile}
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage{listings}
+\usepackage{alloy-style}
+
+\usepackage{multirow}
+
+\begin{document}
+
+%TITLE PAGE
+
+\begin{titlepage}
+
+
+%LOGO
+
+\begin{center}
+    \includegraphics[height=5cm]{Logo_Polimi}\\
+    \vspace{7cm}
+      \begin{huge}
+        \textbf{CLup - Customer Line Up}\\
+      \end{huge}
+      \vspace{0.3cm}
+      \begin{large}
+        \textit{Software Engineering 2 Project 2020/21}\\
+      \end{large}
+      
+      \vfill
+      \begin{author}
+        \textbf{\Large Authors}\\
+        \begin{itemize}
+          \item Francesco Attorre - \textit{10618456}\\
+          \item Thomas Jean Bernard Bonenfant - \textit{10597564}\\
+          \item Veronica Cardigliano - \textit{10627267}\\
+        \end{itemize}
+      \end{author}
+
+    \end{center}
+  
+  \end{titlepage}
+
+%Define deliverable specific info
+%Replace cell contents where needed
+\begin{table}[h!]
+\begin{tabu} to \textwidth { X[0.3,r,p] X[0.7,l,p] }
+\hline
+
+\textbf{Deliverable:} & DD\\
+\textbf{Title:} & Design Document \\
+\textbf{Authors:} & Francesco Attorre, Thomas Jean Bernard Bonenfant, Veronica Cardigliano \\
+\textbf{Version:} & 1.0 \\ 
+\textbf{Date:} & 10-January-2021 \\
+\textbf{Download page:} & https://github.com/FrancescoAttorre/softeng2-attorre-bonenfant-cardigliano \\
+\textbf{Copyright:} & Copyright © 2021, Francesco Attorre, Thomas Jean Bernard Bonenfant, Veronica Cardigliano - All rights reserved \\
+\hline
+\end{tabu}
+\end{table}
+
+\setcounter{page}{2}
+
+
+%------------------------------------------------------------------------------------------------------------------------------------------------
+%Table Of Contents
+\newpage
+
+\addcontentsline{toc}{section}{Table of Contents}
+\hypersetup{linkcolor = black}
+\tableofcontents
+
+\newpage
+%\addcontentsline{toc}{section}{List of Figures}
+%\listoffigures
+%\addcontentsline{toc}{section}{List of Tables}
+%\listoftables
+
+%------------------------------------------------------------------------------------------------------------------------------------------------
+%Introduction
+\clearpage
+{\color{Cerulean}{\section{Introduction}}}
+\label{sect:introduction}
+\input{Files/introduction}
+
+%------------------------------------------------------------------------------------------------------------------------------------------------
+%Overall Description
+\clearpage
+{\color{Cerulean}{\section{Architectural Design}}}
+\label{sect:architecturalDesign}
+\input{Files/architecturalDesign}
+
+%------------------------------------------------------------------------------------------------------------------------------------------------
+%Specific Requirements
+\clearpage
+{\color{Cerulean}{\section{User Interface Design}}}
+\label{sect:userInterface}
+\input{Files/userInterface}
+
+%------------------------------------------------------------------------------------------------------------------------------------------------
+\clearpage
+{\color{Cerulean}{\section{Requirements Traceability}}}
+\label{sect:requirements}
+\input{Files/requirements}
+
+%------------------------------------------------------------------------------------------------------------------------------------------------
+\clearpage
+{\color{Cerulean}{\section{Implementation, Integration and Test Plan}}}
+\label{sect:implementation}
+\input{Files/implementation}
+
+%------------------------------------------------------------------------------------------------------------------------------------------------
+\clearpage
+{\color{Cerulean}{\section{Effort Spent}}}
+\label{sect:effort}
+\input{Files/effort}
+
+%------------------------------------------------------------------------------------------------------------------------------------------------
+\clearpage
+{\color{Cerulean}{\section{Used Tools}}}
+\color{Black}
+Tools used to create this RASD document:\\
+\begin {itemize}
+	\item StarUML: for all the UML diagrams
+	\item LaTeX: to create the pdf
+	\item GitHub: for the repo of the project
+	\item GoogleDoc: for a shared editing of the document
+\end {itemize}
+
+%------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+\end{document}
