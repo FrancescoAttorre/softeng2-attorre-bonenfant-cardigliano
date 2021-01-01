@@ -1,8 +1,8 @@
 \renewcommand{\thesubsection}{\Alph{subsection}}
      	\subsection{Purpose}
-	The goal of this document (DD: Design Document) is to
-
+	The goal of this Design Document is to provide a general view of the architecture of the software, adding more technical details to the information provided in the RASD document. The architecture will be explained in terms of hardware and software components, the interfaces they provide and the interactions between them. The document is going to face also the integration and testing plans, and the main design patterns to be exploited. Information related too much on the implementation will not be dealt in detail since this document aims to the description of an high level architecture of the system. 
          \subsection{Scope}
+         CLup is an application which aims to manage crowds in a period of global pandemic. It allows store managers to monitor the entrances in a building and to avoid the the formation of queues in front of stores. CLup will allow people to save time and be safer, managing both the accesses of people who use the application directly, and of people who go physically to the store, using store managers as intermediaries. CLup can be accessed by customers, store managers and activities which will register stores available to be visited. Customers using the application, moreover, will be notified when they're supposed to leave for the store, and, when registered, they will have the possibility to book a visit to a store, being informed on alternative time slots or similar stores when nothing is available for their choices.  Booking a visit, customers can decide how much time they want spend in the building and, optionally, which specific departments they want to visit, in order to allow a greater number of people to enter when possible.
          
          \subsection{Definitions, Acronyms, Abbreviations}
          	\subsubsection{Definitions}
