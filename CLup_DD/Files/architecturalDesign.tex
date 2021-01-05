@@ -10,7 +10,22 @@ Here are proposed sequence diagrams in order to describe the way components inte
 \subsubsection{oneSubsectionPerAction}
 
 \subsection{Component Interfaces}
+The following diagram shows all the component interfaces already exploited in the sequence diagrams together with the dependencies between the various components. 
 
 \subsection{Selected architectural styles and patterns}
-Explain which styles/patterns you used, why, and how
+The architectural style selected is a three-tier client-server architecture, in order to have a good decoupling of logic, data and presentation, increasing reusability, flexibility and scalability. Moreover, components in the application server have to be developed with low coupling among modules in order to make the system more comprehensible and maintainable. About the components, they have been designed to maintain a stateless logic as much as possible, that is, they should not contain an internal state, but refer to the database to get the necessary information about the system. This is important since instances of components can fail, go down and nothing must go lost in this eventuality. In this context the scalability of the database is so important, and DataAccessManager will play a leading role. 
+The protocol used to send requests is HTTP, which is a good choice to implement a RESTful architecture to meet the above objectives of having a stateless and low coupling system. Other advantages are that it would be cacheable and with a uniform interface.
+Data are transmitted in JSON, which is one of the simplest and most easily customizable protocols. It is also easy readable and allows fast parsing.\\
+
+Finally, we've decided to use some design patterns in order to exploit existing models to solve recurrent problems. This benefits the reusability and maintainability of the code, as well as making it easier for designers to understand how the system works. Below the patterns used: \\
+Model View Controller - MVC\\
+MVC is a widely used pattern, particularly suitable for the development of applications written in object-oriented programming languages such as java. MVC is based on three main roles which are: the Model that contains all the methods to access the data useful to the application, the View that visualizes the data contained in the model and deals with the interaction with users and the Controller which receives the commands of the user and executes them them modifying the other two components. In CLup, the Model logic is in ..., the controller part .... Instead, the view is represented mainly by ...
+\\
+Adapter pattern\\
+Adapter is a structural pattern that aims to match interfaces of different classes. The interface of the Adapter is interposed between the system and the Adaptee, that is the object to be adapted. In this way, whoever has to use a method of the Adaptee sees only an interface (or an abstract class) which would be implemented according to the component to be adapted. In the case of CLup, the component MapsServiceAdapter acts as the adapter, and GoogleMapsService is the component to be adapted. In this way, even assuming that the external service is changed, the internal system will not undergo any changes, since the new API will be handled by the MapsServiceAdapter component.\\
+Facade pattern\\
+Facade is also a structural pattern, which consists in a single class representing the entire subsystem. In the case of CLup, the Dispatcher takes all the requests from the client and then directs them to the specific component of the AppServer. The aim of this component is to mask the complexity of the entire subsystem, with which you can communicate via a simple interface.
+
+
 \subsection {Other design decisions}
+Thin/Fat client? DB?
