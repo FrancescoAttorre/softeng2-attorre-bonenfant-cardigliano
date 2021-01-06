@@ -6,7 +6,49 @@
 \subsection{Deployment view}
 
 \subsection{Runtime view}
-Here are proposed sequence diagrams in order to describe the way components interact with each other to accomplish specific tasks (the ones shown in the use cases of the RASD document).
+Here are proposed sequence diagrams in order to describe the way components interact with each other to accomplish specific tasks (the ones shown in the use cases of the RASD document).\\
+
+\begin{center} 
+Premise\\
+\end{center}
+It’s not explicitly stated in every sequence diagram that a token checking is performed for every request done from the Client to the Server. In order to do this, the dispatcher before processing the request just received will perform on AuthServer a token validity check. Instead the identification action performed in some diagrams has the task to retrieve the User information.\\
+
+\newpage
+\textbf{Authentication Sequence Diagram\\}
+\textit{Two different authentication procedures can occur, the first is an authentication on a RegisteredAppCustomer account, instead a daily access to CLup services can be requested by UnregisteredAppCustomer.\\}
+\textbf{Description\\}
+Both of the following process lead to gaining a token, that is a temporary access key for Server functionalities. The second one is Daily in the sense that every operation on server would stay for at most one day.
+account based - an authentication request is made by the client, after correctly forwarding this request to AuthManager an account check is done. If the user exists and has no token already associated with its account, then a new one will be created. Client receives a response containing his token. 
+daily - a daily authentication request is made by the client, after correctly forwarding this request to AuthManager an access check is done. If the client can get a token in order to access server basic functions a new association between a specific client and a new token is made, else a negative response is sent back to the client. \\
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=\textwidth]{Authentication (registered) Sequence Diagram}
+ \caption{ Authentication (registered) Sequence Diagram}
+ \end{figure}
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=\textwidth]{Authentication (daily) Sequence Diagram}
+ \caption{Authentication (daily) Sequence Diagram}
+ \end{figure}
+
+\newpage
+\textbf{ Acquire a LineUpDigitalTicket Sequence Diagram\\}
+\textit{This diagram explains how a LineUpDigitalTicket cou be acquired by an AppCustomer.\\}
+\textbf{Description\\}
+Client retrieves its position and sends a request in order to receive a list of buildings from which one would be selected. Building retrieval is effectively done by the DataManager. Whereas the MapsServiceAdapter (communication with a maps API) provide useful information to correctly pick only reachable buildings.
+Once the building is selected, Client sends another request in order to gain a ticket. An identification is performed on AuthManager to correctly retrieve the UserID (associated to the token) needed in ticket acquisition. Afterwards, to complete the process,if the building has at least one void space the ticket state is setted to Valid,else the ticket is inserted in the queue.
+Note that only after a Discovery request from the client, this ticket will produce a notification (as described in next diagram).\\
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=\textwidth]{Acquire a LineUpDigitalTicket Sequence Diagram}
+ \caption{ Acquire a LineUpDigitalTicket Sequence Diagram}
+ \end{figure}
+
+
+
 \subsubsection{oneSubsectionPerAction}
 
 \subsection{Component Interfaces}
