@@ -4,9 +4,54 @@
 \subsection{Component view}
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=1.1\textwidth]{/Diagrams/ComponentDiagram}
+	\includegraphics[width=1\textwidth]{/Diagrams/ComponentDiagram}
 	\caption{Component Diagram}
 \end{figure}
+
+
+
+\textbf{TicketManager}\\
+This component provides services to deliver new tickets, change their state and communicates with BuildingManager to associate them with a Building.\\
+
+
+\textbf{AuthManager}\\
+This component offers services to authenticate users and deliver them tokens that authorize to use the other services. The dispatcher component will ask the Auth Manager to check the token validity before forwarding requests to other Components.\\
+
+\textbf{BuildingManager}\\
+Provides services to add buildings to the system, track the number of people in specific buildings, append and pop line up tickets from queues and add booking tickets to a building.\\
+
+\textbf{RegistrationService}\\
+Allows UnregisteredAppCustomers and Activities to register to CLup through its service.\\
+
+\textbf{GoogleMapsService}\\
+External service component that provides web mapping. Used to locate Buildings nearby.\\
+
+\textbf{Dispatcher}\\
+This component manages the requests received from MobileApp and Web Server components and redirects each one to the correct component able to handle it.\\
+
+\textbf{Mobile Application}\\
+Acts as a Client sending requests to the Dispatcher component.
+It it a fat client since it does contain Applicative logic.\\
+
+\textbf{Web Application}\\
+Web Client sending requests to the Dispatcher like the Mobile Application. It will be thinner than the Mobile Application taking part only at the Presentation Level since it does not contain any Applicative logic.\\
+
+\textbf{DataManager}\\
+Manages datastructures and objects to persist to the database.\\
+
+\textbf{DBMS Service}\\
+Represents the DBMS and the service he offers. It communicats with the DataManager\\
+
+\textbf{GPS Service}\\
+Positioning system used to locate a device.\\
+
+\textbf{MapsServiceMobileAdapter}\\
+Adapter that offers to the MobileApplication component an interface for using Mapping services. Useful if the external Mapping service changes the Mobile Application will always used the same interface.\\
+
+\textbf{MapsServiceServerAdapter}\\
+Like previous adapter but for the BuildingManager component. Having 2 different Adapters offers the possibility to use different Mapping services for MobileApplication and BuildingManager 
+
+
 \subsection{Deployment view}
 
 \subsection{Runtime view}
