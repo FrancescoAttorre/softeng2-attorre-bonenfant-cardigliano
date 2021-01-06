@@ -1,6 +1,9 @@
 %Product Perspective
 \subsection{Overview: High-level components and their interaction}
 
+The architectural style chosen to develop the system is a three layer architecture, with a layer of Presentation, one of Business logic/Application and one of Data. This style has been chosen since it allows an easy decoupling of logic and data and of logic and presentation. The presentation level is the one which handles interactions with users, with the interfaces to communicate with them.
+The Business logic consists in the functions provided to the users. Moreover, this layer handles the communication between the other two layers. The data access layer, instead, manages the access to the database both for storing and retrieving data for the other layers. The hardware architecture chosen is the three-tier one. An advantage of this architecture is that the client tier doesn't communicate directly with the DBMS, so the middle tier guarantee a major level of security. Moreover, in this way the connection with the DBMS will be persistent and consequently less expensive. These application layers are divided into three physical dedicated machines. A mobile device/pc, basing on the type of user, that is a personal computer for the activities and a mobile phone for customers and store managers, is used to interface with the user. The Business logic, instead, is the application server which communicates with the DatabaseServer.
+
 \subsection{Component view}
 \begin{figure}[H]
 	\centering
@@ -12,42 +15,29 @@
 
 \textbf{TicketManager}\\
 This component provides services to deliver new tickets, change their state and communicates with BuildingManager to associate them with a Building.\\
-
-
 \textbf{AuthManager}\\
 This component offers services to authenticate users and deliver them tokens that authorize to use the other services. The dispatcher component will ask the Auth Manager to check the token validity before forwarding requests to other Components.\\
-
 \textbf{BuildingManager}\\
 Provides services to add buildings to the system, track the number of people in specific buildings, append and pop line up tickets from queues and add booking tickets to a building.\\
-
 \textbf{RegistrationService}\\
 Allows UnregisteredAppCustomers and Activities to register to CLup through its service.\\
-
 \textbf{GoogleMapsService}\\
 External service component that provides web mapping. Used to locate Buildings nearby.\\
-
 \textbf{Dispatcher}\\
 This component manages the requests received from MobileApp and Web Server components and redirects each one to the correct component able to handle it.\\
-
 \textbf{Mobile Application}\\
 Acts as a Client sending requests to the Dispatcher component.
-It it a fat client since it does contain Applicative logic.\\
-
+It is a fat client since it does contain Applicative logic.\\
 \textbf{Web Application}\\
 Web Client sending requests to the Dispatcher like the Mobile Application. It will be thinner than the Mobile Application taking part only at the Presentation Level since it does not contain any Applicative logic.\\
-
 \textbf{DataManager}\\
-Manages datastructures and objects to persist to the database.\\
-
+Manages data structures and objects to persist to the database.\\
 \textbf{DBMS Service}\\
-Represents the DBMS and the service he offers. It communicats with the DataManager\\
-
+Represents the DBMS and the service he offers. It communicates with the DataManager\\
 \textbf{GPS Service}\\
 Positioning system used to locate a device.\\
-
 \textbf{MapsServiceMobileAdapter}\\
 Adapter that offers to the MobileApplication component an interface for using Mapping services. Useful if the external Mapping service changes the Mobile Application will always used the same interface.\\
-
 \textbf{MapsServiceServerAdapter}\\
 Like previous adapter but for the BuildingManager component. Having 2 different Adapters offers the possibility to use different Mapping services for MobileApplication and BuildingManager 
 
@@ -55,7 +45,7 @@ Like previous adapter but for the BuildingManager component. Having 2 different 
 \subsection{Deployment view}
 
 \subsection{Runtime view}
-Here are proposed sequence diagrams in order to describe the way components interact with each other to accomplish specific tasks (the ones shown in the use cases of the RASD document).\\
+Here are proposed sequence diagrams in order to describe the way components interact with each other to accomplish specific tasks.\\
 
 \begin{center} 
 Premise\\
@@ -96,27 +86,28 @@ Note that only after a Discovery request from the client, this ticket will produ
  \caption{ Acquire a LineUpDigitalTicket Sequence Diagram}
  \end{figure}
 
-
-
 \subsubsection{oneSubsectionPerAction}
 
 \subsection{Component Interfaces}
 The following diagram shows all the component interfaces already exploited in the sequence diagrams together with the dependencies between the various components. 
-
+\newpage
 \subsection{Selected architectural styles and patterns}
-The architectural style selected is a three-tier client-server architecture, in order to have a good decoupling of logic, data and presentation, increasing reusability, flexibility and scalability. Moreover, components in the application server have to be developed with low coupling among modules in order to make the system more comprehensible and maintainable. About the components, they have been designed to maintain a stateless logic as much as possible, that is, they should not contain an internal state, but refer to the database to get the necessary information about the system. This is important since instances of components can fail, go down and nothing must go lost in this eventuality. In this context the scalability of the database is so important, and DataAccessManager will play a leading role. 
+The architectural style selected is a three-tier client-server architecture, in order to have a good decoupling of logic, data and presentation, increasing reusability, flexibility and scalability. Moreover, components in the application server have to be developed mainly with low coupling among modules in order to make the system more comprehensible and maintainable. About the components, they have been designed to maintain a stateless logic as much as possible, that is, they should not contain an internal state, but refer to the database to get the necessary information. This is important since instances of components can fail and nothing must go lost in this eventuality. In this context the scalability of the database is so important, and DataAccessManager will play a leading role. 
 The protocol used to send requests is HTTP, which is a good choice to implement a RESTful architecture to meet the above objectives of having a stateless and low coupling system. Other advantages are that it would be cacheable and with a uniform interface.
-Data are transmitted in JSON, which is one of the simplest and most easily customizable protocols. It is also easy readable and allows fast parsing.\\
-
+To ensure a secure and reliable communication between client and server, HTTPS is used with TLS encryption.
+Data are transmitted in JSON, which is one of the simplest and most easily customizable protocol. It is also easy readable and allows fast parsing.\\
 Finally, we've decided to use some design patterns in order to exploit existing models to solve recurrent problems. This benefits the reusability and maintainability of the code, as well as making it easier for designers to understand how the system works. Below the patterns used: \\
-Model View Controller - MVC\\
-MVC is a widely used pattern, particularly suitable for the development of applications written in object-oriented programming languages such as java. MVC is based on three main roles which are: the Model that contains all the methods to access the data useful to the application, the View that visualizes the data contained in the model and deals with the interaction with users and the Controller which receives the commands of the user and executes them them modifying the other two components. In CLup, the Model logic is in ..., the controller part .... Instead, the view is represented mainly by ...
-\\
-Adapter pattern\\
-Adapter is a structural pattern that aims to match interfaces of different classes. The interface of the Adapter is interposed between the system and the Adaptee, that is the object to be adapted. In this way, whoever has to use a method of the Adaptee sees only an interface (or an abstract class) which would be implemented according to the component to be adapted. In the case of CLup, the component MapsServiceAdapter acts as the adapter, and GoogleMapsService is the component to be adapted. In this way, even assuming that the external service is changed, the internal system will not undergo any changes, since the new API will be handled by the MapsServiceAdapter component.\\
-Facade pattern\\
+\subsubsection{Model View Controller - MVC}
+MVC is a widely used pattern, particularly suitable for the development of applications written in object-oriented programming languages such as java. MVC is based on three main roles which are: the Model that contains all the methods to access the data useful to the application, the View that visualizes the data contained in the model and deals with the interaction with users and the Controller which receives the commands of the user and executes them them modifying the other two components. In CLup, the Controller logic is in the Dispatcher component, the Model is represented by services offered by the other application server's components, plus the DBMSAccessService, instead the view is in the Mobile and Web Applications.\\
+\subsubsection{Adapter pattern}
+Adapter is a structural pattern that aims to match interfaces of different classes. The interface of the Adapter is interposed between the system and the Adaptee, that is the object to be adapted. In this way, whoever has to use a method of the Adaptee sees only an interface (or an abstract class) which would be implemented according to the component to be adapted. In the case of CLup, the components MapsServiceMobileAdapter and MapsServiceServerAdapter act as the adapter for the mobile application and the server, and GoogleMapsService is the component to be adapted. In this way, even assuming that the external service is changed, the internal system will not undergo any changes, since the new API will be handled by these components.\\
+\subsubsection{Facade pattern}
 Facade is also a structural pattern, which consists in a single class representing the entire subsystem. In the case of CLup, the Dispatcher takes all the requests from the client and then directs them to the specific component of the AppServer. The aim of this component is to mask the complexity of the entire subsystem, with which you can communicate via a simple interface.
-
-
+\newpage
 \subsection {Other design decisions}
-Thin/Fat client? DB?
+\subsubsection{Thin Client}
+Having most of the business logic on server side, our client can be defined thin, although there are small pieces of business logic also in the client side. In fact, the client has a MapsServiceMobileAdapter to access the external component in order to compute independently the travel time in a real time way, in case it has decided to activate the GPS services. An advantage of this choice is a lighter communication with the server, which is not constantly updated on the position of the client when not necessary. Also the control on when to notify the client to leave for the building is made client side, given such information about position and time to reach it, avoiding to overload the server.
+Another advantage of having a thin client with a little of business logic is that, having an application which works mainly online, in any case it will always be connected to the server having the main logic, but even if the connection would be interrupted, some services encapsulated in the client will still remain available.
+\subsubsection{Database}
+...
+\newpage
