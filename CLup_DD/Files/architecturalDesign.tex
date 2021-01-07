@@ -50,15 +50,17 @@ Here are proposed sequence diagrams in order to describe the way components inte
 \begin{center} 
 Premise\\
 \end{center}
-It’s not explicitly stated in every sequence diagram that a token checking is performed for every request done from the Client to the Server. In order to do this, the dispatcher before processing the request just received will perform on AuthServer a token validity check. Instead the identification action performed in some diagrams has the task to retrieve the User information.\\
+It’s not explicitly stated in every sequence diagram that a token checking is performed for every request done from Clients to the Server. The Dispatcher ,before processing the request just received ,will perform on AuthServer a token validity check, which comprises a verification on the funcionality that a Client can request on the Server. \\ 
+Instead the identification action performed in some diagrams has the task to retrieve the User information, usually an identifier.
+\\
 
 \newpage
-\textbf{Authentication Sequence Diagram\\}
-\textit{Two different authentication procedures can occur, the first is an authentication on a RegisteredAppCustomer account, instead a daily access to CLup services can be requested by UnregisteredAppCustomer.\\}
+\subsection{Authentication Sequence Diagram}
+\textit{Two different authentication procedures can occur, the first is an authentication on a RegisteredAppCustomer, instead a daily access to CLup services can be requested by UnregisteredAppCustomer.\\}
 \textbf{Description\\}
 Both of the following process lead to gaining a token, that is a temporary access key for Server functionalities. The second one is Daily in the sense that every operation on server would stay for at most one day.
-account based - an authentication request is made by the client, after correctly forwarding this request to AuthManager an account check is done. If the user exists and has no token already associated with its account, then a new one will be created. Client receives a response containing his token. 
-daily - a daily authentication request is made by the client, after correctly forwarding this request to AuthManager an access check is done. If the client can get a token in order to access server basic functions a new association between a specific client and a new token is made, else a negative response is sent back to the client. \\
+account based - an authentication request is made by the MobileApplication, after correctly forwarding this request to AuthManager an account check is done. If the user exists and has no token already associated with its account, then a new one will be created. MobileApplication receives a response containing his token. 
+daily - a daily authentication request is made by the MobileApplication, after correctly forwarding this request to AuthManager an access check is done. If the client can get a token in order to access server basic functions a new association between a specific MoibleApplication and a new token is made, else a negative response is sent back to the client. \\
 
 \begin{figure}[H]
  \centering
@@ -73,17 +75,50 @@ daily - a daily authentication request is made by the client, after correctly fo
  \end{figure}
 
 \newpage
-\textbf{ Acquire a LineUpDigitalTicket Sequence Diagram\\}
-\textit{This diagram explains how a LineUpDigitalTicket cou be acquired by an AppCustomer.\\}
+\subsection{ Acquire a LineUpDigitalTicket Sequence Diagram}
+\textit{This diagram explains how an AppCustomer can acquire a LineUpDigitalTicket.\\}
 \textbf{Description\\}
-Client retrieves its position and sends a request in order to receive a list of buildings from which one would be selected. Building retrieval is effectively done by the DataManager. Whereas the MapsServiceAdapter (communication with a maps API) provide useful information to correctly pick only reachable buildings.
-Once the building is selected, Client sends another request in order to gain a ticket. An identification is performed on AuthManager to correctly retrieve the UserID (associated to the token) needed in ticket acquisition. Afterwards, to complete the process,if the building has at least one void space the ticket state is setted to Valid,else the ticket is inserted in the queue.
-Note that only after a Discovery request from the client, this ticket will produce a notification (as described in next diagram).\\
+MobileApplication retrieves a position (manually or through GPS) and sends a request in order to receive a list of buildings from which one would be selected. Building retrieval is effectively done by the DataManager. Whereas the MapsServiceAdapter (communication with a maps API) provides to BuildingManager useful information to correctly pick only reachable buildings.
+Once the building is selected, MobileApplication sends another request in order to gain a ticket. An identification is performed on AuthManager to correctly retrieve the UserID (associated to the token) needed in ticket acquisition. Afterwards, to complete the process,if the building has at least one void space the ticket state is setted to Valid,else the ticket is inserted in the queue.
+If ticket insertion goes wrong a negative acknowledgment is sent back.
+Note that only after a Discovery request from the MobileApplication, this ticket will produce a notification (as described in next diagram).\\
+\textbf{variant\\}
+MobileApplication ticket request performed by a StoreManager works equally, but building list is not requested because of it is constrained by the one for which StoreManager is signed in. \\
 
 \begin{figure}[H]
  \centering
  \includegraphics[width=\textwidth]{Acquire a LineUpDigitalTicket Sequence Diagram}
  \caption{ Acquire a LineUpDigitalTicket Sequence Diagram}
+ \end{figure}
+
+\newpage
+\subsection{Acquire a BookingDigitalTicket Sequence Diagram}
+\textit{This diagram explains how a RegisteredAppCustomer can acquire a BookingDigitalTicket\\}
+\textbf{Description\\}
+MobileApplication retrieves a position (manually or through GPS) and sends a request with the purpose to receive a list of buildings from which one would be selected.
+Building retrieval is effectively done by the DataManager. Whereas the MapsServiceAdapter (communicating with a maps API) provides BuildingManager useful information to correctly pick only reachable buildings.
+Once the building is selected, MobileApplication sends another request in order to have a list of TimeSlots. Dispatcher forwards this request to the BuildingManager that primarily retrieves Building which capacity information is needed to compute TimeSlots availability for a specific date.
+Lastly MobileApplication requests the Server to gain a ticket. An identification is performed on AuthManager to correctly retrieve the UserID (associated with the token) needed in ticket acquisition. Then a general check validity is performed by BuildingManager, non valid tickets will be not acquired. An acknowledgement is sent back to MobileApplication.
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=\textwidth]{Acquire a BookingDigitalTicket Sequence Diagram}
+ \caption{ Acquire a BookingDigitalTicket Sequence Diagram}
+ \end{figure}
+
+\newpage
+\subsection{Discovery Sequence Diagram}
+\textit{This diagram explains how an AppCustomer can be notified about when to start reaching a Building or a StoreManager when to inform validity of some PhysicalCustomers’s Tickets.\\}
+\textbf{Description\\}
+A Discovery request is a polling request made by a MobileApplication in order to receive updates about Ticket. The Dispatcher first identifies the User and then retrieves all tickets and waiting time inserted in reply to the MobileApplication.
+When the MobileApplication has all the information needed can start the ticket checking.
+For AppCustomer a notification will be received based on the actual position and on ticket estimated waiting time, instead a StoreManager will check only for just validated tickets.
+\\
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=\textwidth]{Discovery Sequence Diagram}
+ \caption{ Discovery Sequence Diagram }
  \end{figure}
 
 \subsubsection{oneSubsectionPerAction}
