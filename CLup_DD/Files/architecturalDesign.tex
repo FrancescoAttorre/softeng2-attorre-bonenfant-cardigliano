@@ -43,6 +43,29 @@ Like previous adapter but for the BuildingManager component. Having 2 different 
 
 
 \subsection{Deployment view}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.1\textwidth]{/Diagrams/DeploymentDiagram}
+	\caption{Deployment Diagram}
+\end{figure}
+
+This diagram shows the overall deployment architecture. Here is a description of every element:\\
+\begin{itemize}
+    \item \textbf{Smartphone}: Device used by AppCustomers and StoreManagers. It will have to contain the CLup App executable in order to use the system.
+    
+    \item \textbf{Computer}: Device used by Activities in order to use the WebApp.
+    
+    \item \textbf{Firewall}: Provides safety access to the internal network of the system as part of the safety of the system against external attacks.
+    
+    \item \textbf{Nginx}: Nginx server used to balance the load on the multiple Application servers. It is responsible to establish an encrypted connection with the clients through Transport Layer Security (TLS). From this point on the connection will be unencrypted as we consider the internal network as secure.
+    
+    \item \textbf{ApplicationServer}: Contains most of the Application Logic. Because of the stateless behavior of the server side logic Application Servers can be easily added to scale out and maintain high availability and reliability. The CLup.ear artifact is the implementation of the ApplicationServer subsystem found in the Component Diagram.
+    
+    \item \textbf{DB Server}: It implements the DBMS Service in the Component Diagram. It is part of a Galera Cluster, a synchronous replication solution, transparent to the Application Servers to improve availability and performance of the DBMS Service. The Cluster will be deployed in a distributed load balancing configuration: each Application server will have a JDBC connector configured for load balancing; this avoids to have between the Application Servers and the Database Servers a separated load balancer that could be a single point of failure (if an ulterior backup load balancer is not added) and a potential bottleneck.
+
+\end{itemize}
+
+
 
 \subsection{Runtime view}
 Here are proposed sequence diagrams in order to describe the way components interact with each other to accomplish specific tasks.\\
