@@ -73,16 +73,15 @@ Here are proposed sequence diagrams in order to describe the way components inte
 \begin{center} 
 Premise\\
 \end{center}
-It’s not explicitly stated in every sequence diagram that a token checking is performed for every request done from Clients to the Server. The Dispatcher ,before processing the request just received ,will perform on AuthServer a token validity check, which comprises a verification on the funcionality that a Client can request on the Server. \\ 
-Instead the identification action performed in some diagrams has the task to retrieve the User information, usually an identifier.
-\\
+It’s not explicitly stated in every sequence diagram that a token checking is performed for every request done from Clients to the Server. The Dispatcher, before processing the request just received, will perform on AuthServer a token validity check, which comprises a verification on the funcionality that a Client can request on the Server. \\ 
+Instead the identification action performed in some diagrams has the task to retrieve the User information, usually an identifier.\\
 
 \newpage
-\subsection{Authentication Sequence Diagram}
+\subsubsection{Authentication Sequence Diagram}
 \textit{Two different authentication procedures can occur, the first is an authentication on a RegisteredAppCustomer, instead a daily access to CLup services can be requested by UnregisteredAppCustomer.\\}
 \textbf{Description\\}
-Both of the following process lead to gaining a token, that is a temporary access key for Server functionalities. The second one is Daily in the sense that every operation on server would stay for at most one day.
-account based - an authentication request is made by the MobileApplication, after correctly forwarding this request to AuthManager an account check is done. If the user exists and has no token already associated with its account, then a new one will be created. MobileApplication receives a response containing his token. 
+Both of the following process lead to gaining a token, that is a temporary access key for Server functionalities. The second one is Daily in the sense that every operation on server would stay for at most one day.\\
+account based - an authentication request is made by the MobileApplication, after correctly forwarding this request to AuthManager an account check is done. If the user exists and has no token already associated with its account, then a new one will be created. MobileApplication receives a response containing his token. \\
 daily - a daily authentication request is made by the MobileApplication, after correctly forwarding this request to AuthManager an access check is done. If the client can get a token in order to access server basic functions a new association between a specific MoibleApplication and a new token is made, else a negative response is sent back to the client. \\
 
 \begin{figure}[H]
@@ -91,6 +90,7 @@ daily - a daily authentication request is made by the MobileApplication, after c
  \caption{ Authentication (registered) Sequence Diagram}
  \end{figure}
 
+\newpage
 \begin{figure}[H]
  \centering
  \includegraphics[width=\textwidth]{Authentication (daily) Sequence Diagram}
@@ -98,14 +98,14 @@ daily - a daily authentication request is made by the MobileApplication, after c
  \end{figure}
 
 \newpage
-\subsection{ Acquire a LineUpDigitalTicket Sequence Diagram}
+\subsubsection{ Acquire a LineUpDigitalTicket Sequence Diagram}
 \textit{This diagram explains how an AppCustomer can acquire a LineUpDigitalTicket.\\}
 \textbf{Description\\}
-MobileApplication retrieves a position (manually or through GPS) and sends a request in order to receive a list of buildings from which one would be selected. Building retrieval is effectively done by the DataManager. Whereas the MapsServiceAdapter (communication with a maps API) provides to BuildingManager useful information to correctly pick only reachable buildings.
-Once the building is selected, MobileApplication sends another request in order to gain a ticket. An identification is performed on AuthManager to correctly retrieve the UserID (associated to the token) needed in ticket acquisition. Afterwards, to complete the process,if the building has at least one void space the ticket state is setted to Valid,else the ticket is inserted in the queue.
-If ticket insertion goes wrong a negative acknowledgment is sent back.
-Note that only after a Discovery request from the MobileApplication, this ticket will produce a notification (as described in next diagram).\\
-\textbf{variant\\}
+MobileApplication retrieves a position (manually or through GPS) and sends a request in order to receive a list of buildings from which one would be selected. Building retrieval is effectively done by the DataManager. Whereas the MapsServiceAdapter (communication with a maps API) provides to BuildingManager useful information to correctly pick only reachable buildings.\\
+Once the building is selected, MobileApplication sends another request in order to gain a ticket. An identification is performed on AuthManager to correctly retrieve the UserID (associated to the token) needed in ticket acquisition. Afterwards, to complete the process,if the building has at least one void space the ticket state is setted to Valid, else the ticket is inserted in queue.
+If ticket insertion goes wrong a negative acknowledgment is sent back.\\
+Note that only after a Discovery request from the MobileApplication, this ticket will produce a notification (as described in Discovery diagram).\\
+\textbf{Variant\\}
 MobileApplication ticket request performed by a StoreManager works equally, but building list is not requested because of it is constrained by the one for which StoreManager is signed in. \\
 
 \begin{figure}[H]
@@ -115,12 +115,12 @@ MobileApplication ticket request performed by a StoreManager works equally, but 
  \end{figure}
 
 \newpage
-\subsection{Acquire a BookingDigitalTicket Sequence Diagram}
+\subsubsection{Acquire a BookingDigitalTicket Sequence Diagram}
 \textit{This diagram explains how a RegisteredAppCustomer can acquire a BookingDigitalTicket\\}
 \textbf{Description\\}
 MobileApplication retrieves a position (manually or through GPS) and sends a request with the purpose to receive a list of buildings from which one would be selected.
-Building retrieval is effectively done by the DataManager. Whereas the MapsServiceAdapter (communicating with a maps API) provides BuildingManager useful information to correctly pick only reachable buildings.
-Once the building is selected, MobileApplication sends another request in order to have a list of TimeSlots. Dispatcher forwards this request to the BuildingManager that primarily retrieves Building which capacity information is needed to compute TimeSlots availability for a specific date.
+Building retrieval is effectively done by the DataManager. Whereas the MapsServiceAdapter (communicating with a maps API) provides BuildingManager useful information to correctly pick only reachable buildings.\\
+Once the building is selected, MobileApplication sends another request in order to have a list of TimeSlots. Dispatcher forwards this request to the BuildingManager that primarily retrieves Building which capacity information is needed to compute TimeSlots availability for a specific date.\\
 Lastly MobileApplication requests the Server to gain a ticket. An identification is performed on AuthManager to correctly retrieve the UserID (associated with the token) needed in ticket acquisition. Then a general check validity is performed by BuildingManager, non valid tickets will be not acquired. An acknowledgement is sent back to MobileApplication.
 
 \begin{figure}[H]
@@ -130,11 +130,12 @@ Lastly MobileApplication requests the Server to gain a ticket. An identification
  \end{figure}
 
 \newpage
-\subsection{Discovery Sequence Diagram}
-\textit{This diagram explains how an AppCustomer can be notified about when to start reaching a Building or a StoreManager when to inform validity of some PhysicalCustomers’s Tickets.\\}
+\subsubsection{Discovery Sequence Diagram}
+\textit{This diagram explains how an AppCustomer can be notified about when to start reaching a Building and about its ticket validity or a StoreManager when to inform validity of some PhysicalCustomers’s Tickets.\\}
 \textbf{Description\\}
-A Discovery request is a polling request made by a MobileApplication in order to receive updates about Ticket. The Dispatcher first identifies the User and then retrieves all tickets and waiting time inserted in reply to the MobileApplication.
-When the MobileApplication has all the information needed can start the ticket checking.
+A Discovery request is a polling request made by a MobileApplication in order to receive updates about Tickets. The Dispatcher first identifies the User and then get updated waiting time estimation from TicketManager.\\
+The waiting time computation process is made by means of a statistic (peculiar of each Building and kept up to date on every exit event) and the queue (which defines the ticket position) in the waiting time computation service. Waiting time depends also on exiting delays which would have a particular rounding.
+Ticket and estimated waiting time for each ticket are sent back to Mobile Application, that will start checking all of them.\\
 For AppCustomer a notification will be received based on the actual position and on ticket estimated waiting time, instead a StoreManager will check only for just validated tickets.
 \\
 
@@ -144,8 +145,32 @@ For AppCustomer a notification will be received based on the actual position and
  \caption{ Discovery Sequence Diagram }
  \end{figure}
 
-\subsubsection{oneSubsectionPerAction}
+\newpage
+\subsubsection{Customer Exit Building Sequence Diagram}
+\textit{This diagram explains how a StoreManager can notify CLup about a Customer left the Building.\\}
+\textbf{Description\\}
+MobileApplication exit request is sent to Dispatcher that identify User(StoreManager associated with the Building for which he is signed up for) then the request is forwarded to BuildingManager.\\
+It will keep up to date statistic (means of delta customer leave) and last exit time for that specific buildin, the nthe validation process will start. Queue is retrieved from DataManager and the next ticket in queue (if there is one) will be validated. An acknowledge for successful processing is received by Dispatcher and then MobileApplication.\\
 
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=\textwidth]{Customer Exit Building Sequence Diagram}
+ \caption{ Customer Exit Building Sequence Diagram }
+ \end{figure}
+
+\newpage
+\subsubsection{Activity Insert Building Sequence Diagram}
+\textit{This diagram explains how an Activity can insert a new Building in CLup.\\}
+\textbf{Description\\}
+WebApplication requests to insert a building providing some parameters, and optionally departments with surplus capacity. Dispatcher receives the request, it firstly identifies the user (that should correspond to an Activity) and then forward the insertion request to BuildingManager, that in order to correctly check if the building can be inserted,it retrieves a list of all buildings and the location,through the MapsServiceServerAdapter, given by the address. At this point if the Building is valid it is persisted. An acknowledgement is sent back to WebApplication.\\
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=\textwidth]{Activity Insert Building Sequence Diagram}
+ \caption{ Activity Insert Building Sequence Diagram }
+ \end{figure}
+
+\newpage
 \subsection{Component Interfaces}
 The following diagram shows all the component interfaces already exploited in the sequence diagrams together with the dependencies between the various components. 
 \newpage
