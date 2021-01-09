@@ -1,3 +1,32 @@
 \subsection{Implementation}
+
+The entire system will be implemented exploiting a \textbf{bottom-up} approach. This approach is chosen for both the server side and the client side, that will be implemented and tested in parallel. A bottom-up implementation is incremental and gives the possibility to test whenever possible every small software unit regardless of the others facilitating bug tracking.\\
+\newline
+The first step can be implementing the DataManager which will be communicating with the DBMSService (MySQL) thanks to JDBC. This will guarantee to others components depending on the DataManager's interfaces to access to persistent objects mapped to the relational database.\\
+\newline
+After that we will implement the AuthManager component which depends only on the DataManager.\\
+The next step consists in implementing the TicketManager.\\
+MapsServiceServerAdapter will be implemented and tested before the BuildingManager as the latter depends on it.\\
+\newline
+Finally, for the server side, the dispatcher will be implemented.\\
+\newline
+The order in which we will implement our components in the application server is:
+
+\begin{enumerate}[label=\arabic*]
+ \item DataManager
+ \item AuthManager
+ \item TicketManager
+ \item BuildingManager
+ \item MapsServiceServerAdapter
+ \item Dispatcher
+\end{enumerate}
+
+In parallel we will implement the MapsServiceMobileAdapter and the MobileApplication components.
+
+DBMSService is not implemented as it is the DBMS software and neither is GoogleMapsService as it is an external service component.
+
+
+
+
 \subsection{Integration}
 \subsection{Test plan}
