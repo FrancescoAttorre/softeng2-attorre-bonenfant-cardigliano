@@ -7,7 +7,7 @@ The Business logic consists in the functions provided to the users. Moreover, th
 \subsection{Component view}
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=1\textwidth]{/Diagrams/ComponentDiagram}
+	\includegraphics[width=1.1\textwidth]{/Diagrams/ComponentDiagram}
 	\caption{Component Diagram}
 \end{figure}
 
@@ -173,6 +173,13 @@ WebApplication requests to insert a building providing some parameters, and opti
 \newpage
 \subsection{Component Interfaces}
 The following diagram shows all the component interfaces already exploited in the sequence diagrams together with the dependencies between the various components. 
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=1.1\textwidth]{Diagrams/ComponentInterfaceDiagram}
+ \caption{ Component Interface Diagram }
+ \end{figure}
+
 \newpage
 \subsection{Selected architectural styles and patterns}
 The architectural style selected is a three-tier client-server architecture, in order to have a good decoupling of logic, data and presentation, increasing reusability, flexibility and scalability. Moreover, components in the application server have to be developed mainly with low coupling among modules in order to make the system more comprehensible and maintainable. About the components, they have been designed to maintain a stateless logic as much as possible, that is, they should not contain an internal state, but refer to the database to get the necessary information. This is important since instances of components can fail and nothing must go lost in this eventuality. In this context the scalability of the database is so important, and DataAccessManager will play a leading role. 
