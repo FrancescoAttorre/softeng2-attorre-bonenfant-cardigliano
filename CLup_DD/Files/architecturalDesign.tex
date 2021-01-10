@@ -22,7 +22,7 @@ Provides services to add buildings to the system, track the number of people in 
 \textbf{RegistrationService}\\
 Allows UnregisteredAppCustomers and Activities to register to CLup through its service.\\
 \textbf{GoogleMapsService}\\
-External service component that provides web mapping. Used to locate Buildings nearby.\\
+External service component that provides web mapping. Used to locate Buildings nearby and compute travel time to reach them with a predefined means of transport.\\
 \textbf{Dispatcher}\\
 This component manages the requests received from MobileApp and Web Server components and redirects each one to the correct component able to handle it.\\
 \textbf{Mobile Application}\\
@@ -61,7 +61,7 @@ This diagram shows the overall deployment architecture. Here is a description of
     
     \item \textbf{ApplicationServer}: Contains most of the Application Logic. Because of the stateless behavior of the server side logic Application Servers can be easily added to scale out and maintain high availability and reliability. The CLup.ear artifact is the implementation of the ApplicationServer subsystem found in the Component Diagram.
     
-    \item \textbf{DB Server}: It implements the DBMS Service in the Component Diagram. It is part of a Galera Cluster, a synchronous replication solution, transparent to the Application Servers to improve availability and performance of the DBMS Service. The Cluster will be deployed in a distributed load balancing configuration: each Application server will have a JDBC connector configured for load balancing; this avoids to have between the Application Servers and the Database Servers a separated load balancer that could be a single point of failure (if an ulterior backup load balancer is not added) and a potential bottleneck.
+    \item \textbf{DB Server}: It implements the DBMS Service in the Component Diagram. An additional description is in section G.2
 
 \end{itemize}
 
@@ -199,5 +199,12 @@ Facade is also a structural pattern, which consists in a single class representi
 Having most of the business logic on server side, our client can be defined thin, although there are small pieces of business logic also in the client side. In fact, the client has a MapsServiceMobileAdapter to access the external component in order to compute independently the travel time in a real time way, in case it has decided to activate the GPS services. An advantage of this choice is a lighter communication with the server, which is not constantly updated on the position of the client when not necessary. Also the control on when to notify the client to leave for the building is made client side, given such information about position and time to reach it, avoiding to overload the server.
 Another advantage of having a thin client with a little of business logic is that, having an application which works mainly online, in any case it will always be connected to the server having the main logic, but even if the connection would be interrupted, some services encapsulated in the client will still remain available.
 \subsubsection{Database}
-...
+We will use Galera Cluster, a synchronous replication solution, transparent to the Application Servers to improve availability and performance of the DBMS Service. The Cluster will be deployed in a distributed load balancing configuration: each Application server will have a JDBC connector configured for load balancing; this avoids to have between the Application Servers and the Database Servers a separated load balancer that could be a single point of failure (if an ulterior backup load balancer is not added) and a potential bottleneck.
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=0.7\textwidth]{GaleraConfiguration}
+ \caption{ Galera Cluster's configuration }
+ \end{figure}
+
+
 \newpage
