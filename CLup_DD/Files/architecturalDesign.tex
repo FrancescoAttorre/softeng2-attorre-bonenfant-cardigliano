@@ -11,36 +11,32 @@ The Business logic consists in the functions provided to the users. Moreover, th
 	\caption{Component Diagram}
 \end{figure}
 
-
+All the components inside the subsystem "Application Server" are stateless components. Below is provided a description of how they work.
 
 \textbf{TicketManager}\\
-This component provides services to deliver new tickets, change their state and communicates with BuildingManager to associate them with a Building.\\
+This component provides services to deliver new tickets and communicates with BuildingManager to associate them with a Building. It creates new line up and booking tickets. It manages ticket states and retrieves information about them when required.\\
 \textbf{AuthManager}\\
-This component offers services to authenticate users and deliver them tokens that authorize to use the other services. The dispatcher component will ask the Auth Manager to check the token validity before forwarding requests to other Components.\\
+This component offers services to authenticate users and deliver them tokens that authorize to use other services. It checks tokens in order to understand whether a user has the authorization to access a requested service, checking also the token validity. The result of this check'll be communicated to the Dispatcher component that'll forward the request to the specific component that provides the service.\\
 \textbf{BuildingManager}\\
-Provides services to add buildings to the system, track the number of people in specific buildings, append and pop line up tickets from queues and add booking tickets to a building.\\
-\textbf{RegistrationService}\\
-Allows UnregisteredAppCustomers and Activities to register to CLup through its service.\\
+Provides services to add buildings to the system, track the number of people in specific buildings and manage queues. It appends and removes line up tickets from queues, computes the available slots for a booking ticket and suggestions of alternative buildings and time slots (advanced functionality). It also checks the building capacity to manage the influx of customers, generates the building access code and computes the estimated waiting time for each customer having a digital ticket. This component is in communication with the TicketManager  in order to validate a ticket when it's the first one in queue.\\
 \textbf{GoogleMapsService}\\
-External service component that provides web mapping. Used to locate Buildings nearby and compute travel time to reach them with a predefined means of transport.\\
+External service component that provides web mapping. Used to locate Buildings given their address and compute travel time to reach them with a predefined means of transport. It'll be exploited both by client and server, and having an Adapter component as intermediary with the system it could be easily replaced.\\
 \textbf{Dispatcher}\\
-This component manages the requests received from MobileApp and Web Server components and redirects each one to the correct component able to handle it.\\
-\textbf{Mobile Application}\\
-Acts as a Client sending requests to the Dispatcher component.
-It is a fat client since it does contain Applicative logic.\\
-\textbf{Web Application}\\
-Web Client sending requests to the Dispatcher like the Mobile Application. It will be thinner than the Mobile Application taking part only at the Presentation Level since it does not contain any Applicative logic.\\
+This component manages the requests received from MobileApplication and WebApplication components and redirects each one to the correct component able to handle it. It interacts with the AuthManager in order to verify if the user is authorized to exploit the requested service, if the check gives a positive response, it proceeds redirecting the request. So, it knows which services and components will handle each request.\\
+\textbf{MobileApplication}\\
+Acts as a Client sending requests to the Dispatcher component. It is a fat client since it contains applicative logic about computation of travel time and sending notifications to the user. It also manages the association of physical tickets with digital ones when used by a store manager.\\
+\textbf{WebApplication}\\
+Web Client sending requests to the Dispatcher like the Mobile Application. It will be thinner than the Mobile Application taking part only at the Presentation Level since it does not contain any Applicative logic. WebApplication is used only by Activities.\\
 \textbf{DataManager}\\
-Manages data structures and objects to persist to the database.\\
+Manages data structures and object relational mapping. It communicates with DBMS service in order to persist objects in the relational Database. \\
 \textbf{DBMS Service}\\
-Represents the DBMS and the service he offers. It communicates with the DataManager\\
+Represents the DBMS and the service he offers. It communicates with the DataManager with standard protocols in order to retrieve or get data.\\
 \textbf{GPS Service}\\
-Positioning system used to locate a device.\\
+Positioning system used to locate a device. This is an optional component and it would be offered by an external software (Android/iOS) already present in the user device.\\
 \textbf{MapsServiceMobileAdapter}\\
-Adapter that offers to the MobileApplication component an interface for using Mapping services. Useful if the external Mapping service changes the Mobile Application will always used the same interface.\\
+Adapter that offers to the MobileApplication component an interface for using Mapping services. Useful if the external Mapping service changes since the Mobile Application will always use the same interface.\\
 \textbf{MapsServiceServerAdapter}\\
-Like previous adapter but for the BuildingManager component. Having two different Adapters offers the possibility to use different Mapping services for MobileApplication and BuildingManager 
-
+This component is an adapter like the previous one, but it is used by the BuildingManager component. Having two different Adapters offers the possibility to use different Mapping services for MobileApplication and BuildingManager.
 
 \subsection{Deployment view}
 \begin{figure}[H]
@@ -61,28 +57,25 @@ This diagram shows the overall deployment architecture. Here is a description of
     
     \item \textbf{ApplicationServer}: Contains most of the Application Logic. Because of the stateless behavior of the server side logic Application Servers can be easily added to scale out and maintain high availability and reliability. The CLup.ear artifact is the implementation of the ApplicationServer subsystem found in the Component Diagram.
     
-    \item \textbf{DB Server}: It implements the DBMS Service in the Component Diagram. An additional description is in section G.2
-
+    \item \textbf{DB Server}: It implements the DBMS Service in the Component Diagram. A more detailed description is provided in section G.2.
 \end{itemize}
 
-
+\newpage
 
 \subsection{Runtime view}
-Here are proposed sequence diagrams in order to describe the way components interact with each other to accomplish specific tasks.\\
+Here are proposed some sequence diagrams in order to describe the way components interact with each other to accomplish specific tasks.\\
 
 \begin{center} 
 Premise\\
 \end{center}
-It’s not explicitly stated in every sequence diagram that a token checking is performed for every request done from Clients to the Server. The Dispatcher, before processing the request just received, will perform on AuthServer a token validity check, which comprises a verification on the funcionality that a Client can request on the Server. \\ 
-Instead the identification action performed in some diagrams has the task to retrieve the User information, usually an identifier.\\
-
-\newpage
+It’s not explicitly stated in every sequence diagram that a token checking is performed for every request done from Clients to the Server. In fact, each request (except for authentication requests) should contain a token in order to authorize the sender. The Dispatcher, before processing the request just received, will perform on AuthServer a token validity check, which comprises a verification of services that a Client can request on the Server. \\
+Instead, the identification action performed in some diagrams has the task to retrieve the User information, usually an identifier.\\
 \subsubsection{Authentication Sequence Diagram}
 \textit{Two different authentication procedures can occur, the first is an authentication on a RegisteredAppCustomer, instead a daily access to CLup services can be requested by UnregisteredAppCustomer.\\}
 \textbf{Description\\}
-Both of the following process lead to gaining a token, that is a temporary access key for Server functionalities. The second one is Daily in the sense that every operation on server would stay for at most one day.\\
+Both of the following processes lead to gain a token, that is a temporary access key for Server functionalities. The second one is Daily in the sense that every operation on server would stay for at most one day.\\
 account based - an authentication request is made by the MobileApplication, after correctly forwarding this request to AuthManager an account check is done. If the user exists and has no token already associated with its account, then a new one will be created. MobileApplication receives a response containing his token. \\
-daily - a daily authentication request is made by the MobileApplication, after correctly forwarding this request to AuthManager an access check is done. If the client can get a token in order to access server basic functions a new association between a specific MoibleApplication and a new token is made, else a negative response is sent back to the client. \\
+daily - a daily authentication request is made by the MobileApplication and, after correctly forwarding this request to AuthManager, an access check is performed. If the client can get a token in order to access line up services, a new association between a specific MobileApplication and the new token is made, otherwise a negative response is sent back to the client. \\
 
 \begin{figure}[H]
  \centering
@@ -101,12 +94,12 @@ daily - a daily authentication request is made by the MobileApplication, after c
 \subsubsection{ Acquire a LineUpDigitalTicket Sequence Diagram}
 \textit{This diagram explains how an AppCustomer can acquire a LineUpDigitalTicket.\\}
 \textbf{Description\\}
-MobileApplication retrieves a position (manually or through GPS) and sends a request in order to receive a list of buildings from which one would be selected. Building retrieval is effectively done by the DataManager. Whereas the MapsServiceAdapter (communication with a maps API) provides to BuildingManager useful information to correctly pick only reachable buildings.\\
-Once the building is selected, MobileApplication sends another request in order to gain a ticket. An identification is performed on AuthManager to correctly retrieve the UserID (associated to the token) needed in ticket acquisition. Afterwards, to complete the process,if the building has at least one void space the ticket state is setted to Valid, else the ticket is inserted in queue.
-If ticket insertion goes wrong a negative acknowledgment is sent back.\\
-Note that only after a Discovery request from the MobileApplication, this ticket will produce a notification (as described in Discovery diagram).\\
+MobileApplication retrieves a position (manually or through GPS) and sends a request in order to receive a list of buildings from which one would be selected. Building retrieval is effectively performed by the DataManager, whereas the MapsServiceAdapter (communication with a maps API) provides to the BuildingManager useful information to correctly pick only reachable buildings.\\
+Once the building is selected, MobileApplication sends another request in order to gain a ticket. An identification is performed on AuthManager to correctly retrieve the UserID (associated to the token) needed in ticket acquisition. Afterwards, to complete the process, if the building has at least one empty space the ticket state is set to Valid, else the ticket is inserted in queue.
+If ticket insertion goes wrong, a negative acknowledgment is sent back.\\
+Note that only after a Discovery request from the MobileApplication, this ticket will produce a notification (as described in the Discovery diagram).\\
 \textbf{Variant\\}
-MobileApplication ticket request performed by a StoreManager works equally, but building list is not requested because of it is constrained by the one for which StoreManager is signed in. \\
+MobileApplication ticket request performed by a StoreManager works in the same way, but building list is not requested since it is constrained by the one for which StoreManager is signed in. \\
 
 \begin{figure}[H]
  \centering
@@ -119,7 +112,7 @@ MobileApplication ticket request performed by a StoreManager works equally, but 
 \textit{This diagram explains how a RegisteredAppCustomer can acquire a BookingDigitalTicket\\}
 \textbf{Description\\}
 MobileApplication retrieves a position (manually or through GPS) and sends a request with the purpose to receive a list of buildings from which one would be selected.
-Building retrieval is effectively done by the DataManager. Whereas the MapsServiceAdapter (communicating with a maps API) provides BuildingManager useful information to correctly pick only reachable buildings.\\
+Building retrieval is effectively performed by the DataManager, whereas the MapsServiceAdapter (communicating with a maps API) provides BuildingManager useful information to correctly pick only reachable buildings.\\
 Once the building is selected, MobileApplication sends another request in order to have a list of TimeSlots. Dispatcher forwards this request to the BuildingManager that primarily retrieves Building which capacity information is needed to compute TimeSlots availability for a specific date.\\
 Lastly MobileApplication requests the Server to gain a ticket. An identification is performed on AuthManager to correctly retrieve the UserID (associated with the token) needed in ticket acquisition. Then a general check validity is performed by BuildingManager, non valid tickets will be not acquired. An acknowledgement is sent back to MobileApplication.
 
@@ -133,10 +126,10 @@ Lastly MobileApplication requests the Server to gain a ticket. An identification
 \subsubsection{Discovery Sequence Diagram}
 \textit{This diagram explains how an AppCustomer can be notified about when to start reaching a Building and about its ticket validity or a StoreManager when to inform validity of some PhysicalCustomers’s Tickets.\\}
 \textbf{Description\\}
-A Discovery request is a polling request made by a MobileApplication in order to receive updates about Tickets. The Dispatcher first identifies the User and then get updated waiting time estimation from TicketManager.\\
-The waiting time computation process is made by means of a statistic (peculiar of each Building and kept up to date on every exit event) and the queue (which defines the ticket position) in the waiting time computation service. Waiting time depends also on exiting delays which would have a particular rounding.
+A Discovery request is a polling request made by a MobileApplication in order to receive updates about Tickets. The Dispatcher first identifies the User and then gets an updated waiting time estimation from the TicketManager.\\
+The waiting time computation process is made by means of a statistic (peculiar of each Building and kept up to date on every exit event) and the related position in queue. Waiting time depends also on exiting delays and it would have a particular rounding.
 Ticket and estimated waiting time for each ticket are sent back to Mobile Application, that will start checking all of them.\\
-For AppCustomer a notification will be received based on the actual position and on ticket estimated waiting time, instead a StoreManager will check only for just validated tickets.
+For AppCustomers a notification will be received based on the actual position and on ticket estimated waiting time, instead a StoreManager will check only for just validated tickets.
 \\
 
 \begin{figure}[H]
@@ -147,10 +140,10 @@ For AppCustomer a notification will be received based on the actual position and
 
 \newpage
 \subsubsection{Customer Exit Building Sequence Diagram}
-\textit{This diagram explains how a StoreManager can notify CLup about a Customer left the Building.\\}
+\textit{This diagram explains how a StoreManager can notify CLup about a Customer leaving the Building.\\}
 \textbf{Description\\}
-MobileApplication exit request is sent to Dispatcher that identify User(StoreManager associated with the Building for which he is signed up for) then the request is forwarded to BuildingManager.\\
-It will keep up to date statistic (means of delta customer leave) and last exit time for that specific buildin, the nthe validation process will start. Queue is retrieved from DataManager and the next ticket in queue (if there is one) will be validated. An acknowledge for successful processing is received by Dispatcher and then MobileApplication.\\
+MobileApplication exit request is sent to the Dispatcher, able to identify the User (the StoreManager associated with the Building for which he is signed up for), then the request is forwarded to the BuildingManager.\\
+The latter will keep statistics up to date (related to the average time between two exits) as well as the last exit time for that specific building, then the ticket validation process will start. Queue is retrieved from DataManager and the next ticket in queue (if there is one) will be validated. An acknowledge for successful processing is received by Dispatcher and then MobileApplication.\\
 
 \begin{figure}[H]
  \centering
@@ -160,9 +153,9 @@ It will keep up to date statistic (means of delta customer leave) and last exit 
 
 \newpage
 \subsubsection{Activity Insert Building Sequence Diagram}
-\textit{This diagram explains how an Activity can insert a new Building in CLup.\\}
+\textit{This diagram explains how an Activity inserts a new Building in CLup.\\}
 \textbf{Description\\}
-WebApplication requests to insert a building providing some parameters, and optionally departments with surplus capacity. Dispatcher receives the request, it firstly identifies the user (that should correspond to an Activity) and then forward the insertion request to BuildingManager, that in order to correctly check if the building can be inserted,it retrieves a list of all buildings and the location,through the MapsServiceServerAdapter, given by the address. At this point if the Building is valid it is persisted. An acknowledgement is sent back to WebApplication.\\
+WebApplication requests to insert a building providing some parameters, and optionally departments with surplus capacity. Dispatcher receives the request, identifies the user (that should correspond to an Activity) and then forward the insertion request to the BuildingManager, that in order to correctly check if the building can be inserted, it retrieves a list of all buildings and the location, through the MapsServiceServerAdapter, given by the address. At this point if the Building is valid it is persisted. An acknowledgement is sent back to WebApplication.\\
 
 \begin{figure}[H]
  \centering
@@ -192,7 +185,7 @@ An updated version of the class diagram is shown below, with the various types u
 
 \newpage
 \subsection{Selected architectural styles and patterns}
-The architectural style selected is a three-tier client-server architecture, in order to have a good decoupling of logic, data and presentation, increasing reusability, flexibility and scalability. Moreover, components in the application server have to be developed mainly with low coupling among modules in order to make the system more comprehensible and maintainable. About the components, they have been designed to maintain a stateless logic as much as possible, that is, they should not contain an internal state, but refer to the database to get the necessary information. This is important since instances of components can fail and nothing must go lost in this eventuality. In this context the scalability of the database is so important, and DataAccessManager will play a leading role. 
+The architectural style selected is a three-tier client-server architecture, in order to have a good decoupling of logic, data and presentation, increasing reusability, flexibility and scalability. Moreover, components in the application server have to be developed mainly with low coupling among modules in order to make the system more comprehensible and maintainable. About the components, they have been designed to maintain a stateless logic as much as possible, that is, they should not contain an internal state, but refer to the database to get the necessary information. This is important since instances of components can fail and nothing must go lost in this eventuality. In this context the scalability of the database is very important, and DataAccessManager will play a leading role. 
 The protocol used to send requests is HTTP, which is a good choice to implement a RESTful architecture to meet the above objectives of having a stateless and low coupling system. Other advantages are that it would be cacheable and with a uniform interface.
 To ensure a secure and reliable communication between client and server, HTTPS is used with TLS encryption.
 Data are transmitted in JSON, which is one of the simplest and most easily customizable protocol. It is also easy readable and allows fast parsing.\\
