@@ -15,7 +15,7 @@ import java.util.List;
 @Entity
 public class Activity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private int id;
 
@@ -25,11 +25,9 @@ public class Activity {
     @Column(unique = true)
     private String pIva;
 
-    @Column
     private String password;
 
-    @Column
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "activity")
     private List<Building> buildings;
 
     public void setId(int id) {

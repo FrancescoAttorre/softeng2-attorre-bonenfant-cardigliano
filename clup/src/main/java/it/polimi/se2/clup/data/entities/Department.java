@@ -1,14 +1,11 @@
 package it.polimi.se2.clup.data.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Department {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int departmentID;
 
     @Column
@@ -16,6 +13,10 @@ public class Department {
 
     @Column
     private String name;
+
+    @ManyToOne
+    private Building building;
+
     public int getDepartmentID() {
         return departmentID;
     }

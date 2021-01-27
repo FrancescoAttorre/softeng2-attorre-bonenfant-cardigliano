@@ -8,7 +8,7 @@ import java.util.List;
 public class Building {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int buildingID;
 
     @Column
@@ -20,8 +20,10 @@ public class Building {
     @Column
     private int capacity;
 
+    @ManyToOne
+    private Activity activity;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "building")
     private List<Department> departments;
 
     @Column
