@@ -9,6 +9,7 @@
 
 
         <class>it.polimi.se2.clup.data.entities.Activity</class>
+        <class>it.polimi.se2.clup.data.entities.Building</class>
 
         <properties>
             <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>

@@ -13,14 +13,19 @@ public class DataManagerTest {
 
     private static DataManager dm;
 
-    private static EntityManagerFactory emf;
-
     @BeforeAll
     public static void setup() {
 
-        emf = Persistence.createEntityManagerFactory("clupTest");
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("clupTest");
         dm = new DataManager();
         dm.em = emf.createEntityManager();
+
+        dm.em.getTransaction().begin();
+
+        System.out.println("Deleting table Activity");
+        Query q1 = dm.em.createQuery("delete from Activity");
+        q1.executeUpdate();
+        dm.em.getTransaction().commit();
 
     }
 
@@ -42,6 +47,8 @@ public class DataManagerTest {
         Assertions.assertEquals("Esselunga", result.getName());
 
     }
+
+
 
 
 

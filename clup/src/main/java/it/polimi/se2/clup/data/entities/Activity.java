@@ -1,6 +1,7 @@
 package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
+import java.util.List;
 
 @NamedQueries({
         @NamedQuery(name = "Activity.selectWithName",
@@ -24,7 +25,12 @@ public class Activity {
     @Column(unique = true)
     private String pIva;
 
+    @Column
     private String password;
+
+    @Column
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Building> buildings;
 
     public void setId(int id) {
         this.id = id;
