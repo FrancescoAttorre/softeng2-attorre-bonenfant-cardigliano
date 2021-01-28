@@ -9,7 +9,7 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Stateless
-public class UserDaraAccessImpl implements UserDataAccessInt{
+public class UserDataAccessImpl implements UserDataAccessInt{
 
     @PersistenceContext(unitName = "clup")
     protected EntityManager em;
