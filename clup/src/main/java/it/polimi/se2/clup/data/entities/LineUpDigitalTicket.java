@@ -14,12 +14,18 @@ public class LineUpDigitalTicket extends DigitalTicket {
     @Column(unique = true, nullable = false)
     private int number;
 
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "associatedDigitalTicket")
+    private PhysicalTicket associatedPhysicalTicket;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Queue queue;
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date acquisitionTime;
+
+    public PhysicalTicket getAssociatedPhysicalTicket() { return associatedPhysicalTicket;}
+    public void setAssociatedPhysicalTicket(PhysicalTicket associatedPhysicalTicket) { this.associatedPhysicalTicket = associatedPhysicalTicket;}
 
     public int getNumber() {
         return number;

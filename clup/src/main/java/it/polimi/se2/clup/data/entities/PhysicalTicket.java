@@ -11,15 +11,15 @@ public class PhysicalTicket {
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ASSOCIATEDDIGITALTICKET_TICKETID", nullable = false)
-    private DigitalTicket associatedDigitalTicket;
+    private LineUpDigitalTicket associatedDigitalTicket;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private StoreManager storeManager;
 
-    public DigitalTicket getAssociatedDigitalTicket() {
+    public LineUpDigitalTicket getAssociatedDigitalTicket() {
         return associatedDigitalTicket;
     }
-    public void setAssociatedDigitalTicket(DigitalTicket associatedDigitalTicket) {
+    public void setAssociatedDigitalTicket(LineUpDigitalTicket associatedDigitalTicket) {
         this.associatedDigitalTicket = associatedDigitalTicket;
     }
 

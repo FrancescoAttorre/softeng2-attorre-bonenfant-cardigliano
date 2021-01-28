@@ -44,10 +44,12 @@ public class Building {
 
     @Column
     private String accessCode;
-    /*
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy="building")
     private List<StoreManager> managers;
-    */
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy="building")
+    private List<DigitalTicket> tickets;
 
     public String getAddress() {
         return address;
@@ -111,6 +113,23 @@ public class Building {
 
     public void setDepartments(List<Department> departments) {
         this.departments = departments;
+    }
+
+    public List<StoreManager> getManagers() {
+        return managers;
+    }
+
+    public void setManagers(List<StoreManager> managers) {
+        this.managers = managers;
+    }
+
+
+    public List<DigitalTicket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<DigitalTicket> tickets) {
+        this.tickets = tickets;
     }
 
     public Activity getActivity() {

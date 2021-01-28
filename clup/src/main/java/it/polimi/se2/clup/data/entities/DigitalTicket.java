@@ -1,7 +1,6 @@
 package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 @Entity
@@ -14,14 +13,11 @@ public class DigitalTicket {
     @Enumerated(EnumType.STRING)
     private TicketState state;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "associatedDigitalTicket")
-    private PhysicalTicket associatedPhysicalTicket;
-
     @ManyToOne(fetch = FetchType.EAGER)
     private AppCustomer ownerCustomer;
 
-    public PhysicalTicket getAssociatedPhysicalTicket() { return associatedPhysicalTicket;}
-    public void setAssociatedPhysicalTicket(PhysicalTicket associatedPhysicalTicket) { this.associatedPhysicalTicket = associatedPhysicalTicket;}
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Building building;
 
     public AppCustomer getOwnerCustomer() { return ownerCustomer;}
     public void setOwnerCustomer (AppCustomer ownerCustomer) { this.ownerCustomer = ownerCustomer;}
@@ -29,8 +25,14 @@ public class DigitalTicket {
     public TicketState getState() {
         return state;
     }
-
     public void setState(TicketState state) {
         this.state = state;
+    }
+
+    public Building getBuilding() {
+        return building;
+    }
+    public void setBuilding(Building building) {
+        this.building = building;
     }
 }
