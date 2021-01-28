@@ -25,6 +25,9 @@ public class BookingDigitalTicket extends DigitalTicket{
     @ManyToOne(fetch = FetchType.EAGER)
     private RegisteredAppCustomer ownerCustomer;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private TimeSlot timeSlot;
+
     public Time getArrivalTime() { return arrivalTime;}
     public void setArrivalTime (Time arrivalTime) { this.arrivalTime = arrivalTime;}
 
@@ -33,6 +36,10 @@ public class BookingDigitalTicket extends DigitalTicket{
 
     public Time getPermanenceTime() { return permanenceTime;}
     public void setPermanenceTime (Time permanenceTime) { this.permanenceTime = permanenceTime;}
+
+    public TimeSlot getTimeSlot() { return timeSlot;}
+    public void setTimeSlot (TimeSlot timeSlot) { this.timeSlot = timeSlot;}
+
 
     //???
     public RegisteredAppCustomer getOwnerCustomer() { return ownerCustomer;}

@@ -1,6 +1,7 @@
 package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 @Entity
@@ -8,10 +9,7 @@ public class DigitalTicket {
 
     @Id
     @Column(unique = true, nullable = false)
-    private String ticketID;        //string in class diagram to distinguish between physical and not (?)
-
-    @Column
-    private int UserID;
+    private int ticketID;
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "associatedDigitalTicket")
     private PhysicalTicket associatedPhysicalTicket;

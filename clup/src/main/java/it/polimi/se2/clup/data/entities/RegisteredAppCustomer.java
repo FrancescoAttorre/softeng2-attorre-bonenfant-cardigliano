@@ -7,7 +7,7 @@ import javax.persistence.*;
         @NamedQuery(name = "RegisteredAppCustomer.findUserByUsernameAndPassword", query = "SELECT u FROM RegisteredAppCustomer u WHERE u.username = :username AND u.password = :password"),
         @NamedQuery(name = "RegisteredAppCustomer.findUserByUsername", query = "SELECT u FROM RegisteredAppCustomer u WHERE u.username = :username"),
 })
-public class RegisteredAppCustomer extends AppCustomer{
+public class RegisteredAppCustomer extends AppCustomer {
 
     @Column(unique = true, nullable = false)
     private String username;

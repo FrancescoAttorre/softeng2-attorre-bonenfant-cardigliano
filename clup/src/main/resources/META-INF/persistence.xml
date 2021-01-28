@@ -18,7 +18,8 @@
         <class>it.polimi.se2.clup.data.entities.PhysicalTicket</class>
         <class>it.polimi.se2.clup.data.entities.LineUpDigitalTicket</class>
         <class>it.polimi.se2.clup.data.entities.BookingDigitalTicket</class>
-
+        <class>it.polimi.se2.clup.data.entities.Queue</class>
+        <class>it.polimi.se2.clup.data.entities.TimeSlot</class>
 
         <properties>
             <property name="eclipselink.logging.level" value="SEVERE" />
@@ -43,6 +44,8 @@
         <class>it.polimi.se2.clup.data.entities.PhysicalTicket</class>
         <class>it.polimi.se2.clup.data.entities.LineUpDigitalTicket</class>
         <class>it.polimi.se2.clup.data.entities.BookingDigitalTicket</class>
+        <class>it.polimi.se2.clup.data.entities.Queue</class>
+        <class>it.polimi.se2.clup.data.entities.TimeSlot</class>
 
         <properties>
             <property name="javax.persistence.transactionType" value="RESOURCE_LOCAL"/>

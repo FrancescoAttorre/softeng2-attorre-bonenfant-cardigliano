@@ -7,9 +7,10 @@ public class PhysicalTicket {
 
     @Id
     @Column(unique = true, nullable = false)
-    private String number;
+    private int number;
 
     @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ASSOCIATEDDIGITALTICKET_TICKETID", nullable = false)
     private DigitalTicket associatedDigitalTicket;
 
     @ManyToOne(fetch = FetchType.EAGER)

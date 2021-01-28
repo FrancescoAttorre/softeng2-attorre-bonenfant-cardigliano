@@ -10,8 +10,8 @@ import java.util.List;
                 query = "select a from Activity a where a.pIva = :pIva"),
         @NamedQuery(name = "Activity.selectAll",
                 query = "select a from Activity a")
-
 })
+
 @Entity
 public class Activity {
     @Id
