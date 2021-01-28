@@ -20,6 +20,8 @@ public class Building {
     @Column
     private int capacity;
 
+    @OneToOne
+    private Queue queue;
 
     @ManyToOne
     private Activity activity;
@@ -121,5 +123,13 @@ public class Building {
 
     public void setState(BuildingState state) {
         this.state = state;
+    }
+
+    public Queue getQueue() {
+        return queue;
+    }
+
+    public void setQueue(Queue queue) {
+        this.queue = queue;
     }
 }

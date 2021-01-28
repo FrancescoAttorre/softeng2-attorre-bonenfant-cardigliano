@@ -11,6 +11,9 @@ public class DigitalTicket {
     @Column(unique = true, nullable = false)
     private int ticketID;
 
+    @Enumerated(EnumType.STRING)
+    private TicketState state;
+
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "associatedDigitalTicket")
     private PhysicalTicket associatedPhysicalTicket;
 
@@ -22,4 +25,12 @@ public class DigitalTicket {
 
     public AppCustomer getOwnerCustomer() { return ownerCustomer;}
     public void setOwnerCustomer (AppCustomer ownerCustomer) { this.ownerCustomer = ownerCustomer;}
+
+    public TicketState getState() {
+        return state;
+    }
+
+    public void setState(TicketState state) {
+        this.state = state;
+    }
 }
