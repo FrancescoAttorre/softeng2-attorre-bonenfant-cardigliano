@@ -20,11 +20,12 @@ public class Building {
     @Column
     private int capacity;
 
-    @OneToOne
-    private Queue queue;
 
     @ManyToOne
     private Activity activity;
+
+    @Enumerated(EnumType.STRING)
+    private BuildingState state;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "building")
     private List<Department> departments;
@@ -106,11 +107,19 @@ public class Building {
         this.departments = departments;
     }
 
-    public Queue getQueue() {
-        return queue;
+    public Activity getActivity() {
+        return activity;
     }
 
-    public void setQueue(Queue queue) {
-        this.queue = queue;
+    public void setActivity(Activity activity) {
+        this.activity = activity;
+    }
+
+    public BuildingState getState() {
+        return state;
+    }
+
+    public void setState(BuildingState state) {
+        this.state = state;
     }
 }

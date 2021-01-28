@@ -10,15 +10,15 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
-public class DataManagerTest {
+public class UserDataAccessImplTest {
 
-    private static DataManager dm;
+    private static UserDataAccessImpl dm;
 
     @BeforeAll
     public static void setup() {
 
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("clupTest");
-        dm = new DataManager();
+        dm = new UserDataAccessImpl();
         dm.em = emf.createEntityManager();
 
         dm.em.getTransaction().begin();
