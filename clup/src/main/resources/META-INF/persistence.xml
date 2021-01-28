@@ -14,6 +14,10 @@
         <class>it.polimi.se2.clup.data.entities.AppCustomer</class>
         <class>it.polimi.se2.clup.data.entities.RegisteredAppCustomer</class>
         <class>it.polimi.se2.clup.data.entities.StoreManager</class>
+        <class>it.polimi.se2.clup.data.entities.DigitalTicket</class>
+        <class>it.polimi.se2.clup.data.entities.PhysicalTicket</class>
+        <class>it.polimi.se2.clup.data.entities.LineUpDigitalTicket</class>
+        <class>it.polimi.se2.clup.data.entities.BookingDigitalTicket</class>
 
 
         <properties>
@@ -23,7 +27,7 @@
             <property name="eclipselink.drop-ddl-jdbc-file-name" value="dropDDL_ddlGeneration.jdbc"/>
             <property name="eclipselink.ddl-generation.output-mode" value="database"/>
 
-            </properties>
+        </properties>
     </persistence-unit>
 
     <persistence-unit name="clupTest">
@@ -35,6 +39,10 @@
         <class>it.polimi.se2.clup.data.entities.AppCustomer</class>
         <class>it.polimi.se2.clup.data.entities.RegisteredAppCustomer</class>
         <class>it.polimi.se2.clup.data.entities.StoreManager</class>
+        <class>it.polimi.se2.clup.data.entities.DigitalTicket</class>
+        <class>it.polimi.se2.clup.data.entities.PhysicalTicket</class>
+        <class>it.polimi.se2.clup.data.entities.LineUpDigitalTicket</class>
+        <class>it.polimi.se2.clup.data.entities.BookingDigitalTicket</class>
 
         <properties>
             <property name="javax.persistence.transactionType" value="RESOURCE_LOCAL"/>
