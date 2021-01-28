@@ -2,7 +2,6 @@ package it.polimi.se2.clup.data;
 
 import it.polimi.se2.clup.data.entities.Activity;
 import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
-import it.polimi.se2.clup.data.entities.User;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -10,7 +9,7 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Stateless
-public class DataManager implements UserDataAccessInt{
+public class UserDaraAccessImpl implements UserDataAccessInt{
 
     @PersistenceContext(unitName = "clup")
     protected EntityManager em;

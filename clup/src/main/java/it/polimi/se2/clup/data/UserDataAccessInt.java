@@ -11,4 +11,5 @@ public interface UserDataAccessInt {
     void insertUser(String username, String password);
     void insertActivity(String name, String pIva, String password);
     void retrieveUser(String pIva);
+    //TODO manca retrieveActivity nel DD
 }
