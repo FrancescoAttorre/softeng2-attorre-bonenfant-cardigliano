@@ -5,10 +5,9 @@ import it.polimi.se2.clup.data.entities.Activity;
 import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.function.Executable;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
+import javax.persistence.*;
 
 public class UserDataAccessImplTest {
 
@@ -25,7 +24,9 @@ public class UserDataAccessImplTest {
 
         System.out.println("Deleting table Activity");
         Query q1 = dm.em.createQuery("delete from Activity");
+        Query q2 = dm.em.createQuery("delete from RegisteredAppCustomer");
         q1.executeUpdate();
+        q2.executeUpdate();
         dm.em.getTransaction().commit();
 
     }
@@ -59,13 +60,12 @@ public class UserDataAccessImplTest {
 
         dm.em.getTransaction().commit();
 
-        RegisteredAppCustomer registeredAppCustomer = dm.em.createNamedQuery("RegisteredAppCustomer.findUserByUsernameAndPassword", RegisteredAppCustomer.class)
+        RegisteredAppCustomer registeredAppCustomer = dm.em.createNamedQuery("RegisteredAppCustomer.checkCredentials", RegisteredAppCustomer.class)
                 .setParameter("username", "firstUser").setParameter("password","firstPassword").getSingleResult();
 
         Assertions.assertEquals("firstUser",registeredAppCustomer.getUsername());
         Assertions.assertEquals("firstPassword",registeredAppCustomer.getPassword());
 
     }
-
 
 }

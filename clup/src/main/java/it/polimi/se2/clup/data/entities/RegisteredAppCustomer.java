@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 @Entity
 @NamedQueries({
-        @NamedQuery(name = "RegisteredAppCustomer.findUserByUsernameAndPassword", query = "SELECT u FROM RegisteredAppCustomer u WHERE u.username = :username AND u.password = :password"),
+        @NamedQuery(name = "RegisteredAppCustomer.checkCredentials", query = "SELECT u FROM RegisteredAppCustomer u WHERE u.username = :username AND u.password = :password"),
         @NamedQuery(name = "RegisteredAppCustomer.findUserByUsername", query = "SELECT u FROM RegisteredAppCustomer u WHERE u.username = :username"),
 })
 public class RegisteredAppCustomer extends AppCustomer {

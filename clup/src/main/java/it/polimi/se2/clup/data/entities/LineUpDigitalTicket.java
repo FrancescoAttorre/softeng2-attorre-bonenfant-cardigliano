@@ -1,6 +1,7 @@
 package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -15,6 +16,10 @@ public class LineUpDigitalTicket extends DigitalTicket {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Queue queue;
+
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date acquisitionTime;
 
     public int getNumber() {
         return number;

@@ -4,6 +4,9 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(name = "Queue.selectQueueWithBuildingId", query = "SELECT q FROM Queue q WHERE q.building = :buildingId"),
+})
 public class Queue {
     @Id
     @OneToOne

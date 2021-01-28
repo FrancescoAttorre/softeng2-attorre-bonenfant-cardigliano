@@ -5,6 +5,10 @@ import java.sql.Time;
 import java.util.List;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(name = "Building.retrieveBuildingById", query = "SELECT u FROM Building u WHERE u.id = :buildingId "),
+        @NamedQuery(name = "Building.findAll", query = "SELECT b FROM Building b"),
+})
 public class Building {
 
     @Id
