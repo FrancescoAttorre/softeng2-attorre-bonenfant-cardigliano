@@ -2,6 +2,7 @@ package it.polimi.se2.clup.data;
 
 
 import it.polimi.se2.clup.data.entities.Activity;
+import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Assertions;
 
@@ -49,7 +50,22 @@ public class DataManagerTest {
     }
 
 
+    @Test
+    public void insertRegisteredAppCustomer() {
 
+        dm.em.getTransaction().begin();
+
+        dm.insertUser("firstUser", "firstPassword");
+
+        dm.em.getTransaction().commit();
+
+        RegisteredAppCustomer registeredAppCustomer = dm.em.createNamedQuery("RegisteredAppCustomer.findUserByUsernameAndPassword", RegisteredAppCustomer.class)
+                .setParameter("username", "firstUser").setParameter("password","firstPassword").getSingleResult();
+
+        Assertions.assertEquals("firstUser",registeredAppCustomer.getUsername());
+        Assertions.assertEquals("firstPassword",registeredAppCustomer.getPassword());
+
+    }
 
 
 }

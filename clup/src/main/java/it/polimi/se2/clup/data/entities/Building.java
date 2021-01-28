@@ -9,7 +9,7 @@ public class Building {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int buildingID;
+    private int id;
 
     @Column
     private String name;
@@ -34,6 +34,10 @@ public class Building {
 
     @Column
     private String accessCode;
+    /*
+    @OneToMany(fetch = FetchType.LAZY, mappedBy="building")
+    private List<StoreManager> managers;
+    */
 
     public String getAddress() {
         return address;
@@ -84,11 +88,11 @@ public class Building {
     }
 
     public void setBuildingID(int buildingID) {
-        this.buildingID = buildingID;
+        this.id = buildingID;
     }
 
     public int getBuildingID() {
-        return buildingID;
+        return id;
     }
 
     public List<Department> getDepartments() {

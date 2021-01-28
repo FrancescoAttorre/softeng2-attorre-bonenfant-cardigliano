@@ -1,10 +1,13 @@
 package it.polimi.se2.clup.data;
 
 import it.polimi.se2.clup.data.entities.Activity;
+import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
+import it.polimi.se2.clup.data.entities.User;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 @Stateless
 public class DataManager implements UserDataAccessInt{
@@ -13,7 +16,12 @@ public class DataManager implements UserDataAccessInt{
     protected EntityManager em;
 
     @Override
-    public void retrieveUser(String username, String password) {
+    public RegisteredAppCustomer retrieveUser(String username, String password) {
+
+        return em.createNamedQuery("RegisteredAppCustomer.findUserByUsernameAndPassword", RegisteredAppCustomer.class)
+                .setParameter("username", username)
+                .setParameter("password", password)
+                .getSingleResult();
 
     }
 
@@ -24,6 +32,18 @@ public class DataManager implements UserDataAccessInt{
 
     @Override
     public void insertUser(String username, String password) {
+        RegisteredAppCustomer appCustomer = new RegisteredAppCustomer();
+        appCustomer.setUsername(username);
+        appCustomer.setPassword(password);
+
+        List<RegisteredAppCustomer> users;
+
+        users = em.createNamedQuery("RegisteredAppCustomer.findUserByUsername",RegisteredAppCustomer.class)
+                .setParameter("username",username)
+                .getResultList();
+
+        if(users.isEmpty())
+            em.persist(appCustomer);
 
     }
 

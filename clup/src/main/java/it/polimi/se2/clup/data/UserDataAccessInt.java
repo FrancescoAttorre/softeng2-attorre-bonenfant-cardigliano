@@ -1,10 +1,12 @@
 package it.polimi.se2.clup.data;
 
+import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
+
 import javax.ejb.Local;
 
 @Local
 public interface UserDataAccessInt {
-    void retrieveUser(String username, String password);
+    RegisteredAppCustomer retrieveUser(String username, String password);
     void insertAccess(String token); //TODO rivedere
     void insertUser(String username, String password);
     void insertActivity(String name, String pIva, String password);
