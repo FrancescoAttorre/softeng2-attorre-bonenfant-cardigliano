@@ -30,9 +30,6 @@ public class Building {
     @ManyToOne
     private Activity activity;
 
-    @Enumerated(EnumType.STRING)
-    private BuildingState state;
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "building")
     private List<Department> departments;
 
@@ -50,6 +47,21 @@ public class Building {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy="building")
     private List<DigitalTicket> tickets;
+
+    @Column
+    private int actualCapacity;
+
+    public int getActualCapacity() {
+        return actualCapacity;
+    }
+
+    public void increaseActualCapacity(){
+        this.actualCapacity++;
+    }
+
+    public void setActualCapacity(int actualCapacity) {
+        this.actualCapacity = actualCapacity;
+    }
 
     public String getAddress() {
         return address;
@@ -138,14 +150,6 @@ public class Building {
 
     public void setActivity(Activity activity) {
         this.activity = activity;
-    }
-
-    public BuildingState getState() {
-        return state;
-    }
-
-    public void setState(BuildingState state) {
-        this.state = state;
     }
 
     public Queue getQueue() {

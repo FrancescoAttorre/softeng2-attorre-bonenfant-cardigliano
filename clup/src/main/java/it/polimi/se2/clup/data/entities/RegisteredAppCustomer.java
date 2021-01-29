@@ -1,19 +1,56 @@
 package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @NamedQueries({
         @NamedQuery(name = "RegisteredAppCustomer.checkCredentials", query = "SELECT u FROM RegisteredAppCustomer u WHERE u.username = :username AND u.password = :password"),
         @NamedQuery(name = "RegisteredAppCustomer.findUserByUsername", query = "SELECT u FROM RegisteredAppCustomer u WHERE u.username = :username"),
 })
-public class RegisteredAppCustomer extends AppCustomer {
+public class RegisteredAppCustomer extends User {
 
     @Column(unique = true, nullable = false)
     private String username;
 
     @Column
     private String password;
+
+    @Column
+    private String position;
+
+    @Column
+    private boolean GPSPreference;
+
+    @Column
+    private String meansOfTransport;
+
+
+
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+    public boolean isGPSPreference() {
+        return GPSPreference;
+    }
+
+    public void setGPSPreference(boolean GPSPreference) {
+        this.GPSPreference = GPSPreference;
+    }
+
+    public String getMeansOfTransport() {
+        return meansOfTransport;
+    }
+
+    public void setMeansOfTransport(String meansOfTransport) {
+        this.meansOfTransport = meansOfTransport;
+    }
 
     public RegisteredAppCustomer() {
         super();

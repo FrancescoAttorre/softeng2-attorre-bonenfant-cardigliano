@@ -16,10 +16,12 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
     }
 
     @Override
-    public BuildingState retrieveBuildingState(int id) throws NoResultException,NonUniqueResultException{
-        return em.createNamedQuery("Building.retrieveBuildingById", Building.class)
+    public boolean retrieveBuildingState(int id) throws NoResultException,NonUniqueResultException{
+        Building building =  em.createNamedQuery("Building.retrieveBuildingById", Building.class)
                 .setParameter("buildingId",id)
-                .getSingleResult().getState();
+                .getSingleResult();
+
+        return (building.getCapacity() - building.getActualCapacity()) > 0;
 
     }
 

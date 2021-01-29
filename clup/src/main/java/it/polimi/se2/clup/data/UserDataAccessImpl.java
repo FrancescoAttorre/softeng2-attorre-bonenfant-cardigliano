@@ -2,9 +2,11 @@ package it.polimi.se2.clup.data;
 
 import it.polimi.se2.clup.data.entities.Activity;
 import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
+import it.polimi.se2.clup.data.entities.UnregisteredAppCustomer;
 
 import javax.ejb.Stateless;
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Stateless
@@ -47,5 +49,17 @@ public class UserDataAccessImpl implements UserDataAccessInt{
         return  em.createNamedQuery("Activity.selectWithPIVA", Activity.class)
                 .setParameter("pIva", pIva)
                 .getSingleResult();
+    }
+
+    @Override
+    public UnregisteredAppCustomer retrieveUnregisteredAppCustomer(int userId) {
+        return em.find(UnregisteredAppCustomer.class,userId);
+    }
+
+    @Override
+    public void insertUnregisteredAppCustomer() {
+        UnregisteredAppCustomer customer = new UnregisteredAppCustomer();
+        customer.setDate(new Date());
+        em.persist(customer);
     }
 }

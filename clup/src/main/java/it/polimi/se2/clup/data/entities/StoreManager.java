@@ -3,6 +3,7 @@ package it.polimi.se2.clup.data.entities;
 import javax.persistence.*;
 import java.util.List;
 
+@DiscriminatorValue("STORE_MANAGER")
 @Entity
 public class StoreManager extends User {
 

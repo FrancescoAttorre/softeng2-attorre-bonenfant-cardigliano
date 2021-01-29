@@ -11,7 +11,6 @@
         <class>it.polimi.se2.clup.data.entities.Building</class>
         <class>it.polimi.se2.clup.data.entities.Department</class>
         <class>it.polimi.se2.clup.data.entities.User</class>
-        <class>it.polimi.se2.clup.data.entities.AppCustomer</class>
         <class>it.polimi.se2.clup.data.entities.RegisteredAppCustomer</class>
         <class>it.polimi.se2.clup.data.entities.StoreManager</class>
         <class>it.polimi.se2.clup.data.entities.DigitalTicket</class>
@@ -20,6 +19,7 @@
         <class>it.polimi.se2.clup.data.entities.BookingDigitalTicket</class>
         <class>it.polimi.se2.clup.data.entities.Queue</class>
         <class>it.polimi.se2.clup.data.entities.TimeSlot</class>
+        <class>it.polimi.se2.clup.data.entities.UnregisteredAppCustomer</class>
 
         <properties>
             <property name="eclipselink.logging.level" value="SEVERE" />
@@ -37,7 +37,6 @@
         <class>it.polimi.se2.clup.data.entities.Building</class>
         <class>it.polimi.se2.clup.data.entities.Department</class>
         <class>it.polimi.se2.clup.data.entities.User</class>
-        <class>it.polimi.se2.clup.data.entities.AppCustomer</class>
         <class>it.polimi.se2.clup.data.entities.RegisteredAppCustomer</class>
         <class>it.polimi.se2.clup.data.entities.StoreManager</class>
         <class>it.polimi.se2.clup.data.entities.DigitalTicket</class>
@@ -46,6 +45,7 @@
         <class>it.polimi.se2.clup.data.entities.BookingDigitalTicket</class>
         <class>it.polimi.se2.clup.data.entities.Queue</class>
         <class>it.polimi.se2.clup.data.entities.TimeSlot</class>
+        <class>it.polimi.se2.clup.data.entities.UnregisteredAppCustomer</class>
 
         <properties>
             <property name="javax.persistence.transactionType" value="RESOURCE_LOCAL"/>

@@ -3,15 +3,23 @@ package it.polimi.se2.clup.data.entities;
 import javax.persistence.*;
 import java.util.List;
 
-@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
-@MappedSuperclass
+@Inheritance(strategy=InheritanceType.JOINED)
 @Entity
-public abstract class User {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    public abstract List<DigitalTicket> getDigitalTickets();
-    public abstract void setDigitalTickets(List<DigitalTicket> digitalTickets);
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<DigitalTicket> digitalTickets;
+
+
+    public List<DigitalTicket> getDigitalTickets() {
+        return digitalTickets;
+    }
+
+    public void setDigitalTickets(List<DigitalTicket> digitalTickets) {
+        this.digitalTickets = digitalTickets;
+    }
 }

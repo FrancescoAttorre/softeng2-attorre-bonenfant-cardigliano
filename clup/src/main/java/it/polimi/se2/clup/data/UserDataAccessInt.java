@@ -2,6 +2,7 @@ package it.polimi.se2.clup.data;
 
 import it.polimi.se2.clup.data.entities.Activity;
 import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
+import it.polimi.se2.clup.data.entities.UnregisteredAppCustomer;
 
 import javax.ejb.Local;
 
@@ -12,4 +13,7 @@ public interface UserDataAccessInt {
     void insertActivity(String name, String pIva, String password);
     Activity retrieveUser(String pIva);
     //TODO manca retrieveActivity nel DD
+
+    UnregisteredAppCustomer retrieveUnregisteredAppCustomer(int userId);
+    void insertUnregisteredAppCustomer();
 }

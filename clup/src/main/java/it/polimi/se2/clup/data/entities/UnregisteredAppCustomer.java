@@ -1,10 +1,18 @@
 package it.polimi.se2.clup.data.entities;
 
+
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
+@Entity
+@NamedQueries({
+        @NamedQuery(name = "UnregisteredAppCustomer.selectAll", query = "SELECT u FROM UnregisteredAppCustomer u "),
+})
+public class UnregisteredAppCustomer extends User{
 
-public class AppCustomer extends User{
+    @Temporal(TemporalType.DATE)
+    private Date date;
 
     @Column
     private String position;
@@ -15,11 +23,14 @@ public class AppCustomer extends User{
     @Column
     private String meansOfTransport;
 
-    public AppCustomer() {
+
+    public Date getDate() {
+        return date;
     }
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<DigitalTicket> digitalTickets;
+    public void setDate(Date date) {
+        this.date = date;
+    }
 
     public String getPosition() {
         return position;
@@ -33,8 +44,8 @@ public class AppCustomer extends User{
         return GPSPreference;
     }
 
-    public void setGPSPreference(boolean GPSpreference) {
-        this.GPSPreference = GPSpreference;
+    public void setGPSPreference(boolean GPSPreference) {
+        this.GPSPreference = GPSPreference;
     }
 
     public String getMeansOfTransport() {
@@ -43,13 +54,5 @@ public class AppCustomer extends User{
 
     public void setMeansOfTransport(String meansOfTransport) {
         this.meansOfTransport = meansOfTransport;
-    }
-
-    public List<DigitalTicket> getDigitalTickets() {
-        return digitalTickets;
-    }
-
-    public void setDigitalTickets(List<DigitalTicket> digitalTickets) {
-        this.digitalTickets = digitalTickets;
     }
 }

@@ -41,6 +41,6 @@ public class BookingDigitalTicket extends DigitalTicket{
     public void setTimeSlot (TimeSlot timeSlot) { this.timeSlot = timeSlot;}
 
 
-    public RegisteredAppCustomer getOwner() { return owner;}
+    public User getOwner() { return owner;}
     public void setOwner(RegisteredAppCustomer ownerCustomer) { this.owner = ownerCustomer;}
 }
