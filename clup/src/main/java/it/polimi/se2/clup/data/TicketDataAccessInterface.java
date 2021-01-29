@@ -4,6 +4,7 @@ import it.polimi.se2.clup.data.entities.BookingDigitalTicket;
 import it.polimi.se2.clup.data.entities.LineUpDigitalTicket;
 import it.polimi.se2.clup.data.entities.TicketState;
 
+import java.util.Date;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -17,5 +18,7 @@ public interface TicketDataAccessInterface {
     List<LineUpDigitalTicket> retrieveLineUpTicketsRegCustomer(int userID);
     List<BookingDigitalTicket> retrieveBookingTicketsRegCustomer(int userID);
     List<LineUpDigitalTicket> retrieveTicketsUnregisteredCustomer(int userID);
-    List<LineUpDigitalTicket> retrieveDigitalTicketsStoreManager(int userID);
+    List<LineUpDigitalTicket> retrieveLineUpTicketsStoreManager(int userID);
+
+    Date retrieveAcquisitionTime (LineUpDigitalTicket lineUpTicket);
 }

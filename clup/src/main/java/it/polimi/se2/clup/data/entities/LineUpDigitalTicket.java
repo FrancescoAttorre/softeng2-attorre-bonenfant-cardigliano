@@ -2,6 +2,7 @@ package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.time.Duration;
 
 @Entity
 public class LineUpDigitalTicket extends DigitalTicket {
@@ -28,6 +29,9 @@ public class LineUpDigitalTicket extends DigitalTicket {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private StoreManager storeManagerOwner;
+
+    @Column
+    private Duration estimatedWaitingTime;
 
     public PhysicalTicket getAssociatedPhysicalTicket() { return associatedPhysicalTicket;}
     public void setAssociatedPhysicalTicket(PhysicalTicket associatedPhysicalTicket) { this.associatedPhysicalTicket = associatedPhysicalTicket;}
@@ -69,5 +73,13 @@ public class LineUpDigitalTicket extends DigitalTicket {
 
     public void setAcquisitionTime(Date acquisitionTime) {
         this.acquisitionTime = acquisitionTime;
+    }
+
+    public Duration getEstimatedWaitingTime() {
+        return estimatedWaitingTime;
+    }
+
+    public void setEstimatedWaitingTime(Duration estimatedWaitingTime) {
+        this.estimatedWaitingTime = estimatedWaitingTime;
     }
 }

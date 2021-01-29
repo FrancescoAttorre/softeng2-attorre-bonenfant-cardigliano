@@ -5,6 +5,7 @@ import it.polimi.se2.clup.data.entities.*;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import java.util.Date;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -107,8 +108,13 @@ public class TicketDataAccess implements TicketDataAccessInterface {
     }
 
     @Override
-    public List<LineUpDigitalTicket> retrieveDigitalTicketsStoreManager(int userID) throws NoResultException {
+    public List<LineUpDigitalTicket> retrieveLineUpTicketsStoreManager(int userID) throws NoResultException {
         StoreManager storeManager = em.find(StoreManager.class, userID);
         return storeManager.getLineUpDigitalTickets();
+    }
+
+    @Override
+    public Date retrieveAcquisitionTime(LineUpDigitalTicket lineUpTicket) {
+        return lineUpTicket.getAcquisitionTime();
     }
 }
