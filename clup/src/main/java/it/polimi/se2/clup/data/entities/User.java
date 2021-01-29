@@ -13,13 +13,4 @@ public class User {
 
     @OneToMany(fetch = FetchType.LAZY)
     private List<DigitalTicket> digitalTickets;
-
-
-    public List<DigitalTicket> getDigitalTickets() {
-        return digitalTickets;
-    }
-
-    public void setDigitalTickets(List<DigitalTicket> digitalTickets) {
-        this.digitalTickets = digitalTickets;
-    }
 }

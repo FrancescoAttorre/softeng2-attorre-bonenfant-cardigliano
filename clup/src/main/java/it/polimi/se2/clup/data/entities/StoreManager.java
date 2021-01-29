@@ -14,8 +14,8 @@ public class StoreManager extends User {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "storeManager")
     private List<PhysicalTicket> physicalTickets;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<DigitalTicket> digitalTickets;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "storeManagerOwner")
+    private List<LineUpDigitalTicket> lineUpDigitalTickets;
 
     public Building getBuilding() {
         return building;
@@ -31,10 +31,10 @@ public class StoreManager extends User {
         this.physicalTickets = physicalTickets;
     }
 
-    public List<DigitalTicket> getDigitalTickets() {
-        return digitalTickets;
+    public List<LineUpDigitalTicket> getLineUpDigitalTickets() {
+        return lineUpDigitalTickets;
     }
-    public void setDigitalTickets(List<DigitalTicket> digitalTickets) {
-        this.digitalTickets = digitalTickets;
+    public void setLineUpDigitalTickets(List<LineUpDigitalTicket> digitalTickets) {
+        this.lineUpDigitalTickets = digitalTickets;
     }
 }

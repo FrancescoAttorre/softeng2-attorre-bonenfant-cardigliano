@@ -23,6 +23,8 @@ public class UnregisteredAppCustomer extends User{
     @Column
     private String meansOfTransport;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "unregisteredOwner")
+    private List<LineUpDigitalTicket> lineUpDigitalTickets;
 
     public Date getDate() {
         return date;
@@ -54,5 +56,13 @@ public class UnregisteredAppCustomer extends User{
 
     public void setMeansOfTransport(String meansOfTransport) {
         this.meansOfTransport = meansOfTransport;
+    }
+
+    public List<LineUpDigitalTicket> getLineUpDigitalTickets() {
+        return lineUpDigitalTickets;
+    }
+
+    public void setLineUpDigitalTickets(List<LineUpDigitalTicket> digitalTickets) {
+        this.lineUpDigitalTickets = digitalTickets;
     }
 }

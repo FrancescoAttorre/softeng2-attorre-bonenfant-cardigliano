@@ -18,9 +18,6 @@ public class AppCustomer extends User{
     public AppCustomer() {
     }
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<DigitalTicket> digitalTickets;
-
     public String getPosition() {
         return position;
     }
@@ -43,13 +40,5 @@ public class AppCustomer extends User{
 
     public void setMeansOfTransport(String meansOfTransport) {
         this.meansOfTransport = meansOfTransport;
-    }
-
-    public List<DigitalTicket> getDigitalTickets() {
-        return digitalTickets;
-    }
-
-    public void setDigitalTickets(List<DigitalTicket> digitalTickets) {
-        this.digitalTickets = digitalTickets;
     }
 }

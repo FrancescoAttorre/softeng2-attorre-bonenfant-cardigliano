@@ -10,8 +10,9 @@ public class LineUpDigitalTicket extends DigitalTicket {
         super();
     }
 
-    @Column(unique = true, nullable = false)
-    private int number;
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date acquisitionTime;
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "associatedDigitalTicket")
     private PhysicalTicket associatedPhysicalTicket;
@@ -19,22 +20,17 @@ public class LineUpDigitalTicket extends DigitalTicket {
     @ManyToOne(fetch = FetchType.LAZY)
     private Queue queue;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    private User owner;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private UnregisteredAppCustomer unregisteredOwner;
 
-    @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date acquisitionTime;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private RegisteredAppCustomer registeredOwner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private StoreManager storeManagerOwner;
 
     public PhysicalTicket getAssociatedPhysicalTicket() { return associatedPhysicalTicket;}
     public void setAssociatedPhysicalTicket(PhysicalTicket associatedPhysicalTicket) { this.associatedPhysicalTicket = associatedPhysicalTicket;}
-
-    public int getNumber() {
-        return number;
-    }
-    public void setNumber(int number) {
-        this.number = number;
-    }
 
     public Queue getQueue() {
         return queue;
@@ -43,6 +39,35 @@ public class LineUpDigitalTicket extends DigitalTicket {
         this.queue = queue;
     }
 
-    public User getOwner() { return owner;}
-    public void setOwner(User ownerCustomer) { this.owner = ownerCustomer;}
+    public UnregisteredAppCustomer getUnregisteredOwner() {
+        return unregisteredOwner;
+    }
+
+    public void setUnregisteredOwner(UnregisteredAppCustomer unregisteredOwner) {
+        this.unregisteredOwner = unregisteredOwner;
+    }
+
+    public RegisteredAppCustomer getRegisteredOwner() {
+        return registeredOwner;
+    }
+
+    public void setRegisteredOwner(RegisteredAppCustomer registeredOwner) {
+        this.registeredOwner = registeredOwner;
+    }
+
+    public StoreManager getStoreManagerOwner() {
+        return storeManagerOwner;
+    }
+
+    public void setStoreManagerOwner(StoreManager storeManagerOwner) {
+        this.storeManagerOwner = storeManagerOwner;
+    }
+
+    public Date getAcquisitionTime() {
+        return acquisitionTime;
+    }
+
+    public void setAcquisitionTime(Date acquisitionTime) {
+        this.acquisitionTime = acquisitionTime;
+    }
 }

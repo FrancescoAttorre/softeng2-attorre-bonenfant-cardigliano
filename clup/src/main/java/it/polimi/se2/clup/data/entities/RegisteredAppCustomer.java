@@ -16,6 +16,12 @@ public class RegisteredAppCustomer extends User {
     @Column
     private String password;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "registeredOwner")
+    private List<LineUpDigitalTicket> lineUpDigitalTickets;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")
+    private List<BookingDigitalTicket> bookingDigitalTickets;
+
     @Column
     private String position;
 
@@ -24,8 +30,6 @@ public class RegisteredAppCustomer extends User {
 
     @Column
     private String meansOfTransport;
-
-
 
 
     public String getPosition() {
@@ -70,5 +74,21 @@ public class RegisteredAppCustomer extends User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<LineUpDigitalTicket> getLineUpDigitalTickets() {
+        return lineUpDigitalTickets;
+    }
+
+    public void setLineUpDigitalTickets(List<LineUpDigitalTicket> digitalTickets) {
+        this.lineUpDigitalTickets = digitalTickets;
+    }
+
+    public List<BookingDigitalTicket> getBookingDigitalTickets() {
+        return bookingDigitalTickets;
+    }
+
+    public void setBookingDigitalTickets(List<BookingDigitalTicket> bookingDigitalTickets) {
+        this.bookingDigitalTickets = bookingDigitalTickets;
     }
 }

@@ -3,9 +3,9 @@ package it.polimi.se2.clup.data;
 import it.polimi.se2.clup.data.entities.*;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import java.sql.Time;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 public class TicketDataAccess implements TicketDataAccessInterface {
@@ -14,14 +14,14 @@ public class TicketDataAccess implements TicketDataAccessInterface {
     protected EntityManager em;
 
     @Override
-    public void insertCustomerLineUpTicket(int userID, int buildingID) {
+    public void insertUnregCustomerLineUpTicket(int userID, int buildingID) throws NoResultException {
         LineUpDigitalTicket newTicket = new LineUpDigitalTicket();
 
-
-        AppCustomer owner = em.find(AppCustomer.class, userID);
         Building building = em.find(Building.class, buildingID);
 
-        //newTicket.setOwner(owner);
+        UnregisteredAppCustomer owner = em.find(UnregisteredAppCustomer.class, userID);
+        newTicket.setUnregisteredOwner(owner);
+
         newTicket.setState(TicketState.INVALID);
         newTicket.setBuilding(building);
 
@@ -29,7 +29,22 @@ public class TicketDataAccess implements TicketDataAccessInterface {
     }
 
     @Override
-    public void insertStoreManagerLineUpTicket(int userID) {
+    public void insertRegCustomerLineUpTicket(int userID, int buildingID) throws NoResultException {
+        LineUpDigitalTicket newTicket = new LineUpDigitalTicket();
+
+        Building building = em.find(Building.class, buildingID);
+
+        RegisteredAppCustomer owner = em.find(RegisteredAppCustomer.class, userID);
+        newTicket.setRegisteredOwner(owner);
+
+        newTicket.setState(TicketState.INVALID);
+        newTicket.setBuilding(building);
+
+        em.persist(newTicket);
+    }
+
+    @Override
+    public void insertStoreManagerLineUpTicket(int userID) throws NoResultException {
         LineUpDigitalTicket newTicket = new LineUpDigitalTicket();
         PhysicalTicket newPhysicalTicket = new PhysicalTicket();
 
@@ -39,7 +54,7 @@ public class TicketDataAccess implements TicketDataAccessInterface {
         newPhysicalTicket.setStoreManager(owner);
         newPhysicalTicket.setAssociatedDigitalTicket(newTicket);
 
-        //newTicket.setOwner(owner);
+        newTicket.setStoreManagerOwner(owner);
         newTicket.setState(TicketState.INVALID);
         newTicket.setAssociatedPhysicalTicket(newPhysicalTicket);
         newTicket.setBuilding(building);
@@ -49,7 +64,8 @@ public class TicketDataAccess implements TicketDataAccessInterface {
     }
 
     @Override
-    public void insertBookingTicket(int userID, int buildingID, Date date, TimeSlot timeSlot) {
+    public void insertBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength)
+            throws NoResultException {
         BookingDigitalTicket newTicket = new BookingDigitalTicket();
 
         RegisteredAppCustomer owner = em.find(RegisteredAppCustomer.class, userID);
@@ -58,29 +74,41 @@ public class TicketDataAccess implements TicketDataAccessInterface {
         newTicket.setOwner(owner);
         newTicket.setState(TicketState.INVALID);
         newTicket.setBuilding(building);
-        newTicket.setTimeSlot(timeSlot);
-
-        Time startingTime = timeSlot.getStartingTime();
-        Time departureTime = timeSlot.getEndingTime();
-
-        newTicket.setArrivalTime(startingTime);
-        newTicket.setDepartureTime(departureTime);
-        //newTicket.setPermanenceTime();
+        newTicket.setTimeSlotID(timeSlotID);
+        newTicket.setDate(date);
+        newTicket.setTimeSlotLength(timeSlotLength);
 
         em.persist(newTicket);
     }
 
     @Override
-    public void updateTicketState(int ticketID, TicketState state) {
+    public void updateTicketState(int ticketID, TicketState state) throws NoResultException {
          em.createNamedQuery("DigitalTicket.retrieveTicketById", DigitalTicket.class)
                 .setParameter("ticketID", ticketID)
                 .getSingleResult().setState(state);
     }
 
     @Override
-    public List<DigitalTicket> retrieveTickets(int userID) {
-        User user= em.find(User.class, userID);
+    public List<BookingDigitalTicket> retrieveBookingTicketsRegCustomer(int userID) throws NoResultException {
+        RegisteredAppCustomer registeredAppCustomer = em.find(RegisteredAppCustomer.class, userID);
+        return registeredAppCustomer.getBookingDigitalTickets();
+    }
 
-        return user.getDigitalTickets();
+    @Override
+    public List<LineUpDigitalTicket> retrieveLineUpTicketsRegCustomer(int userID) throws NoResultException {
+        RegisteredAppCustomer registeredAppCustomer = em.find(RegisteredAppCustomer.class, userID);
+        return registeredAppCustomer.getLineUpDigitalTickets();
+    }
+
+    @Override
+    public List<LineUpDigitalTicket> retrieveTicketsUnregisteredCustomer(int userID) throws NoResultException {
+        UnregisteredAppCustomer unregisteredAppCustomer = em.find(UnregisteredAppCustomer.class, userID);
+        return unregisteredAppCustomer.getLineUpDigitalTickets();
+    }
+
+    @Override
+    public List<LineUpDigitalTicket> retrieveDigitalTicketsStoreManager(int userID) throws NoResultException {
+        StoreManager storeManager = em.find(StoreManager.class, userID);
+        return storeManager.getLineUpDigitalTickets();
     }
 }

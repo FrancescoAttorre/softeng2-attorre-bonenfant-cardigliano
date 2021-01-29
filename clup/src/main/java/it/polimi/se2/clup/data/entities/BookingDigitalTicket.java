@@ -4,7 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
-import java.sql.Time;
+import java.time.LocalDate;
 
 @Entity
 public class BookingDigitalTicket extends DigitalTicket{
@@ -14,33 +14,36 @@ public class BookingDigitalTicket extends DigitalTicket{
     }
 
     @Column
-    private Time arrivalTime;
+    private LocalDate date;
 
     @Column
-    private Time departureTime;
+    private int timeSlotID;
 
     @Column
-    private Time permanenceTime;
+    private int timeSlotLength;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private RegisteredAppCustomer owner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private TimeSlot timeSlot;
+    public int getTimeSlotID() {
+        return timeSlotID;
+    }
 
-    public Time getArrivalTime() { return arrivalTime;}
-    public void setArrivalTime (Time arrivalTime) { this.arrivalTime = arrivalTime;}
+    public void setTimeSlotID(int timeSlotID) {
+        this.timeSlotID = timeSlotID;
+    }
 
-    public Time getDepartureTime() { return departureTime;}
-    public void setDepartureTime (Time departureTime) { this.departureTime = departureTime;}
+    public int getTimeSlotLength() {
+        return timeSlotLength;
+    }
 
-    public Time getPermanenceTime() { return permanenceTime;}
-    public void setPermanenceTime (Time permanenceTime) { this.permanenceTime = permanenceTime;}
+    public void setTimeSlotLength(int timeSlotLength) {
+        this.timeSlotLength = timeSlotLength;
+    }
 
-    public TimeSlot getTimeSlot() { return timeSlot;}
-    public void setTimeSlot (TimeSlot timeSlot) { this.timeSlot = timeSlot;}
+    public LocalDate getDate() { return date;}
+    public void setDate (LocalDate date) { this.date = date;}
 
-
-    public User getOwner() { return owner;}
+    public RegisteredAppCustomer getOwner() { return owner;}
     public void setOwner(RegisteredAppCustomer ownerCustomer) { this.owner = ownerCustomer;}
 }
