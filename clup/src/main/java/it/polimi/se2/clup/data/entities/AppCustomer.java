@@ -11,7 +11,7 @@ public class AppCustomer extends User{
     private String position;
 
     @Column
-    private boolean GPSpreference;
+    private boolean GPSPreference;
 
     @Column
     private String meansOfTransport;
@@ -30,12 +30,12 @@ public class AppCustomer extends User{
         this.position = position;
     }
 
-    public boolean isGPSpreference() {
-        return GPSpreference;
+    public boolean isGPSPreference() {
+        return GPSPreference;
     }
 
-    public void setGPSpreference(boolean GPSpreference) {
-        this.GPSpreference = GPSpreference;
+    public void setGPSPreference(boolean GPSpreference) {
+        this.GPSPreference = GPSpreference;
     }
 
     public String getMeansOfTransport() {

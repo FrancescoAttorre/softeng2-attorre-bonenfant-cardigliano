@@ -28,6 +28,5 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
         Queue queue = em.find(Queue.class, ticket.getBuilding().getBuildingID());
         queue.addQueueTickets(ticket);
         em.persist(queue);
-
     }
 }

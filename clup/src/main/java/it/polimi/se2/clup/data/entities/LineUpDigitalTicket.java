@@ -2,7 +2,6 @@ package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 public class LineUpDigitalTicket extends DigitalTicket {
@@ -19,6 +18,9 @@ public class LineUpDigitalTicket extends DigitalTicket {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Queue queue;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private User owner;
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
@@ -41,4 +43,6 @@ public class LineUpDigitalTicket extends DigitalTicket {
         this.queue = queue;
     }
 
+    public User getOwner() { return owner;}
+    public void setOwner(User ownerCustomer) { this.owner = ownerCustomer;}
 }

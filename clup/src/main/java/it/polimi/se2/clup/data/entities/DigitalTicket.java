@@ -4,6 +4,9 @@ import javax.persistence.*;
 
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 @Entity
+@NamedQueries({
+        @NamedQuery(name = "DigitalTicket.retrieveTicketById", query = "SELECT dt FROM DigitalTicket dt WHERE dt.ticketID = :ticketID "),
+})
 public class DigitalTicket {
 
     @Id
@@ -14,13 +17,7 @@ public class DigitalTicket {
     private TicketState state;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    private AppCustomer ownerCustomer;
-
-    @ManyToOne(fetch = FetchType.EAGER)
     private Building building;
-
-    public AppCustomer getOwnerCustomer() { return ownerCustomer;}
-    public void setOwnerCustomer (AppCustomer ownerCustomer) { this.ownerCustomer = ownerCustomer;}
 
     public TicketState getState() {
         return state;
