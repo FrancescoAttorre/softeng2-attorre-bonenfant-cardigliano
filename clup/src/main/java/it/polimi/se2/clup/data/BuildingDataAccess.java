@@ -1,14 +1,8 @@
 package it.polimi.se2.clup.data;
 
-import it.polimi.se2.clup.data.entities.Building;
-import it.polimi.se2.clup.data.entities.BuildingState;
-import it.polimi.se2.clup.data.entities.DigitalTicket;
-import it.polimi.se2.clup.data.entities.Queue;
+import it.polimi.se2.clup.data.entities.*;
 
-import javax.persistence.EntityExistsException;
-import javax.persistence.EntityManager;
-import javax.persistence.NonUniqueResultException;
-import javax.persistence.PersistenceContext;
+import javax.persistence.*;
 import java.util.List;
 
 public class BuildingDataAccess implements BuildingDataAccessInterface{
@@ -22,27 +16,18 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
     }
 
     @Override
-    public BuildingState retrieveBuildingState(int id) {
-        List<Building> buildings = em.createNamedQuery("Building.retrieveBuildingById", Building.class)
+    public BuildingState retrieveBuildingState(int id) throws NoResultException,NonUniqueResultException{
+        return em.createNamedQuery("Building.retrieveBuildingById", Building.class)
                 .setParameter("buildingId",id)
-                .getResultList();
-        if(buildings.isEmpty())
-            return null;
-        else if (buildings.size() == 1)
-            return buildings.get(0).getState();
-        else
-            throw new NonUniqueResultException("More than one Building with same id");
+                .getSingleResult().getState();
 
     }
 
     @Override
-    public void insertInQueue(DigitalTicket ticket) {
-        /*
-        List<Queue> queues = em.createNamedQuery("Queue.selectQueueWithBuildingId",Queue.class)
-                .setParameter(ticket.get).getResultList();
-        if(queues.isEmpty())
-            throw new EntityExistsException();
+    public void insertInQueue(LineUpDigitalTicket ticket) throws NoResultException {
+        Queue queue = em.find(Queue.class, ticket.getBuilding().getBuildingID());
+        queue.addQueueTickets(ticket);
+        em.persist(queue);
 
-         */
     }
 }

@@ -4,10 +4,7 @@ import it.polimi.se2.clup.data.entities.Activity;
 import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
 
 import javax.ejb.Stateless;
-import javax.persistence.EntityExistsException;
-import javax.persistence.EntityManager;
-import javax.persistence.NonUniqueResultException;
-import javax.persistence.PersistenceContext;
+import javax.persistence.*;
 import java.util.List;
 
 @Stateless
@@ -17,21 +14,11 @@ public class UserDataAccessImpl implements UserDataAccessInt{
     protected EntityManager em;
 
     @Override
-    public RegisteredAppCustomer retrieveUser(String username, String password) {
-        List<RegisteredAppCustomer> customers;
-
-        customers =  em.createNamedQuery("RegisteredAppCustomer.checkCredentials", RegisteredAppCustomer.class)
+    public RegisteredAppCustomer retrieveUser(String username, String password) throws NonUniqueResultException, NoResultException{
+        return  em.createNamedQuery("RegisteredAppCustomer.checkCredentials", RegisteredAppCustomer.class)
                     .setParameter("username", username)
                     .setParameter("password", password)
-                    .getResultList();
-
-        if(customers.isEmpty())
-            return null;
-        else if (customers.size() == 1)
-            return customers.get(0);
-        else
-            throw new NonUniqueResultException("More than one user registered with same credentials");
-
+                    .getSingleResult();
     }
 
     @Override
@@ -40,11 +27,7 @@ public class UserDataAccessImpl implements UserDataAccessInt{
         appCustomer.setUsername(username);
         appCustomer.setPassword(password);
 
-        try{
-            em.persist(appCustomer);
-        }catch(EntityExistsException e){
-            throw e;
-        }
+        em.persist(appCustomer);
     }
 
 
@@ -55,26 +38,14 @@ public class UserDataAccessImpl implements UserDataAccessInt{
         activity.setName(name);
         activity.setpIva(pIva);
         activity.setPassword(password);
-        try{
-            em.persist(activity);
-        }catch(EntityExistsException e){
-            throw e;
-        }
+
+        em.persist(activity);
     }
 
     @Override
-    public Activity retrieveUser(String pIva) {
-        List<Activity> activities;
-
-        activities =  em.createNamedQuery("Activity.selectWithPIVA", Activity.class)
+    public Activity retrieveUser(String pIva) throws NonUniqueResultException, NoResultException {
+        return  em.createNamedQuery("Activity.selectWithPIVA", Activity.class)
                 .setParameter("pIva", pIva)
-                .getResultList();
-
-        if(activities.isEmpty())
-            return null;
-        else if (activities.size() == 1)
-            return activities.get(0);
-        else
-            throw new NonUniqueResultException("More than one Activity with same pIva");
+                .getSingleResult();
     }
 }
