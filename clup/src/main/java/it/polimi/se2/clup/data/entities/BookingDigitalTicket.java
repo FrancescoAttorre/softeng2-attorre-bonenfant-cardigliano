@@ -1,12 +1,12 @@
 package it.polimi.se2.clup.data.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(name = "BookingDigitalTicket.selectByBuildingIdAndDate", query = "SELECT b FROM BookingDigitalTicket b WHERE b.date = :date AND b.building = :buildingId "),
+})
 public class BookingDigitalTicket extends DigitalTicket{
 
     public BookingDigitalTicket() {

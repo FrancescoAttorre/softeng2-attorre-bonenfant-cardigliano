@@ -4,6 +4,9 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(name = "Queue.selectTicketInQueueByBuildingId", query = "SELECT t FROM Queue q JOIN q.queueTickets t WHERE q.building = :buildingId ORDER BY t.acquisitionTime"),
+})
 public class Queue {
     @Id
     @OneToOne

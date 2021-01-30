@@ -2,6 +2,8 @@ package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
 import java.sql.Time;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Entity
@@ -15,13 +17,13 @@ public class Building {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(nullable = false)
     private String address;
 
-    @Column
+    @Column(nullable = false)
     private int capacity;
 
     @OneToOne
@@ -30,16 +32,16 @@ public class Building {
     @ManyToOne
     private Activity activity;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "building")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "building",cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Department> departments;
 
-    @Column
-    private Time opening;
+    @Column(nullable = false)
+    private LocalTime opening;
 
-    @Column
-    private Time closing;
+    @Column(nullable = false)
+    private LocalTime closing;
 
-    @Column
+    @Column(unique = true, nullable = false)
     private String accessCode;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy="building")
@@ -51,8 +53,34 @@ public class Building {
     @Column
     private int actualCapacity;
 
+    @Column
+    private int deltaExitTime; // seconds between the last exit time of last exits
+
+    @Column
+    private int lastExitTime; // seconds between 00:00 and actual time
+
+    public int getDeltaExitTime() {
+        return deltaExitTime;
+    }
+
+    public void setDeltaExitTime(int deltaExitTime) {
+        this.deltaExitTime = deltaExitTime;
+    }
+
+    public int getLastExitTime() {
+        return lastExitTime;
+    }
+
+    public void setLastExitTime(int lastExitTime) {
+        this.lastExitTime = lastExitTime;
+    }
+
     public int getActualCapacity() {
         return actualCapacity;
+    }
+
+    public void addDepartment(Department department) {
+        this.departments.add(department);
     }
 
     public void increaseActualCapacity(){
@@ -79,19 +107,19 @@ public class Building {
         this.capacity = capacity;
     }
 
-    public Time getOpening() {
+    public LocalTime getOpening() {
         return opening;
     }
 
-    public void setOpening(Time opening) {
+    public void setOpening(LocalTime opening) {
         this.opening = opening;
     }
 
-    public Time getClosing() {
+    public LocalTime getClosing() {
         return closing;
     }
 
-    public void setClosing(Time closing) {
+    public void setClosing(LocalTime closing) {
         this.closing = closing;
     }
 

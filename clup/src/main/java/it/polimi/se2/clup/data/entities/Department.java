@@ -10,7 +10,6 @@ public class Department {
 
     @Column
     private int surplusCapacity;
-
     @Column
     private String name;
 

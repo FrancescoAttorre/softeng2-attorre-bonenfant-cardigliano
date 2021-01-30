@@ -32,4 +32,12 @@ public class DigitalTicket {
     public void setBuilding(Building building) {
         this.building = building;
     }
+
+    public int getTicketID() {
+        return ticketID;
+    }
+
+    public void setTicketID(int ticketID) {
+        this.ticketID = ticketID;
+    }
 }
