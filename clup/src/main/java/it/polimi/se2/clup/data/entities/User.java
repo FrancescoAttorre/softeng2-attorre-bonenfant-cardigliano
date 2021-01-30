@@ -13,4 +13,8 @@ public class User {
 
     @OneToMany(fetch = FetchType.LAZY)
     private List<DigitalTicket> digitalTickets;
+
+    public int getId() {
+        return id;
+    }
 }

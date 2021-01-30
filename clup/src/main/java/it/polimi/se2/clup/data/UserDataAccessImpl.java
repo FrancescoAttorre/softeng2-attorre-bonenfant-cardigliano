@@ -2,12 +2,12 @@ package it.polimi.se2.clup.data;
 
 import it.polimi.se2.clup.data.entities.Activity;
 import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
+import it.polimi.se2.clup.data.entities.StoreManager;
 import it.polimi.se2.clup.data.entities.UnregisteredAppCustomer;
 
 import javax.ejb.Stateless;
 import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Stateless
 public class UserDataAccessImpl implements UserDataAccessInt{
@@ -16,10 +16,9 @@ public class UserDataAccessImpl implements UserDataAccessInt{
     protected EntityManager em;
 
     @Override
-    public RegisteredAppCustomer retrieveUser(String username, String password) throws NonUniqueResultException, NoResultException{
-        return  em.createNamedQuery("RegisteredAppCustomer.checkCredentials", RegisteredAppCustomer.class)
+    public RegisteredAppCustomer retrieveUser(String username) throws NonUniqueResultException, NoResultException{
+        return  em.createNamedQuery("RegisteredAppCustomer.findUserByUsername", RegisteredAppCustomer.class)
                     .setParameter("username", username)
-                    .setParameter("password", password)
                     .getSingleResult();
     }
 
@@ -45,10 +44,15 @@ public class UserDataAccessImpl implements UserDataAccessInt{
     }
 
     @Override
-    public Activity retrieveUser(String pIva) throws NonUniqueResultException, NoResultException {
+    public Activity retrieveActivity(String pIva) throws NonUniqueResultException, NoResultException {
         return  em.createNamedQuery("Activity.selectWithPIVA", Activity.class)
                 .setParameter("pIva", pIva)
                 .getSingleResult();
+    }
+
+    @Override
+    public StoreManager retrieveStoreManager(int id) {
+        return null;
     }
 
     @Override
@@ -57,9 +61,11 @@ public class UserDataAccessImpl implements UserDataAccessInt{
     }
 
     @Override
-    public void insertUnregisteredAppCustomer() {
+    public int insertUnregisteredAppCustomer() {
         UnregisteredAppCustomer customer = new UnregisteredAppCustomer();
-        customer.setDate(new Date());
+        customer.setDate(LocalDateTime.now());
         em.persist(customer);
+
+        return customer.getId();
     }
 }
