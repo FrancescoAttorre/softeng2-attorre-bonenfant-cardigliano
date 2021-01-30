@@ -24,7 +24,6 @@ public class UserDataAccessImplTest {
 
         dm.em.getTransaction().begin();
 
-        System.out.println("Deleting table Activity");
         Query q1 = dm.em.createQuery("delete from Activity");
         Query q2 = dm.em.createQuery("delete from RegisteredAppCustomer");
         q1.executeUpdate();
@@ -84,10 +83,8 @@ public class UserDataAccessImplTest {
 
         List<UnregisteredAppCustomer> unregisteredAppCustomers = dm.em.createNamedQuery("UnregisteredAppCustomer.selectAll", UnregisteredAppCustomer.class)
                 .getResultList();
-
-
-
     }
+
     @Test
     public void retrieveRegisteredAppCustomer() {
         RegisteredAppCustomer registeredAppCustomer = dm.em.createNamedQuery("RegisteredAppCustomer.findUserByUsername", RegisteredAppCustomer.class)

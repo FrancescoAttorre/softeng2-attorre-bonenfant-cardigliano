@@ -2,7 +2,7 @@ package it.polimi.se2.clup.data.entities;
 
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -11,8 +11,7 @@ import java.util.List;
 })
 public class UnregisteredAppCustomer extends User{
 
-    @Temporal(TemporalType.DATE)
-    private Date date;
+    private LocalDateTime date;
 
     @Column
     private String position;
@@ -26,11 +25,15 @@ public class UnregisteredAppCustomer extends User{
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "unregisteredOwner")
     private List<LineUpDigitalTicket> lineUpDigitalTickets;
 
-    public Date getDate() {
+    public void addLineUpTicket(LineUpDigitalTicket lineUpTicket){
+        this.lineUpDigitalTickets.add(lineUpTicket);
+    }
+
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 

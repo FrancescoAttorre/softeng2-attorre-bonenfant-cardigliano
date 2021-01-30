@@ -4,6 +4,8 @@ import it.polimi.se2.clup.data.entities.*;
 import it.polimi.se2.clup.data.entities.Queue;
 
 import javax.persistence.*;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoField;
@@ -42,7 +44,7 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
     }
 
     @Override
-    public List<Integer> retrieveTimeSlots(int buildingId, Date date) {
+    public List<Integer> retrieveTimeSlots(int buildingId, LocalDate date) {
         List<BookingDigitalTicket> tickets = em.createNamedQuery("BookingDigitalTicket.selectByBuildingIdAndDate",BookingDigitalTicket.class)
                 .setParameter("date" , date).setParameter("buildingId",buildingId).getResultList();
 
@@ -93,12 +95,12 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
         //simple version
         //weight 0.8 for old delta
 
-        double weightedOldDelta = building.getDeltaExitTime() * 0.8 ;
+        double weightedOldDelta = building.getDeltaExitTime().toMinutes() * 0.8 ;
         double weightedNewDelta = (double)lastExitTime.get(ChronoField.SECOND_OF_DAY) - (double)building.getLastExitTime() * 0.2;
 
         //TODO : check order of new delta
 
-        building.setDeltaExitTime((int)(weightedNewDelta + weightedOldDelta));
+        building.setDeltaExitTime(Duration.ofMinutes((int)(weightedNewDelta + weightedOldDelta)));
 
         return true;
     }

@@ -2,6 +2,7 @@ package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
 import java.sql.Time;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -54,16 +55,16 @@ public class Building {
     private int actualCapacity;
 
     @Column
-    private int deltaExitTime; // seconds between the last exit time of last exits
+    private Duration deltaExitTime; // seconds between the last exit time of last exits
 
     @Column
     private int lastExitTime; // seconds between 00:00 and actual time
 
-    public int getDeltaExitTime() {
+    public Duration getDeltaExitTime() {
         return deltaExitTime;
     }
 
-    public void setDeltaExitTime(int deltaExitTime) {
+    public void setDeltaExitTime(Duration deltaExitTime) {
         this.deltaExitTime = deltaExitTime;
     }
 

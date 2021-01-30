@@ -1,4 +1,4 @@
-package it.polimi.se2.clup.data;
+package it.polimi.se2.clup.ticket;
 
 import it.polimi.se2.clup.data.entities.*;
 

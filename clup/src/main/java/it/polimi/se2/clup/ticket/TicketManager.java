@@ -1,5 +1,6 @@
-package it.polimi.se2.clup.data;
+package it.polimi.se2.clup.ticket;
 
+import it.polimi.se2.clup.data.TicketDataAccess;
 import it.polimi.se2.clup.data.entities.*;
 
 import java.time.Duration;
@@ -8,9 +9,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 public class TicketManager implements TicketManagerInterface {
 
-    private TicketDataAccess ticketDataAccess;
+    public static final int extraTime = 10;
+    public static final int firstPosInQueue = 0;
+
+    private TicketDataAccess ticketDataAccess = new TicketDataAccess();
 
     public TicketDataAccess getTicketDataAccess() {
         return ticketDataAccess;
@@ -90,15 +95,31 @@ public class TicketManager implements TicketManagerInterface {
     }
 
     private Duration computeWaitingTime (LineUpDigitalTicket ticket) {
-        Duration additionalTime = Duration.ofMinutes(10);
+
+        Duration additionalTime = Duration.ofMinutes(extraTime);
+        Duration newWaitingTime;
+        int positionInQueue;
         ticketDataAccess.retrieveAcquisitionTime(ticket);
 
         if (ticket.getState() == TicketState.VALID)
             return Duration.ZERO;
 
-        if (ticket.getQueue().getQueueTickets().get(0) == ticket && ticket.getState() != TicketState.VALID )
-            return ticket.getEstimatedWaitingTime().plus(additionalTime);
-        return null;
+        if (ticket.getEstimatedWaitingTime().toMinutes() <= 0 && ticket.getState() != TicketState.VALID) {
+            newWaitingTime = ticket.getEstimatedWaitingTime().plus(additionalTime);
+            ticket.setEstimatedWaitingTime(newWaitingTime);
+            return newWaitingTime;
+        }
+        //change of state to VALID is only when a customer exits a building
+
+        //Ordered queue
+        positionInQueue = ticket.getQueue().getQueueTickets().indexOf(ticket);
+        //if equal to -1 the ticket doesn't exist in queue
+
+        newWaitingTime = Duration.ofMinutes(ticket.getBuilding().getDeltaExitTime().toMinutes() * positionInQueue);
+
+        ticket.setEstimatedWaitingTime(newWaitingTime);
+
+        return newWaitingTime;
     }
 
     @Override

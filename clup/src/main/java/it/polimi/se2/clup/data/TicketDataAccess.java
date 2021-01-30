@@ -37,6 +37,7 @@ public class TicketDataAccess implements TicketDataAccessInterface {
 
         RegisteredAppCustomer owner = em.find(RegisteredAppCustomer.class, userID);
         newTicket.setRegisteredOwner(owner);
+        owner.addLineUpTicket(newTicket);
 
         newTicket.setState(TicketState.INVALID);
         newTicket.setBuilding(building);
@@ -51,6 +52,9 @@ public class TicketDataAccess implements TicketDataAccessInterface {
 
         StoreManager owner = em.find(StoreManager.class, userID);
         Building building = owner.getBuilding();
+
+        owner.addLineUpTicket(newTicket);
+        owner.addPhysicalTicket(newPhysicalTicket);
 
         newPhysicalTicket.setStoreManager(owner);
         newPhysicalTicket.setAssociatedDigitalTicket(newTicket);
@@ -67,9 +71,11 @@ public class TicketDataAccess implements TicketDataAccessInterface {
     @Override
     public void insertBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength)
             throws NoResultException {
+
         BookingDigitalTicket newTicket = new BookingDigitalTicket();
 
         RegisteredAppCustomer owner = em.find(RegisteredAppCustomer.class, userID);
+        owner.addBookingTicket(newTicket);
         Building building = em.find(Building.class, buildingID);
 
         newTicket.setOwner(owner);

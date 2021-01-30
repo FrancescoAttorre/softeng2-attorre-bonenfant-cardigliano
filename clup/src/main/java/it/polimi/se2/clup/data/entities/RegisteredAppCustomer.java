@@ -31,6 +31,13 @@ public class RegisteredAppCustomer extends User {
     @Column
     private String meansOfTransport;
 
+    public void addLineUpTicket(LineUpDigitalTicket lineUpTicket){
+        this.lineUpDigitalTickets.add(lineUpTicket);
+    }
+
+    public void addBookingTicket(BookingDigitalTicket bookingTicket){
+        this.bookingDigitalTickets.add(bookingTicket);
+    }
 
     public String getPosition() {
         return position;

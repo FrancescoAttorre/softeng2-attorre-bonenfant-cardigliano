@@ -17,6 +17,14 @@ public class StoreManager extends User {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "storeManagerOwner")
     private List<LineUpDigitalTicket> lineUpDigitalTickets;
 
+    public void addLineUpTicket(LineUpDigitalTicket lineUpTicket){
+        this.lineUpDigitalTickets.add(lineUpTicket);
+    }
+
+    public void addPhysicalTicket(PhysicalTicket physicalTicket){
+        this.physicalTickets.add(physicalTicket);
+    }
+
     public Building getBuilding() {
         return building;
     }
