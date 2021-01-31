@@ -14,10 +14,11 @@ import java.util.Map;
 public interface BuildingDataAccessInterface {
     List<Building> retrieveBuildings();
     void insertBuilding(String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String,Integer> surplus, String accessCode);
+    Building retrieveBuilding(int buildingId);
     boolean retrieveBuildingState(int id);
     boolean insertInQueue(LineUpDigitalTicket ticket);
-    List<Integer> retrieveTimeSlots(int buildingId, LocalDate date);
+    Map<Department,List<Integer>> retrieveTimeSlots(int buildingId, LocalDate date);
     List<LineUpDigitalTicket> retrieveTicketInQueue(int buildingId);
-    boolean updateStatistics(int buildingId, LocalDateTime lastExitTime);
-    boolean updateLastExitTime(int buildingId, LocalDateTime lastExitTime);
+    boolean updateStatistics(int buildingId, LocalTime lastExitTime);
+    boolean updateLastExitTime(int buildingId, LocalTime lastExitTime);
 }

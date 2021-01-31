@@ -1,6 +1,7 @@
 package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Department {
@@ -15,6 +16,9 @@ public class Department {
 
     @ManyToOne
     private Building building;
+
+    @ManyToMany(mappedBy = "departments")
+    private List<BookingDigitalTicket> tickets;
 
     public int getDepartmentID() {
         return departmentID;
@@ -38,5 +42,11 @@ public class Department {
 
     public int getSurplusCapacity() { return surplusCapacity; }
 
+    public List<BookingDigitalTicket> getTickets() {
+        return tickets;
+    }
 
+    public void setTickets(List<BookingDigitalTicket> tickets) {
+        this.tickets = tickets;
+    }
 }

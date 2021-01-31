@@ -2,6 +2,7 @@ package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @NamedQueries({
@@ -24,6 +25,9 @@ public class BookingDigitalTicket extends DigitalTicket{
 
     @ManyToOne(fetch = FetchType.EAGER)
     private RegisteredAppCustomer owner;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<Department> departments;
 
     public int getTimeSlotID() {
         return timeSlotID;

@@ -17,18 +17,21 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
     protected EntityManager em;
 
     @Override
+    public Building retrieveBuilding(int buildingId){
+        //exception if null ???
+        return em.find(Building.class,buildingId);
+    }
+
+    @Override
     public List<Building> retrieveBuildings() {
         return em.createNamedQuery("Building.findAll", Building.class).getResultList();
     }
 
     @Override
     public boolean retrieveBuildingState(int id) throws NoResultException,NonUniqueResultException{
-        Building building =  em.createNamedQuery("Building.retrieveBuildingById", Building.class)
-                .setParameter("buildingId",id)
-                .getSingleResult();
+        Building building = em.find(Building.class, id);
 
         return (building.getCapacity() - building.getActualCapacity()) > 0;
-
     }
 
     @Override
@@ -44,29 +47,36 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
     }
 
     @Override
-    public List<Integer> retrieveTimeSlots(int buildingId, LocalDate date) {
+    public Map<Department,List<Integer>> retrieveTimeSlots(int buildingId, LocalDate date) {
         List<BookingDigitalTicket> tickets = em.createNamedQuery("BookingDigitalTicket.selectByBuildingIdAndDate",BookingDigitalTicket.class)
                 .setParameter("date" , date).setParameter("buildingId",buildingId).getResultList();
 
-        List<Integer> timeSlots = new ArrayList<>();
+        Building building = em.find(Building.class, buildingId);
 
-        for (BookingDigitalTicket b: tickets ){
-            for(int i = 0; i < b.getTimeSlotLength(); i++){
-                timeSlots.add(b.getTimeSlotID() + i);
+        Map<Department,List<Integer>> bookedTimeSlots = new HashMap<>();
+
+        for(Department d : building.getDepartments()){
+            List<Integer> timeSlots = new ArrayList<>();
+            for (BookingDigitalTicket b: d.getTickets() ){
+                for(int i = 0; i < b.getTimeSlotLength(); i++){
+                    timeSlots.add(b.getTimeSlotID() + i);
+                }
             }
+            bookedTimeSlots.put(d,timeSlots);
         }
 
-        return  timeSlots;
+        return  bookedTimeSlots;
     }
 
     @Override
     public void insertBuilding(String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String, Integer> surplus,String accessCode) {
         Building building = new Building();
-        building.setName(name);
+        building.setName(name); //TODO: name should be unique ? check or catch exception ?
         building.setOpening(opening);
         building.setClosing(closing);
         building.setAddress(address);
         building.setCapacity(capacity);
+        building.setDeltaExitTime(Duration.ZERO);
 
         for (String deptName : surplus.keySet()){
             Department department = new Department();
@@ -87,26 +97,32 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
     }
 
     @Override
-    public boolean updateStatistics(int buildingId, LocalDateTime lastExitTime) {
+    public boolean updateStatistics(int buildingId, LocalTime lastExitTime) {
         Building building = em.find(Building.class, buildingId);
 
         if(building == null) return false;
 
         //simple version
         //weight 0.8 for old delta
+        double weightedOldDelta;
+        double weightedNewDelta;
+        if(building.getDeltaExitTime().equals(Duration.ZERO)){
+            weightedNewDelta = (double)lastExitTime.get(ChronoField.SECOND_OF_DAY) - (double)building.getOpening().get(ChronoField.SECOND_OF_DAY);
 
-        double weightedOldDelta = building.getDeltaExitTime().toMinutes() * 0.8 ;
-        double weightedNewDelta = (double)lastExitTime.get(ChronoField.SECOND_OF_DAY) - (double)building.getLastExitTime() * 0.2;
+            building.setDeltaExitTime(Duration.ofSeconds((long) weightedNewDelta));
+        }else {
+            weightedOldDelta = building.getDeltaExitTime().toSeconds() * 0.8 ;
+            weightedNewDelta = (double)lastExitTime.get(ChronoField.SECOND_OF_DAY) - (double)building.getLastExitTime() * 0.2;
 
-        //TODO : check order of new delta
-
-        building.setDeltaExitTime(Duration.ofMinutes((int)(weightedNewDelta + weightedOldDelta)));
+            //TODO : check order of new delta
+            building.setDeltaExitTime(Duration.ofSeconds((long)(weightedNewDelta + weightedOldDelta)));
+        }
 
         return true;
     }
 
     @Override
-    public boolean updateLastExitTime(int buildingId, LocalDateTime lastExit) {
+    public boolean updateLastExitTime(int buildingId, LocalTime lastExit) {
         Building building = em.find(Building.class,buildingId);
 
         if(building == null) return false;
