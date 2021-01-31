@@ -1,10 +1,14 @@
 package it.polimi.se2.clup.ticket;
 
+import it.polimi.se2.clup.auth.exceptions.CredentialsException;
+import it.polimi.se2.clup.building.BuildingManager;
 import it.polimi.se2.clup.data.TicketDataAccess;
 import it.polimi.se2.clup.data.entities.*;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,9 +17,17 @@ import java.util.Map;
 public class TicketManager implements TicketManagerInterface {
 
     public static final int extraTime = 10;
-    public static final int firstPosInQueue = 0;
 
     private TicketDataAccess ticketDataAccess = new TicketDataAccess();
+    private BuildingManager buildingManager = new BuildingManager();
+
+    public BuildingManager getBuildingManager() {
+        return buildingManager;
+    }
+
+    public void setBuildingManager(BuildingManager buildingManager) {
+        this.buildingManager = buildingManager;
+    }
 
     public TicketDataAccess getTicketDataAccess() {
         return ticketDataAccess;
@@ -27,7 +39,8 @@ public class TicketManager implements TicketManagerInterface {
 
     @Override
     public void acquireStoreManagerTicket(int userID) {
-        ticketDataAccess.insertStoreManagerLineUpTicket(userID);
+        LineUpDigitalTicket newTicket = ticketDataAccess.insertStoreManagerLineUpTicket(userID);
+        buildingManager.insertInQueue(newTicket);
     }
 
     @Override
@@ -37,7 +50,14 @@ public class TicketManager implements TicketManagerInterface {
 
     @Override
     public void acquireRegCustomerLineUpTicket(int userID, int buildingID) {
-        ticketDataAccess.insertRegCustomerLineUpTicket(userID, buildingID);
+        LineUpDigitalTicket newTicket = ticketDataAccess.insertRegCustomerLineUpTicket(userID, buildingID);
+        buildingManager.insertInQueue(newTicket);
+    }
+
+    @Override
+    public void acquireUnregCustomerLineUpTicket(int userID, int buildingID) {
+        LineUpDigitalTicket newTicket = ticketDataAccess.insertUnregCustomerLineUpTicket(userID, buildingID);
+        buildingManager.insertInQueue(newTicket);
     }
 
     @Override
@@ -61,7 +81,7 @@ public class TicketManager implements TicketManagerInterface {
     }
 
     @Override
-    public Map<LineUpDigitalTicket, Duration> getWaitingUpdateRegCustomer(int userID) {
+    public Map<LineUpDigitalTicket, Duration> getWaitingUpdateRegCustomer(int userID) throws NotInQueueException {
         List<LineUpDigitalTicket> customerLineUpTickets = ticketDataAccess.retrieveLineUpTicketsRegCustomer(userID);
         Map<LineUpDigitalTicket, Duration> lineUpWaitingTimes = new HashMap<>();
 
@@ -73,7 +93,7 @@ public class TicketManager implements TicketManagerInterface {
     }
 
     @Override
-    public Map<LineUpDigitalTicket, Duration> getWaitingUpdateSM(int userID) {
+    public Map<LineUpDigitalTicket, Duration> getWaitingUpdateSM(int userID) throws NotInQueueException {
         List<LineUpDigitalTicket> customerLineUpTickets = ticketDataAccess.retrieveLineUpTicketsStoreManager(userID);
         Map<LineUpDigitalTicket, Duration> lineUpWaitingTimes = new HashMap<>();
 
@@ -84,7 +104,7 @@ public class TicketManager implements TicketManagerInterface {
     }
 
     @Override
-    public Map<LineUpDigitalTicket, Duration> getWaitingUpdateUnregCustomer(int userID) {
+    public Map<LineUpDigitalTicket, Duration> getWaitingUpdateUnregCustomer(int userID) throws NotInQueueException {
         List<LineUpDigitalTicket> customerLineUpTickets = ticketDataAccess.retrieveTicketsUnregisteredCustomer(userID);
         Map<LineUpDigitalTicket, Duration> lineUpWaitingTimes = new HashMap<>();
 
@@ -94,37 +114,48 @@ public class TicketManager implements TicketManagerInterface {
         return lineUpWaitingTimes;
     }
 
-    private Duration computeWaitingTime (LineUpDigitalTicket ticket) {
-
-        Duration additionalTime = Duration.ofMinutes(extraTime);
-        Duration newWaitingTime;
-        int positionInQueue;
-        ticketDataAccess.retrieveAcquisitionTime(ticket);
-
-        if (ticket.getState() == TicketState.VALID)
-            return Duration.ZERO;
-
-        if (ticket.getEstimatedWaitingTime().toMinutes() <= 0 && ticket.getState() != TicketState.VALID) {
-            newWaitingTime = ticket.getEstimatedWaitingTime().plus(additionalTime);
-            ticket.setEstimatedWaitingTime(newWaitingTime);
-            return newWaitingTime;
-        }
-        //change of state to VALID is only when a customer exits a building
-
-        //Ordered queue
-        positionInQueue = ticket.getQueue().getQueueTickets().indexOf(ticket);
-        //if equal to -1 the ticket doesn't exist in queue
-
-        newWaitingTime = Duration.ofMinutes(ticket.getBuilding().getDeltaExitTime().toMinutes() * positionInQueue);
-
-        ticket.setEstimatedWaitingTime(newWaitingTime);
-
-        return newWaitingTime;
+    @Override
+    public void validateTicket(int ticketID) {
+        ticketDataAccess.updateTicketState(ticketID, TicketState.VALID);
     }
 
-    @Override
-    public void acquireUnregCustomerLineUpTicket(int userID, int buildingID) {
-        ticketDataAccess.insertUnregCustomerLineUpTicket(userID, buildingID);
+    /**
+     * ComputeWaitingTime sets the waiting time to zero for valid tickets, changes their state to
+     * expired when the ticket are valid from more than 10 minutes,
+     * for non valid tickets, instead, it updates the estimated waiting time, basing on the last exit
+     * from the ticket's building, the current time and the medium waiting time for that building
+     * @return new value of estimated waiting time
+     * @throws NotInQueueException if the ticket is not found in the related queue
+     */
+
+    private Duration computeWaitingTime (LineUpDigitalTicket ticket) throws NotInQueueException {
+
+        Duration newWaitingTime;
+
+        switch (ticket.getState()) {
+            case EXPIRED -> newWaitingTime = Duration.ZERO;
+            case VALID -> {
+                newWaitingTime = Duration.ZERO;
+                if ((ChronoUnit.MINUTES.between(LocalDateTime.now(), ticket.getValidationTime())) > 10)
+                    ticketDataAccess.updateTicketState(ticket.getTicketID(), TicketState.EXPIRED);
+            }
+            case INVALID -> {
+                Duration additionalTime = Duration.ofMinutes(extraTime);
+                int positionInQueue = ticket.getQueue().getQueueTickets().indexOf(ticket);
+                if (positionInQueue != -1) {
+                    long averageWait = ticket.getBuilding().getDeltaExitTime().toMinutes();
+
+                    newWaitingTime = Duration.ofMinutes((averageWait * (positionInQueue + 1)) -
+                            (LocalDateTime.now().getMinute() - ticket.getBuilding().getLastExitTime()));
+
+                    if (newWaitingTime.toMinutes() <= 0)
+                        newWaitingTime = newWaitingTime.plus(additionalTime);
+                } else
+                    throw new NotInQueueException();
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + ticket.getState());
+        }
+        return newWaitingTime;
     }
 
     @Override

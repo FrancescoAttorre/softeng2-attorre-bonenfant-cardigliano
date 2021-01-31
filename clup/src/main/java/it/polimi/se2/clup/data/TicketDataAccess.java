@@ -5,7 +5,7 @@ import it.polimi.se2.clup.data.entities.*;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class TicketDataAccess implements TicketDataAccessInterface {
     protected EntityManager em;
 
     @Override
-    public void insertUnregCustomerLineUpTicket(int userID, int buildingID) throws NoResultException {
+    public LineUpDigitalTicket insertUnregCustomerLineUpTicket(int userID, int buildingID) throws NoResultException {
         LineUpDigitalTicket newTicket = new LineUpDigitalTicket();
 
         Building building = em.find(Building.class, buildingID);
@@ -23,14 +23,17 @@ public class TicketDataAccess implements TicketDataAccessInterface {
         UnregisteredAppCustomer owner = em.find(UnregisteredAppCustomer.class, userID);
         newTicket.setUnregisteredOwner(owner);
 
+        newTicket.setAcquisitionTime(LocalDateTime.now());
         newTicket.setState(TicketState.INVALID);
         newTicket.setBuilding(building);
+        newTicket.setQueue(building.getQueue());
 
         em.persist(newTicket);
+        return newTicket;
     }
 
     @Override
-    public void insertRegCustomerLineUpTicket(int userID, int buildingID) throws NoResultException {
+    public LineUpDigitalTicket insertRegCustomerLineUpTicket(int userID, int buildingID) throws NoResultException {
         LineUpDigitalTicket newTicket = new LineUpDigitalTicket();
 
         Building building = em.find(Building.class, buildingID);
@@ -39,14 +42,17 @@ public class TicketDataAccess implements TicketDataAccessInterface {
         newTicket.setRegisteredOwner(owner);
         owner.addLineUpTicket(newTicket);
 
+        newTicket.setAcquisitionTime(LocalDateTime.now());
         newTicket.setState(TicketState.INVALID);
         newTicket.setBuilding(building);
+        newTicket.setQueue(building.getQueue());
 
         em.persist(newTicket);
+        return newTicket;
     }
 
     @Override
-    public void insertStoreManagerLineUpTicket(int userID) throws NoResultException {
+    public LineUpDigitalTicket insertStoreManagerLineUpTicket(int userID) throws NoResultException {
         LineUpDigitalTicket newTicket = new LineUpDigitalTicket();
         PhysicalTicket newPhysicalTicket = new PhysicalTicket();
 
@@ -58,18 +64,21 @@ public class TicketDataAccess implements TicketDataAccessInterface {
 
         newPhysicalTicket.setStoreManager(owner);
         newPhysicalTicket.setAssociatedDigitalTicket(newTicket);
+        newTicket.setQueue(building.getQueue());
 
         newTicket.setStoreManagerOwner(owner);
+        newTicket.setAcquisitionTime(LocalDateTime.now());
         newTicket.setState(TicketState.INVALID);
         newTicket.setAssociatedPhysicalTicket(newPhysicalTicket);
         newTicket.setBuilding(building);
 
         em.persist(newPhysicalTicket);
         em.persist(newTicket);
+        return newTicket;
     }
 
     @Override
-    public void insertBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength)
+    public BookingDigitalTicket insertBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength)
             throws NoResultException {
 
         BookingDigitalTicket newTicket = new BookingDigitalTicket();
@@ -86,13 +95,16 @@ public class TicketDataAccess implements TicketDataAccessInterface {
         newTicket.setTimeSlotLength(timeSlotLength);
 
         em.persist(newTicket);
+        return newTicket;
     }
 
     @Override
     public void updateTicketState(int ticketID, TicketState state) throws NoResultException {
-         em.createNamedQuery("DigitalTicket.retrieveTicketById", DigitalTicket.class)
+         DigitalTicket ticketToUpdate = em.createNamedQuery("DigitalTicket.retrieveTicketById", DigitalTicket.class)
                 .setParameter("ticketID", ticketID)
-                .getSingleResult().setState(state);
+                .getSingleResult();
+         ticketToUpdate.setState(state);
+         ticketToUpdate.setValidationTime(LocalDateTime.now());
     }
 
     @Override
@@ -120,7 +132,7 @@ public class TicketDataAccess implements TicketDataAccessInterface {
     }
 
     @Override
-    public Date retrieveAcquisitionTime(LineUpDigitalTicket lineUpTicket) {
+    public LocalDateTime retrieveAcquisitionTime (LineUpDigitalTicket lineUpTicket) {
         return lineUpTicket.getAcquisitionTime();
     }
 }

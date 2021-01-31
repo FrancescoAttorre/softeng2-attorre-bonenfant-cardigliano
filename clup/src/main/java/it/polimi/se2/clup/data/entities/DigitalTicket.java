@@ -1,6 +1,7 @@
 package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 @Entity
@@ -18,6 +19,17 @@ public class DigitalTicket {
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Building building;
+
+    @Column
+    private LocalDateTime validationTime;
+
+    public LocalDateTime getValidationTime() {
+        return validationTime;
+    }
+
+    public void setValidationTime(LocalDateTime validationTime) {
+        this.validationTime = validationTime;
+    }
 
     public TicketState getState() {
         return state;

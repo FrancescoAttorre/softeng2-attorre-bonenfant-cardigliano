@@ -41,4 +41,6 @@ public class AppCustomer extends User{
     public void setMeansOfTransport(String meansOfTransport) {
         this.meansOfTransport = meansOfTransport;
     }
+
+
 }

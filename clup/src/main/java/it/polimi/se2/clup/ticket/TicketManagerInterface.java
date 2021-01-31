@@ -24,7 +24,9 @@ public interface TicketManagerInterface {
 
     void setTicketState(int ticketID, TicketState state);
 
-    Map<LineUpDigitalTicket, Duration> getWaitingUpdateRegCustomer(int userID);
-    Map<LineUpDigitalTicket, Duration> getWaitingUpdateSM(int userID);
-    Map<LineUpDigitalTicket, Duration> getWaitingUpdateUnregCustomer(int userID);
+    Map<LineUpDigitalTicket, Duration> getWaitingUpdateRegCustomer(int userID) throws NotInQueueException;
+    Map<LineUpDigitalTicket, Duration> getWaitingUpdateSM(int userID) throws NotInQueueException;
+    Map<LineUpDigitalTicket, Duration> getWaitingUpdateUnregCustomer(int userID) throws NotInQueueException;
+
+    void validateTicket(int ticketID);
 }
