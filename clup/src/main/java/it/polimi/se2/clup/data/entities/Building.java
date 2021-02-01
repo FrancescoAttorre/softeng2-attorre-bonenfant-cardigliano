@@ -27,7 +27,7 @@ public class Building {
     @Column(nullable = false)
     private int capacity;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "building")
     private Queue queue;
 
     @ManyToOne

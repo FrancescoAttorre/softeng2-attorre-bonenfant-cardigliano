@@ -86,6 +86,7 @@ public class UserDataAccessImpl implements UserDataAccessInt{
         return  activity;
     }
 
+    //TODO
     @Override
     public StoreManager retrieveStoreManager(int id) {
         return null;

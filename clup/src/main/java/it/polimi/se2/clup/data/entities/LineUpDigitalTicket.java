@@ -7,11 +7,11 @@ import java.time.LocalDateTime;
         @NamedQuery(name = "LineUpDigitalTicket.selectWithID",
                 query = "select t from LineUpDigitalTicket t where t.ticketID = :ID"),
         @NamedQuery(name = "LineUpDigitalTicket.selectWithUnregID",
-                query = "select t from LineUpDigitalTicket t where t.unregisteredOwner = :unregID"),
+                query = "select t from LineUpDigitalTicket t where t.unregisteredOwner.id = :unregID"),
         @NamedQuery(name = "LineUpDigitalTicket.selectWithRegID",
-                query = "select t from LineUpDigitalTicket t where t.registeredOwner = :regID"),
+                query = "select t from LineUpDigitalTicket t where t.registeredOwner.id = :regID"),
         @NamedQuery(name = "LineUpDigitalTicket.selectWithSMID",
-                query = "select t from LineUpDigitalTicket t where t.storeManagerOwner = :SMID"),
+                query = "select t from LineUpDigitalTicket t where t.storeManagerOwner.id = :SMID"),
 })
 
 @Entity

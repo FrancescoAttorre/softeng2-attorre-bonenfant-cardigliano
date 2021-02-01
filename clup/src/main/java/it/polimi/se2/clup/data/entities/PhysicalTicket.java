@@ -6,7 +6,7 @@ import javax.persistence.*;
 public class PhysicalTicket {
 
     @Id
-    @Column(unique = true, nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int number;
 
     @OneToOne(fetch = FetchType.EAGER)

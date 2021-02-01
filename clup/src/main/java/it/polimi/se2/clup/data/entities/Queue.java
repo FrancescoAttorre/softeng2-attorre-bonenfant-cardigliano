@@ -10,7 +10,6 @@ import java.util.List;
 public class Queue {
     @Id
     @OneToOne
-    @JoinColumn(unique = true, nullable = false, name="BUILDING_ID")
     private Building building;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "queue")

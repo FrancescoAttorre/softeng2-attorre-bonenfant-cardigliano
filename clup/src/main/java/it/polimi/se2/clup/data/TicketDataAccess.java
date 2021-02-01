@@ -22,6 +22,7 @@ public class TicketDataAccess implements TicketDataAccessInterface {
         Building building = em.find(Building.class, buildingID);
 
         UnregisteredAppCustomer owner = em.find(UnregisteredAppCustomer.class, userID);
+        owner.addLineUpTicket(newTicket);
         newTicket.setUnregisteredOwner(owner);
 
         newTicket.setAcquisitionTime(LocalDateTime.now());
@@ -111,7 +112,8 @@ public class TicketDataAccess implements TicketDataAccessInterface {
                 .setParameter("ticketID", ticketID)
                 .getSingleResult();
          ticketToUpdate.setState(state);
-         ticketToUpdate.setValidationTime(LocalDateTime.now());
+         if (state.equals(TicketState.VALID))
+            ticketToUpdate.setValidationTime(LocalDateTime.now());
     }
 
     @Override

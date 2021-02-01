@@ -18,7 +18,6 @@
         <class>it.polimi.se2.clup.data.entities.LineUpDigitalTicket</class>
         <class>it.polimi.se2.clup.data.entities.BookingDigitalTicket</class>
         <class>it.polimi.se2.clup.data.entities.Queue</class>
-        <class>it.polimi.se2.clup.data.entities.TimeSlot</class>
         <class>it.polimi.se2.clup.data.entities.UnregisteredAppCustomer</class>
 
         <properties>
@@ -44,7 +43,6 @@
         <class>it.polimi.se2.clup.data.entities.LineUpDigitalTicket</class>
         <class>it.polimi.se2.clup.data.entities.BookingDigitalTicket</class>
         <class>it.polimi.se2.clup.data.entities.Queue</class>
-        <class>it.polimi.se2.clup.data.entities.TimeSlot</class>
         <class>it.polimi.se2.clup.data.entities.UnregisteredAppCustomer</class>
 
         <properties>

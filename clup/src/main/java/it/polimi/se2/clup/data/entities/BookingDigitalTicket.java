@@ -8,7 +8,7 @@ import java.util.List;
 @NamedQueries({
         @NamedQuery(name = "BookingDigitalTicket.selectByBuildingIdAndDate", query = "SELECT b FROM BookingDigitalTicket b WHERE b.date = :date AND b.building = :buildingId "),
         @NamedQuery(name = "BookingDigitalTicket.selectWithRegID",
-                query = "select t from BookingDigitalTicket t where t.owner = :regID"),
+                query = "select t from BookingDigitalTicket t where t.owner.id = :regID"),
 })
 public class BookingDigitalTicket extends DigitalTicket{
 

@@ -10,6 +10,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ public class TicketDataAccessTest {
     private static TicketDataAccess dm;
     private static int unregID;
     private static int buildingID;
+    private static int smID;
 
     @BeforeAll
     public static void setup() {
@@ -58,27 +60,27 @@ public class TicketDataAccessTest {
                 "ESSL9821"
         );
 
-        bdm.em.getTransaction().commit();
 
-        buildingID = bdm.em.createNamedQuery("Building.findAll", Building.class).getResultList().get(0).getBuildingID();
+        Building building = bdm.em.createNamedQuery("Building.findAll", Building.class).getResultList().get(0);
 
-        //TODO:Creation of a store manager for that building
+        buildingID = building.getBuildingID();
+
+        smID = udm.insertStoreManager("ESSL9821");
 
         em.getTransaction().commit();
-
     }
 
-    /*
+
     @Test
-    public void insertStoreManagerLineUpTicket() {
+    public void storeManagerTicketsEnteredProperly() {
 
         dm.em.getTransaction().begin();
 
-        LineUpDigitalTicket newTicket = dm.insertStoreManagerLineUpTicket(2);
+        LineUpDigitalTicket newTicket = dm.insertStoreManagerLineUpTicket(smID);
 
         dm.em.getTransaction().commit();
 
-        Query query = dm.em.createNamedQuery("LineUpDigitalTicket.selectWithSMID").setParameter("SMID", "2");
+        Query query = dm.em.createNamedQuery("LineUpDigitalTicket.selectWithSMID").setParameter("SMID", smID);
         List<LineUpDigitalTicket> result = query.getResultList();
         Assertions.assertTrue(result.contains(newTicket));
 
@@ -90,7 +92,9 @@ public class TicketDataAccessTest {
         Assertions.assertEquals(newTicket.getQueue(), newTicket.getBuilding().getQueue());
         Assertions.assertNull(newTicket.getRegisteredOwner());
         Assertions.assertNull(newTicket.getUnregisteredOwner());
-    }*/
+
+        Assertions.assertTrue(dm.retrieveLineUpTicketsStoreManager(smID).contains(newTicket));
+    }
 
     @Test
     public void unregCustomerLineUpTicketEnteredProperly() {
@@ -115,6 +119,10 @@ public class TicketDataAccessTest {
         Assertions.assertEquals(newTicket.getBuilding().getBuildingID(), buildingID);
         Assertions.assertEquals(newTicket.getUnregisteredOwner().getId(), unregID);
         Assertions.assertEquals(newTicket.getQueue(), newTicket.getBuilding().getQueue());
+
+        List<LineUpDigitalTicket> tickets = dm.retrieveTicketsUnregisteredCustomer(unregID);
+
+        Assertions.assertTrue(dm.retrieveTicketsUnregisteredCustomer(unregID).contains(newTicket));
     }
 
     @Test
@@ -142,5 +150,16 @@ public class TicketDataAccessTest {
         Assertions.assertEquals(newTicket.getBuilding().getBuildingID(), buildingID);
 
         Assertions.assertEquals(newTicket.getOwner().getId(), regID);
+
+        Assertions.assertTrue(dm.retrieveBookingTicketsRegCustomer(regID).contains(newTicket));
+    }
+
+    @Test
+    public void ticketStateUpdate() {
+        LineUpDigitalTicket newTicket = dm.insertUnregCustomerLineUpTicket(unregID, buildingID);
+        dm.updateTicketState(newTicket.getTicketID(), TicketState.VALID);
+
+        Assertions.assertEquals(newTicket.getState(), TicketState.VALID);
+        Assertions.assertNotNull(newTicket.getValidationTime());
     }
 }

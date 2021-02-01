@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 public class DigitalTicket {
 
     @Id
-    @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int ticketID;
 
