@@ -71,11 +71,18 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
     @Override
     public void insertBuilding(String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String, Integer> surplus,String accessCode) {
         Building building = new Building();
+        Queue queue = new Queue();
+        queue.setBuilding(building);
+
+        em.persist(queue);
+
         building.setName(name); //TODO: name should be unique ? check or catch exception ?
         building.setOpening(opening);
         building.setClosing(closing);
         building.setAddress(address);
         building.setCapacity(capacity);
+        building.setAccessCode(accessCode);
+        building.setQueue(queue);
         building.setDeltaExitTime(Duration.ZERO);
 
         for (String deptName : surplus.keySet()){

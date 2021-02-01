@@ -3,6 +3,17 @@ package it.polimi.se2.clup.data.entities;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@NamedQueries({
+        @NamedQuery(name = "LineUpDigitalTicket.selectWithID",
+                query = "select t from LineUpDigitalTicket t where t.ticketID = :ID"),
+        @NamedQuery(name = "LineUpDigitalTicket.selectWithUnregID",
+                query = "select t from LineUpDigitalTicket t where t.unregisteredOwner = :unregID"),
+        @NamedQuery(name = "LineUpDigitalTicket.selectWithRegID",
+                query = "select t from LineUpDigitalTicket t where t.registeredOwner = :regID"),
+        @NamedQuery(name = "LineUpDigitalTicket.selectWithSMID",
+                query = "select t from LineUpDigitalTicket t where t.storeManagerOwner = :SMID"),
+})
+
 @Entity
 public class LineUpDigitalTicket extends DigitalTicket {
 
@@ -10,7 +21,7 @@ public class LineUpDigitalTicket extends DigitalTicket {
         super();
     }
 
-    @Column
+    @Column(unique = true)
     //@Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime acquisitionTime;
 

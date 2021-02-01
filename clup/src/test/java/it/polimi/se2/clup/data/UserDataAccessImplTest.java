@@ -6,7 +6,6 @@ import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
 import it.polimi.se2.clup.data.entities.UnregisteredAppCustomer;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.function.Executable;
 
 import javax.persistence.*;
 import java.util.List;

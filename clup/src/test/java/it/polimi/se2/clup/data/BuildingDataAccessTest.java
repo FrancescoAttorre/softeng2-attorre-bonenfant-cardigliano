@@ -40,7 +40,7 @@ public class BuildingDataAccessTest {
         surplus.put("Bevande",12);
 
         dm.insertBuilding(
-                "EsselugnaStore",
+                "EsselungaStore",
                 LocalTime.of(8,0,0),
                 LocalTime.of(21,0,0),
                 "via Roma,1",

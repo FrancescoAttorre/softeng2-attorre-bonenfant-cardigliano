@@ -7,6 +7,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TicketDataAccess implements TicketDataAccessInterface {
@@ -78,7 +79,8 @@ public class TicketDataAccess implements TicketDataAccessInterface {
     }
 
     @Override
-    public BookingDigitalTicket insertBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength)
+    public BookingDigitalTicket insertBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID,
+                                                    int timeSlotLength, List<String> chosenDepartments)
             throws NoResultException {
 
         BookingDigitalTicket newTicket = new BookingDigitalTicket();
@@ -93,7 +95,12 @@ public class TicketDataAccess implements TicketDataAccessInterface {
         newTicket.setTimeSlotID(timeSlotID);
         newTicket.setDate(date);
         newTicket.setTimeSlotLength(timeSlotLength);
-
+        List<Department> departments = new ArrayList<>();
+        for (Department buildingDep: building.getDepartments()) {
+            if (chosenDepartments.contains(buildingDep.getName()))
+                departments.add(buildingDep);
+        }
+        newTicket.setDepartments(departments);
         em.persist(newTicket);
         return newTicket;
     }

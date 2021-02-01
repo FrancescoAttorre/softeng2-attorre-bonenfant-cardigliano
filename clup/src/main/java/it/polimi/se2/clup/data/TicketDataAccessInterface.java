@@ -1,6 +1,7 @@
 package it.polimi.se2.clup.data;
 
 import it.polimi.se2.clup.data.entities.BookingDigitalTicket;
+import it.polimi.se2.clup.data.entities.Department;
 import it.polimi.se2.clup.data.entities.LineUpDigitalTicket;
 import it.polimi.se2.clup.data.entities.TicketState;
 
@@ -13,7 +14,8 @@ public interface TicketDataAccessInterface {
     LineUpDigitalTicket insertUnregCustomerLineUpTicket(int userID, int buildingID);
     LineUpDigitalTicket insertRegCustomerLineUpTicket (int userID, int buildingID);
     LineUpDigitalTicket insertStoreManagerLineUpTicket (int userID);
-    BookingDigitalTicket insertBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength);
+    BookingDigitalTicket insertBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength,
+                                             List<String> chosenDepartments);
     void updateTicketState(int ticketID, TicketState state);
     List<LineUpDigitalTicket> retrieveLineUpTicketsRegCustomer(int userID);
     List<BookingDigitalTicket> retrieveBookingTicketsRegCustomer(int userID);

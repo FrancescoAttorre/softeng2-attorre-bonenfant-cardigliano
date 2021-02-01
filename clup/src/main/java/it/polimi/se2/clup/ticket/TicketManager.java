@@ -44,8 +44,9 @@ public class TicketManager implements TicketManagerInterface {
     }
 
     @Override
-    public void acquireBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength) {
-        ticketDataAccess.insertBookingTicket(userID, buildingID, date, timeSlotID, timeSlotLength);
+    public void acquireBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID,
+                                     int timeSlotLength, List<String> departments) {
+        ticketDataAccess.insertBookingTicket(userID, buildingID, date, timeSlotID, timeSlotLength, departments);
     }
 
     @Override

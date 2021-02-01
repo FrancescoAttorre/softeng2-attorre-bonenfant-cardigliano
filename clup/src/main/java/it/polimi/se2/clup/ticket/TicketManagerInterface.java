@@ -11,7 +11,7 @@ public interface TicketManagerInterface {
 
     void acquireStoreManagerTicket(int userID);
 
-    void acquireBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength);
+    void acquireBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength, List<String> departments);
 
     void acquireUnregCustomerLineUpTicket(int userID, int buildingID);
 

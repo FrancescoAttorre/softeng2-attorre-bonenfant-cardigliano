@@ -1,20 +1,20 @@
 package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
-import java.sql.Time;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @NamedQueries({
-        @NamedQuery(name = "Building.retrieveBuildingByName", query = "SELECT u FROM Building u WHERE u.id = :buildingName "),
+        @NamedQuery(name = "Building.retrieveBuildingByName", query = "SELECT u FROM Building u WHERE u.name = :buildingName "),
         @NamedQuery(name = "Building.findAll", query = "SELECT b FROM Building b"),
 })
 public class Building {
 
     @Id
+    @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
@@ -34,7 +34,7 @@ public class Building {
     private Activity activity;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "building",cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<Department> departments;
+    private List<Department> departments = new ArrayList<>();
 
     @Column(nullable = false)
     private LocalTime opening;
