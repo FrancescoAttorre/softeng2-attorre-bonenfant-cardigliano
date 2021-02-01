@@ -8,7 +8,6 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import it.polimi.se2.clup.auth.exceptions.AuthorizationException;
 import it.polimi.se2.clup.auth.exceptions.TokenException;
-import org.eclipse.persistence.sdo.helper.extension.Token;
 
 import java.util.Date;
 

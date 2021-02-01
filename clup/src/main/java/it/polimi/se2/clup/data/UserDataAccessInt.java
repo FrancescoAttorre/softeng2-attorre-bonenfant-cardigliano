@@ -12,6 +12,7 @@ public interface UserDataAccessInt {
     RegisteredAppCustomer retrieveUser(String username);
     void insertUser(String username, String password);
     void insertActivity(String name, String pIva, String password);
+    Integer insertStoreManager(String accessCode);
     Activity retrieveActivity(String pIva);
     StoreManager retrieveStoreManager(int id);
     UnregisteredAppCustomer retrieveUnregisteredAppCustomer(int userId);

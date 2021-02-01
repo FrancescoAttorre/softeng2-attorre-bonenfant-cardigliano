@@ -1,9 +1,6 @@
 package it.polimi.se2.clup.data;
 
-import it.polimi.se2.clup.data.entities.Activity;
-import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
-import it.polimi.se2.clup.data.entities.StoreManager;
-import it.polimi.se2.clup.data.entities.UnregisteredAppCustomer;
+import it.polimi.se2.clup.data.entities.*;
 
 import javax.ejb.Stateless;
 import javax.persistence.*;
@@ -16,10 +13,19 @@ public class UserDataAccessImpl implements UserDataAccessInt{
     protected EntityManager em;
 
     @Override
-    public RegisteredAppCustomer retrieveUser(String username) throws NonUniqueResultException, NoResultException{
-        return  em.createNamedQuery("RegisteredAppCustomer.findUserByUsername", RegisteredAppCustomer.class)
+    public RegisteredAppCustomer retrieveUser(String username) {
+
+        RegisteredAppCustomer rac;
+
+        try {
+            rac = em.createNamedQuery("RegisteredAppCustomer.findUserByUsername", RegisteredAppCustomer.class)
                     .setParameter("username", username)
                     .getSingleResult();
+        } catch (NoResultException e) {
+            rac = null;
+        }
+
+        return rac;
     }
 
     @Override
@@ -44,10 +50,40 @@ public class UserDataAccessImpl implements UserDataAccessInt{
     }
 
     @Override
+    public Integer insertStoreManager(String accessCode) {
+        StoreManager sm = new StoreManager();
+
+        Integer id;
+
+        try {
+            Building b = em.createNamedQuery("Building.retrieveByAccessCode", Building.class)
+                    .setParameter("accessCode", accessCode)
+                    .getSingleResult();
+            sm.setBuilding(b);
+            em.persist(sm);
+
+            id = sm.getId();
+        } catch (NoResultException e) {
+            id = null;
+        }
+
+        return id;
+    }
+
+    @Override
     public Activity retrieveActivity(String pIva) throws NonUniqueResultException, NoResultException {
-        return  em.createNamedQuery("Activity.selectWithPIVA", Activity.class)
-                .setParameter("pIva", pIva)
-                .getSingleResult();
+
+        Activity activity;
+
+        try {
+            activity = em.createNamedQuery("Activity.selectWithPIVA", Activity.class)
+                    .setParameter("pIva", pIva)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            activity = null;
+        }
+
+        return  activity;
     }
 
     @Override

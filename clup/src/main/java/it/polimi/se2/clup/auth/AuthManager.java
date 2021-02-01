@@ -3,22 +3,22 @@ package it.polimi.se2.clup.auth;
 import it.polimi.se2.clup.auth.exceptions.CredentialsException;
 import it.polimi.se2.clup.auth.exceptions.TokenException;
 import it.polimi.se2.clup.data.UserDataAccessInt;
+import it.polimi.se2.clup.data.entities.Activity;
 import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
-import it.polimi.se2.clup.data.entities.StoreManager;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 @Stateless
 public class AuthManager implements AuthManagerInt{
-    @EJB private UserDataAccessInt userDAO;
+    @EJB protected UserDataAccessInt userDAO;
 
     //TODO: Handle specific exception and not general Exception type
 
     TokenManager tokenManager = new TokenManager();
 
-    private final long regExpiration = 60000; //1m
-    private final long unregExpiration = 1440000; //24h
+    private final long regExpiration = 60 * 1000; //1m
+    private final long unregExpiration = 1000 * 60 * 60 * 24; //24h
 
     @Override
     public boolean registerUser(String username, String password) {
@@ -59,14 +59,21 @@ public class AuthManager implements AuthManagerInt{
     }
 
     @Override
-    public String authenticate(int storeManagerID) {
-        StoreManager sm = userDAO.retrieveStoreManager(storeManagerID);
+    public String authenticate(String buildingAccessCode) throws CredentialsException{
+        Integer id = userDAO.insertStoreManager(Hash.simpleHash(buildingAccessCode));
 
-        return tokenManager.createToken(storeManagerID, regExpiration, AuthFlag.MANAGER);
+        if(id == null)
+            throw new CredentialsException("Wrong Access Code");
+
+        return tokenManager.createToken(id, regExpiration, AuthFlag.MANAGER);
     }
 
     public String authenticate(String username, String password) throws CredentialsException {
         RegisteredAppCustomer rac = userDAO.retrieveUser(username);
+
+        if(rac == null) {
+            throw new CredentialsException("Username does not exist");
+        }
 
         String hashedPassword = rac.getPassword();
         String token;
@@ -74,10 +81,25 @@ public class AuthManager implements AuthManagerInt{
         if(Hash.verifyHash(password, hashedPassword)) {
             token = tokenManager.createToken(rac.getId(), regExpiration, AuthFlag.REGISTERED);
         } else
-            throw new CredentialsException("Wrong credentials");
+            throw new CredentialsException("Wrong password");
 
         return token;
 
+    }
+
+    @Override
+    public String authenticateActivity(String pIVA, String password) throws CredentialsException {
+        Activity activity = userDAO.retrieveActivity(pIVA);
+
+        String hashedPassword = activity.getPassword();
+        String token;
+
+        if(Hash.verifyHash(password, hashedPassword)) {
+            token = tokenManager.createToken(activity.getId(), regExpiration, AuthFlag.ACTIVITY);
+        } else
+            throw new CredentialsException("Wrong credentials");
+
+        return token;
     }
 
     public String createDailyToken() {
@@ -89,6 +111,13 @@ public class AuthManager implements AuthManagerInt{
     @Override
     public int verifyToken(String token, AuthFlag auth) throws TokenException {
         return tokenManager.verify(token, auth);
+    }
+
+    @Override
+    public String[] generateAccessCode() {
+        String accessCode = AccessCode.generate();
+
+        return new String[]{accessCode, Hash.simpleHash(accessCode)};
     }
 
 

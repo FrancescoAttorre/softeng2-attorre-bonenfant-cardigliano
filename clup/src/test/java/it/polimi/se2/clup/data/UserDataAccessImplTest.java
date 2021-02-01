@@ -8,7 +8,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Assertions;
 
 import javax.persistence.*;
-import java.util.List;
 
 public class UserDataAccessImplTest {
 
@@ -63,8 +62,8 @@ public class UserDataAccessImplTest {
 
         dm.em.getTransaction().commit();
 
-        RegisteredAppCustomer registeredAppCustomer = dm.em.createNamedQuery("RegisteredAppCustomer.checkCredentials", RegisteredAppCustomer.class)
-                .setParameter("username", "insertedUser").setParameter("password","insertedPassword").getSingleResult();
+        RegisteredAppCustomer registeredAppCustomer = dm.em.createNamedQuery("RegisteredAppCustomer.findUserByUsername", RegisteredAppCustomer.class)
+                .setParameter("username", "insertedUser").getSingleResult();
 
         Assertions.assertEquals("insertedUser",registeredAppCustomer.getUsername());
         Assertions.assertEquals("insertedPassword",registeredAppCustomer.getPassword());
@@ -80,8 +79,10 @@ public class UserDataAccessImplTest {
 
         dm.em.getTransaction().commit();
 
-        List<UnregisteredAppCustomer> unregisteredAppCustomers = dm.em.createNamedQuery("UnregisteredAppCustomer.selectAll", UnregisteredAppCustomer.class)
-                .getResultList();
+        Assertions.assertDoesNotThrow(() -> dm.em.createNamedQuery("UnregisteredAppCustomer.selectAll", UnregisteredAppCustomer.class)
+                .getResultList());
+
+
     }
 
     @Test
@@ -93,4 +94,15 @@ public class UserDataAccessImplTest {
         Assertions.assertEquals("firstPassword",registeredAppCustomer.getPassword());
 
     }
+
+    @Test
+    public void unExistentUser() {
+        Assertions.assertNull(dm.retrieveUser("unExistentUser"));
+    }
+
+    @Test
+    public void unExistentActivity() {
+        Assertions.assertNull(dm.retrieveActivity("unExistentPIVA"));
+    }
+
 }

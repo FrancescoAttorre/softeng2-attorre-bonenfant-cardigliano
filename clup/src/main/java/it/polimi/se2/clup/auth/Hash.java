@@ -27,15 +27,31 @@ class Hash {
             e.printStackTrace();
         }
 
-        return ":";
+        return null;
     }
+
+    public static String simpleHash(String code) {
+        String generatedHash;
+
+        try {
+            MessageDigest md = MessageDigest.getInstance(algorithm);
+            byte[] bytes = md.digest(code.getBytes());
+
+            return Base64.getEncoder().encodeToString(bytes);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
 
     public static String hash(String password) {
         return hash(password, getSalt());
     }
 
     private static byte[] getSalt() {
-        SecureRandom sr = null;
+        SecureRandom sr;
         byte[] salt = new byte[saltLength];
 
         try {

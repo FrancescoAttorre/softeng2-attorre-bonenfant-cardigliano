@@ -3,6 +3,8 @@ package it.polimi.se2.clup.data.entities;
 import javax.persistence.*;
 import java.util.List;
 
+@NamedQuery(name="StoreManager.getBuildingAccessCode",
+            query="Select b.accessCode from Building b where b = :building")
 @DiscriminatorValue("STORE_MANAGER")
 @Entity
 public class StoreManager extends User {

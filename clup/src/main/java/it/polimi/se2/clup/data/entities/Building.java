@@ -8,13 +8,13 @@ import java.util.List;
 
 @Entity
 @NamedQueries({
-        @NamedQuery(name = "Building.retrieveBuildingByName", query = "SELECT u FROM Building u WHERE u.name = :buildingName "),
+        @NamedQuery(name = "Building.retrieveByAccessCode", query = "SELECT u FROM Building  u WHERE u.accessCode = :accessCode"),
+        @NamedQuery(name = "Building.retrieveBuildingByName", query = "SELECT u FROM Building u WHERE u.id = :buildingName "),
         @NamedQuery(name = "Building.findAll", query = "SELECT b FROM Building b"),
 })
 public class Building {
 
     @Id
-    @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 

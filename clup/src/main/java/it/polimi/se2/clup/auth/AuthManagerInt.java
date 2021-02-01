@@ -21,7 +21,7 @@ public interface AuthManagerInt {
      * Returns an Authorization Token for a StoreManager
      * @return Authorization token
      */
-    String authenticate(int storeManagerID);
+    String authenticate(String buildingAccessCode) throws CredentialsException;
 
     /**
      * Checks credentials and returns an Authorization token
@@ -30,6 +30,8 @@ public interface AuthManagerInt {
      * @throws CredentialsException
      */
     String authenticate(String username, String password) throws CredentialsException;
+
+    String authenticateActivity(String pIVA, String password) throws CredentialsException;
 
     /**
      * Add an UnregisterdAppCustomer to the system and returns an Authorization token
@@ -43,5 +45,11 @@ public interface AuthManagerInt {
      * @throws TokenException
      */
     int verifyToken(String token, AuthFlag auth) throws TokenException;
+
+    /**
+     * Generates an Array containing an access code and its hash (no salt)
+     * @return {code, hashedCode}
+     */
+    String[] generateAccessCode();
 
 }
