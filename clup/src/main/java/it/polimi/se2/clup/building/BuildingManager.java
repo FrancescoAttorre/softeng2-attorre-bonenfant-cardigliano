@@ -63,4 +63,11 @@ public class BuildingManager implements BuildingManagerInterface{
         return queueManager.insertInQueue(ticket);
     }
 
+    public QueueManager getQueueManager() {
+        return queueManager;
+    }
+
+    public void setQueueManager(QueueManager queueManager) {
+        this.queueManager = queueManager;
+    }
 }

@@ -9,8 +9,9 @@ import java.time.LocalDateTime;
 @Stateless
 public class UserDataAccessImpl implements UserDataAccessInt{
 
+    //TODO: set to protected? (public for test pusposes)
     @PersistenceContext(unitName = "clup")
-    protected EntityManager em;
+    public EntityManager em;
 
     @Override
     public RegisteredAppCustomer retrieveUser(String username) {

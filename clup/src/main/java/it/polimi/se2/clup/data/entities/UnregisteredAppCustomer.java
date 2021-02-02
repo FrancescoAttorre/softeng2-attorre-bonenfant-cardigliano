@@ -3,6 +3,7 @@ package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,7 +24,7 @@ public class UnregisteredAppCustomer extends User{
     private String meansOfTransport;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "unregisteredOwner")
-    private List<LineUpDigitalTicket> lineUpDigitalTickets;
+    private List<LineUpDigitalTicket> lineUpDigitalTickets = new ArrayList<>();
 
     public void addLineUpTicket(LineUpDigitalTicket lineUpTicket){
         this.lineUpDigitalTickets.add(lineUpTicket);

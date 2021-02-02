@@ -58,7 +58,7 @@ public class Building {
     private Duration deltaExitTime; // seconds between the last exit time of last exits
 
     @Column
-    private int lastExitTime; // seconds between 00:00 and actual time
+    private LocalTime lastExitTime; // seconds between 00:00 and actual time
 
     public Duration getDeltaExitTime() {
         return deltaExitTime;
@@ -68,11 +68,11 @@ public class Building {
         this.deltaExitTime = deltaExitTime;
     }
 
-    public int getLastExitTime() {
+    public LocalTime getLastExitTime() {
         return lastExitTime;
     }
 
-    public void setLastExitTime(int lastExitTime) {
+    public void setLastExitTime(LocalTime lastExitTime) {
         this.lastExitTime = lastExitTime;
     }
 

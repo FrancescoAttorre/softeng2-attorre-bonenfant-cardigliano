@@ -14,7 +14,7 @@ import java.util.*;
 public class BuildingDataAccess implements BuildingDataAccessInterface{
 
     @PersistenceContext(unitName = "clup")
-    protected EntityManager em;
+    public EntityManager em;
 
     @Override
     public Building retrieveBuilding(int buildingId){
@@ -69,7 +69,7 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
     }
 
     @Override
-    public void insertBuilding(String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String, Integer> surplus,String accessCode) {
+    public int insertBuilding(String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String, Integer> surplus,String accessCode) {
         Building building = new Building();
         Queue queue = new Queue();
         queue.setBuilding(building);
@@ -94,6 +94,7 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
         }
 
         em.persist(building);
+        return building.getBuildingID();
     }
 
     @Override
@@ -114,12 +115,14 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
         double weightedOldDelta;
         double weightedNewDelta;
         if(building.getDeltaExitTime().equals(Duration.ZERO)){
-            weightedNewDelta = (double)lastExitTime.get(ChronoField.SECOND_OF_DAY) - (double)building.getOpening().get(ChronoField.SECOND_OF_DAY);
+            //weightedNewDelta = (double)lastExitTime.get(ChronoField.SECOND_OF_DAY) - (double)building.getOpening().get(ChronoField.SECOND_OF_DAY);
+            weightedNewDelta = lastExitTime.toSecondOfDay() - building.getOpening().toSecondOfDay();
 
             building.setDeltaExitTime(Duration.ofSeconds((long) weightedNewDelta));
         }else {
             weightedOldDelta = building.getDeltaExitTime().toSeconds() * 0.8 ;
-            weightedNewDelta = (double)lastExitTime.get(ChronoField.SECOND_OF_DAY) - (double)building.getLastExitTime() * 0.2;
+            //weightedNewDelta = (double)lastExitTime.get(ChronoField.SECOND_OF_DAY) - (double)building.getLastExitTime() * 0.2;
+            weightedNewDelta = lastExitTime.toSecondOfDay() - lastExitTime.toSecondOfDay() * 0.2;
 
             //TODO : check order of new delta
             building.setDeltaExitTime(Duration.ofSeconds((long)(weightedNewDelta + weightedOldDelta)));
@@ -134,7 +137,7 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
 
         if(building == null) return false;
 
-        building.setLastExitTime(lastExit.get(ChronoField.SECOND_OF_DAY)); //should throw an exception ?
+        building.setLastExitTime(lastExit); //should throw an exception ?
         return true;
     }
 }

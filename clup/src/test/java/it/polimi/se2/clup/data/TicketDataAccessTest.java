@@ -10,7 +10,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,20 +28,20 @@ public class TicketDataAccessTest {
 
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("clupTest");
         dm = new TicketDataAccess();
-        UserDataAccessImpl udm = new UserDataAccessImpl();
+        UserDataAccessImpl uda = new UserDataAccessImpl();
         BuildingDataAccess bdm = new BuildingDataAccess();
         EntityManager em = emf.createEntityManager();
         dm.em = em;
-        udm.em = em;
+        uda.em = em;
         bdm.em = em;
 
         em.getTransaction().begin();
 
         //Creation of an unregistered customer
-        unregID = udm.insertUnregisteredAppCustomer();
+        unregID = uda.insertUnregisteredAppCustomer();
 
         //Creation of a registered customer
-        udm.insertUser("user", "password");
+        uda.insertUser("user", "password");
 
         //Creation of a sample building
 
@@ -50,22 +49,16 @@ public class TicketDataAccessTest {
         surplus.put("Macelleria",1);
         surplus.put("Pescheria",3);
 
-        bdm.insertBuilding(
+        buildingID = bdm.insertBuilding(
                 "EsselungaStore",
                 LocalTime.of(8,0,0),
                 LocalTime.of(21,0,0),
                 "via Roma,1",
                 3,
                 surplus,
-                "ESSL9821"
-        );
+                "ESSL9821");
 
-
-        Building building = bdm.em.createNamedQuery("Building.findAll", Building.class).getResultList().get(0);
-
-        buildingID = building.getBuildingID();
-
-        smID = udm.insertStoreManager("ESSL9821");
+        smID = uda.insertStoreManager("ESSL9821");
 
         em.getTransaction().commit();
     }

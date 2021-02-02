@@ -21,23 +21,23 @@ public class LineUpDigitalTicket extends DigitalTicket {
         super();
     }
 
-    @Column(unique = true)
+    @Column
     //@Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime acquisitionTime;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "associatedDigitalTicket")
+    @OneToOne(mappedBy = "associatedDigitalTicket")
     private PhysicalTicket associatedPhysicalTicket;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Queue queue;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private UnregisteredAppCustomer unregisteredOwner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private RegisteredAppCustomer registeredOwner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private StoreManager storeManagerOwner;
 
     public PhysicalTicket getAssociatedPhysicalTicket() { return associatedPhysicalTicket;}

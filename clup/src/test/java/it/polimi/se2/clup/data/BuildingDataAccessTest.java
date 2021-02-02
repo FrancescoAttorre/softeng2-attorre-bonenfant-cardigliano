@@ -74,14 +74,14 @@ public class BuildingDataAccessTest {
         Building building = dm.em.createNamedQuery("Building.retrieveBuildingByName", Building.class).setParameter("buildingName","EsselungaStore").getSingleResult();
 
         Duration oldDelta = building.getDeltaExitTime();
-        int oldLastExitTime = building.getLastExitTime();
+        LocalTime oldLastExitTime = building.getLastExitTime();
 
         dm.updateStatistics(building.getBuildingID(),exitTime);
 
         dm.em.getTransaction().commit();
 
         Duration newDelta = building.getDeltaExitTime();
-        int newLastExitTime = building.getLastExitTime();
+        LocalTime newLastExitTime = building.getLastExitTime();
 
         //TODO:
         Assertions.assertNotEquals(oldDelta,newDelta);

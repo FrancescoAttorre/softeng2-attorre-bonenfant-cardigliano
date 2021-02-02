@@ -29,4 +29,7 @@ public class QueueManager {
             return null;
     }
 
+    public BuildingDataAccess getDataAccess() {
+        return dataAccess;
+    }
 }

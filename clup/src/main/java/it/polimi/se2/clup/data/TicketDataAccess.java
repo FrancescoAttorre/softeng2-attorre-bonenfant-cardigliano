@@ -13,7 +13,7 @@ import java.util.List;
 public class TicketDataAccess implements TicketDataAccessInterface {
 
     @PersistenceContext(unitName = "clup")
-    protected EntityManager em;
+    public EntityManager em;
 
     @Override
     public LineUpDigitalTicket insertUnregCustomerLineUpTicket(int userID, int buildingID) throws NoResultException {

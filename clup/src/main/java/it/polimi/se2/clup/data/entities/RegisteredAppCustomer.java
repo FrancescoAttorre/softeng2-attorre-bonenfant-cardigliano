@@ -1,6 +1,7 @@
 package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -16,10 +17,10 @@ public class RegisteredAppCustomer extends User {
     private String password;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "registeredOwner")
-    private List<LineUpDigitalTicket> lineUpDigitalTickets;
+    private List<LineUpDigitalTicket> lineUpDigitalTickets = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")
-    private List<BookingDigitalTicket> bookingDigitalTickets;
+    private List<BookingDigitalTicket> bookingDigitalTickets = new ArrayList<>();
 
     @Column
     private String position;

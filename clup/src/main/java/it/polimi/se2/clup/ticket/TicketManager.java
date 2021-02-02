@@ -1,6 +1,5 @@
 package it.polimi.se2.clup.ticket;
 
-import it.polimi.se2.clup.auth.exceptions.CredentialsException;
 import it.polimi.se2.clup.building.BuildingManager;
 import it.polimi.se2.clup.data.TicketDataAccess;
 import it.polimi.se2.clup.data.entities.*;
@@ -8,6 +7,7 @@ import it.polimi.se2.clup.data.entities.*;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +17,7 @@ import java.util.Map;
 public class TicketManager implements TicketManagerInterface {
 
     public static final int extraTime = 10;
+    public static final int defaultWaitingTime = 15;
 
     private TicketDataAccess ticketDataAccess = new TicketDataAccess();
     private BuildingManager buildingManager = new BuildingManager();
@@ -109,9 +110,9 @@ public class TicketManager implements TicketManagerInterface {
         List<LineUpDigitalTicket> customerLineUpTickets = ticketDataAccess.retrieveTicketsUnregisteredCustomer(userID);
         Map<LineUpDigitalTicket, Duration> lineUpWaitingTimes = new HashMap<>();
 
-        for (LineUpDigitalTicket ticket : customerLineUpTickets) {
+        for (LineUpDigitalTicket ticket : customerLineUpTickets)
             lineUpWaitingTimes.put(ticket, computeWaitingTime(ticket));
-        }
+
         return lineUpWaitingTimes;
     }
 
@@ -146,8 +147,12 @@ public class TicketManager implements TicketManagerInterface {
                 if (positionInQueue != -1) {
                     long averageWait = ticket.getBuilding().getDeltaExitTime().toMinutes();
 
-                    newWaitingTime = Duration.ofMinutes((averageWait * (positionInQueue + 1)) -
-                            (LocalDateTime.now().getMinute() - ticket.getBuilding().getLastExitTime()));
+                    if (ticket.getBuilding().getLastExitTime() != null)
+                        newWaitingTime = Duration.ofMinutes((averageWait * (positionInQueue + 1)) -
+                            (LocalTime.now().getMinute() - ticket.getBuilding().getLastExitTime().getMinute())); //if more than 1h doesn't work
+                    else
+                        newWaitingTime = Duration.ofMinutes(defaultWaitingTime -
+                                (LocalDateTime.now().getMinute() - ticket.getAcquisitionTime().getMinute()));
 
                     if (newWaitingTime.toMinutes() <= 0)
                         newWaitingTime = newWaitingTime.plus(additionalTime);

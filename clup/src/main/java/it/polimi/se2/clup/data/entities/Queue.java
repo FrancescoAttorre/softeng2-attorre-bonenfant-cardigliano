@@ -1,6 +1,7 @@
 package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,7 +14,7 @@ public class Queue {
     private Building building;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "queue")
-    private List<LineUpDigitalTicket> queueTickets;
+    private List<LineUpDigitalTicket> queueTickets = new ArrayList<>();
 
     public Building getBuilding() {
         return building;
@@ -25,9 +26,7 @@ public class Queue {
     public List<LineUpDigitalTicket> getQueueTickets() {
         return queueTickets;
     }
-    public void setQueueTickets(List<LineUpDigitalTicket> queueTickets) {
-        this.queueTickets = queueTickets;
-    }
+    public void setQueueTickets(List<LineUpDigitalTicket> queueTickets) {this.queueTickets = queueTickets;}
 
     public void addQueueTickets(LineUpDigitalTicket queueTicket){
         this.queueTickets.add(queueTicket);

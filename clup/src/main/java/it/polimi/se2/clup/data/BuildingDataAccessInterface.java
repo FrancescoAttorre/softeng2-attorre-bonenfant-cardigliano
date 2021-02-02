@@ -13,7 +13,7 @@ import java.util.Map;
 
 public interface BuildingDataAccessInterface {
     List<Building> retrieveBuildings();
-    void insertBuilding(String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String,Integer> surplus, String accessCode);
+    int insertBuilding(String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String,Integer> surplus, String accessCode);
     Building retrieveBuilding(int buildingId);
     boolean retrieveBuildingState(int id);
     boolean insertInQueue(LineUpDigitalTicket ticket);
