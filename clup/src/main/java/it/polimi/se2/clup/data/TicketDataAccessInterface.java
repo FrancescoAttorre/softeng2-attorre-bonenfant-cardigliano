@@ -5,10 +5,12 @@ import it.polimi.se2.clup.data.entities.Department;
 import it.polimi.se2.clup.data.entities.LineUpDigitalTicket;
 import it.polimi.se2.clup.data.entities.TicketState;
 
+import javax.ejb.Local;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.List;
 
+@Local
 public interface TicketDataAccessInterface {
 
     LineUpDigitalTicket insertUnregCustomerLineUpTicket(int userID, int buildingID);

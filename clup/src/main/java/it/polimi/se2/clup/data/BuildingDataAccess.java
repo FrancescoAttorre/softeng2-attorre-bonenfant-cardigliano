@@ -72,6 +72,7 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
     public int insertBuilding(String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String, Integer> surplus,String accessCode) {
         Building building = new Building();
         Queue queue = new Queue();
+        building.setQueue(queue);
         queue.setBuilding(building);
 
         em.persist(queue);

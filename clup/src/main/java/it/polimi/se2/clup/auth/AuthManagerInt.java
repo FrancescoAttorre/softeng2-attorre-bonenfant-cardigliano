@@ -3,6 +3,7 @@ package it.polimi.se2.clup.auth;
 import it.polimi.se2.clup.auth.exceptions.CredentialsException;
 import it.polimi.se2.clup.auth.exceptions.TokenException;
 
+
 public interface AuthManagerInt {
     /**
      * Registers a user as RegisteredAppCustomer

@@ -2,6 +2,7 @@ package it.polimi.se2.clup.data;
 
 import it.polimi.se2.clup.data.entities.*;
 
+import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Stateless
 public class TicketDataAccess implements TicketDataAccessInterface {
 
     @PersistenceContext(unitName = "clup")

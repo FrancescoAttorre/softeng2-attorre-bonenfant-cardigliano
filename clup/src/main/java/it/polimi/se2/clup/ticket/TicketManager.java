@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static it.polimi.se2.clup.data.entities.TicketState.INVALID;
+
 
 public class TicketManager implements TicketManagerInterface {
 
@@ -132,16 +134,19 @@ public class TicketManager implements TicketManagerInterface {
 
     private Duration computeWaitingTime (LineUpDigitalTicket ticket) throws NotInQueueException {
 
-        Duration newWaitingTime;
+        Duration newWaitingTime = null;
 
         switch (ticket.getState()) {
-            case EXPIRED -> newWaitingTime = Duration.ZERO;
-            case VALID -> {
+            case EXPIRED:
+                newWaitingTime = Duration.ZERO;
+                break;
+            case VALID:
                 newWaitingTime = Duration.ZERO;
                 if ((ChronoUnit.MINUTES.between(LocalDateTime.now(), ticket.getValidationTime())) > 10)
                     ticketDataAccess.updateTicketState(ticket.getTicketID(), TicketState.EXPIRED);
-            }
-            case INVALID -> {
+                break;
+
+            case INVALID:
                 Duration additionalTime = Duration.ofMinutes(extraTime);
                 int positionInQueue = ticket.getQueue().getQueueTickets().indexOf(ticket);
                 if (positionInQueue != -1) {
@@ -158,8 +163,9 @@ public class TicketManager implements TicketManagerInterface {
                         newWaitingTime = newWaitingTime.plus(additionalTime);
                 } else
                     throw new NotInQueueException();
-            }
-            default -> throw new IllegalStateException("Unexpected value: " + ticket.getState());
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + ticket.getState());
         }
         return newWaitingTime;
     }

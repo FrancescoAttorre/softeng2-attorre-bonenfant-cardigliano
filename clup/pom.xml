@@ -11,8 +11,6 @@
     <packaging>war</packaging>
 
     <properties>
-        <maven.compiler.target>14</maven.compiler.target>
-        <maven.compiler.source>14</maven.compiler.source>
         <junit.version>5.7.0</junit.version>
     </properties>
 
@@ -21,6 +19,12 @@
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
             <version>8.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.ejb</groupId>
+            <artifactId>javax.ejb-api</artifactId>
+            <version>3.2.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -68,6 +72,14 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.12.4</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>9</source>
+                    <target>9</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>
