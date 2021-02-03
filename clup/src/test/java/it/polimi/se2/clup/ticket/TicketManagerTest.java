@@ -1,11 +1,13 @@
 package it.polimi.se2.clup.ticket;
 
+import it.polimi.se2.clup.building.QueueManager;
 import it.polimi.se2.clup.data.BuildingDataAccess;
 import it.polimi.se2.clup.data.TicketDataAccess;
 import it.polimi.se2.clup.data.UserDataAccessImpl;
-import it.polimi.se2.clup.data.entities.LineUpDigitalTicket;
+import it.polimi.se2.clup.data.entities.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.persistence.EntityManager;
@@ -21,10 +23,11 @@ public class TicketManagerTest {
     static TicketDataAccess tda;
     static BuildingDataAccess bda;
     static UserDataAccessImpl uda;
+    static QueueManager qm;
     private static int unregID;
 
-    @BeforeAll
-    public static void setup() {
+    @BeforeEach
+    public void setup() {
 
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("clupTest");
         EntityManager em = emf.createEntityManager();
@@ -34,12 +37,16 @@ public class TicketManagerTest {
         tda = new TicketDataAccess();
         bda = new BuildingDataAccess();
         uda = new UserDataAccessImpl();
+        qm = new QueueManager();
         uda.em = em;
         bda.em = em;
         tda.em = em;
 
         tm.setTicketDataAccess(tda);
+        tm.getBuildingManager().setQueueManager(qm);
         tm.getBuildingManager().getQueueManager().getDataAccess().em = em;
+
+        removeAllFromDatabase(em);
 
         em.getTransaction().begin();
 
@@ -62,6 +69,23 @@ public class TicketManagerTest {
         tm.acquireUnregCustomerLineUpTicket(unregID, buildingID);
         tm.acquireUnregCustomerLineUpTicket(unregID, buildingID);
 
+        em.getTransaction().commit();
+    }
+
+    private void removeAllFromDatabase(EntityManager em) {
+        em.getTransaction().begin();
+        for(RegisteredAppCustomer u : em.createNamedQuery("RegisteredAppCustomer.findAll",RegisteredAppCustomer.class).getResultList()){
+            em.remove(u);
+        }
+        for(UnregisteredAppCustomer u : em.createNamedQuery("UnregisteredAppCustomer.findAll",UnregisteredAppCustomer.class).getResultList()){
+            em.remove(u);
+        }
+        for(StoreManager u : em.createNamedQuery("StoreManager.findAll",StoreManager.class).getResultList()){
+            em.remove(u);
+        }
+        for(Building b : em.createNamedQuery("Building.findAll",Building.class).getResultList()){
+            em.remove(b);
+        }
         em.getTransaction().commit();
     }
 

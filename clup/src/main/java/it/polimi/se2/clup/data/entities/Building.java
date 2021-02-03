@@ -9,7 +9,7 @@ import java.util.List;
 @Entity
 @NamedQueries({
         @NamedQuery(name = "Building.retrieveByAccessCode", query = "SELECT u FROM Building  u WHERE u.accessCode = :accessCode"),
-        @NamedQuery(name = "Building.retrieveBuildingByName", query = "SELECT u FROM Building u WHERE u.id = :buildingName "),
+        @NamedQuery(name = "Building.retrieveBuildingByName", query = "SELECT u FROM Building u WHERE u.name = :buildingName "),
         @NamedQuery(name = "Building.findAll", query = "SELECT b FROM Building b"),
 })
 public class Building {
@@ -27,7 +27,7 @@ public class Building {
     @Column(nullable = false)
     private int capacity;
 
-    @OneToOne(fetch = FetchType.EAGER, mappedBy = "building")
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "building",orphanRemoval = true, cascade = CascadeType.ALL)
     private Queue queue;
 
     @ManyToOne

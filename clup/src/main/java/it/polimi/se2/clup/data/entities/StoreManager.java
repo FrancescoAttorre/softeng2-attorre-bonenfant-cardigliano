@@ -3,8 +3,10 @@ package it.polimi.se2.clup.data.entities;
 import javax.persistence.*;
 import java.util.List;
 
-@NamedQuery(name="StoreManager.getBuildingAccessCode",
-            query="Select b.accessCode from Building b where b = :building")
+@NamedQueries({
+        @NamedQuery(name="StoreManager.getBuildingAccessCode", query="Select b.accessCode from Building b where b = :building"),
+        @NamedQuery(name="StoreManager.findAll", query="Select sm from StoreManager sm"),
+})
 @DiscriminatorValue("STORE_MANAGER")
 @Entity
 public class StoreManager extends User {
@@ -13,10 +15,10 @@ public class StoreManager extends User {
     @JoinColumn(name="BUILDING_ID")
     private Building building;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "storeManager")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "storeManager",orphanRemoval = true)
     private List<PhysicalTicket> physicalTickets;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "storeManagerOwner")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "storeManagerOwner",orphanRemoval = true)
     private List<LineUpDigitalTicket> lineUpDigitalTickets;
 
     public void addLineUpTicket(LineUpDigitalTicket lineUpTicket){

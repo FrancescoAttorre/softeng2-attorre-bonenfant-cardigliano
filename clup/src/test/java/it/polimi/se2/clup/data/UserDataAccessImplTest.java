@@ -1,9 +1,7 @@
 package it.polimi.se2.clup.data;
 
 
-import it.polimi.se2.clup.data.entities.Activity;
-import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
-import it.polimi.se2.clup.data.entities.UnregisteredAppCustomer;
+import it.polimi.se2.clup.data.entities.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Assertions;
 
@@ -13,24 +11,38 @@ public class UserDataAccessImplTest {
 
     private static UserDataAccessImpl dm;
 
-    @BeforeAll
-    public static void setup() {
+    @BeforeEach
+    public void setup() {
 
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("clupTest");
         dm = new UserDataAccessImpl();
         dm.em = emf.createEntityManager();
 
-        dm.em.getTransaction().begin();
+        removeAllFromDatabase(dm.em);
 
-        Query q1 = dm.em.createQuery("delete from Activity");
-        Query q2 = dm.em.createQuery("delete from RegisteredAppCustomer");
-        q1.executeUpdate();
-        q2.executeUpdate();
+        dm.em.getTransaction().begin();
 
         dm.insertUser("firstUser", "firstPassword");
 
         dm.em.getTransaction().commit();
 
+    }
+
+    private void removeAllFromDatabase(EntityManager em) {
+        em.getTransaction().begin();
+        for(RegisteredAppCustomer u : em.createNamedQuery("RegisteredAppCustomer.findAll",RegisteredAppCustomer.class).getResultList()){
+            em.remove(u);
+        }
+        for(UnregisteredAppCustomer u : em.createNamedQuery("UnregisteredAppCustomer.findAll",UnregisteredAppCustomer.class).getResultList()){
+            em.remove(u);
+        }
+        for(StoreManager u : em.createNamedQuery("StoreManager.findAll",StoreManager.class).getResultList()){
+            em.remove(u);
+        }
+        for(Building b : em.createNamedQuery("Building.findAll",Building.class).getResultList()){
+            em.remove(b);
+        }
+        em.getTransaction().commit();
     }
 
     @Test
@@ -79,7 +91,7 @@ public class UserDataAccessImplTest {
 
         dm.em.getTransaction().commit();
 
-        Assertions.assertDoesNotThrow(() -> dm.em.createNamedQuery("UnregisteredAppCustomer.selectAll", UnregisteredAppCustomer.class)
+        Assertions.assertDoesNotThrow(() -> dm.em.createNamedQuery("UnregisteredAppCustomer.findAll", UnregisteredAppCustomer.class)
                 .getResultList());
 
 

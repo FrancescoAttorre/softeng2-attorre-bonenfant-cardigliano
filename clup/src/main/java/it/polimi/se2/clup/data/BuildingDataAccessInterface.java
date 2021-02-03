@@ -21,4 +21,6 @@ public interface BuildingDataAccessInterface {
     List<LineUpDigitalTicket> retrieveTicketInQueue(int buildingId);
     boolean updateStatistics(int buildingId, LocalTime lastExitTime);
     boolean updateLastExitTime(int buildingId, LocalTime lastExitTime);
+
+    void removeFromQueue(int ticketId);
 }

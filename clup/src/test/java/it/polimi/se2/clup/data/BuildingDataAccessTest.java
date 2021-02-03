@@ -1,10 +1,15 @@
 package it.polimi.se2.clup.data;
 
 import it.polimi.se2.clup.data.entities.Building;
+import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
+import it.polimi.se2.clup.data.entities.StoreManager;
+import it.polimi.se2.clup.data.entities.UnregisteredAppCustomer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
@@ -18,19 +23,16 @@ public class BuildingDataAccessTest {
 
     private static BuildingDataAccess dm;
 
-    @BeforeAll
-    public static void setup() {
+    @BeforeEach
+    public void setup() {
 
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("clupTest");
         dm = new BuildingDataAccess();
         dm.em = emf.createEntityManager();
 
-        dm.em.getTransaction().begin();
+        removeAllFromDatabase(dm.em);
 
-        Query q1 = dm.em.createQuery("delete from Building");
-        Query q2 = dm.em.createQuery("delete from Department");
-        q1.executeUpdate();
-        q2.executeUpdate();
+        dm.em.getTransaction().begin();
 
         //creation of EsselungaStore
 
@@ -52,6 +54,23 @@ public class BuildingDataAccessTest {
 
         dm.em.getTransaction().commit();
 
+    }
+
+    private void removeAllFromDatabase(EntityManager em) {
+        em.getTransaction().begin();
+        for(RegisteredAppCustomer u : em.createNamedQuery("RegisteredAppCustomer.findAll",RegisteredAppCustomer.class).getResultList()){
+            em.remove(u);
+        }
+        for(UnregisteredAppCustomer u : em.createNamedQuery("UnregisteredAppCustomer.findAll",UnregisteredAppCustomer.class).getResultList()){
+            em.remove(u);
+        }
+        for(StoreManager u : em.createNamedQuery("StoreManager.findAll",StoreManager.class).getResultList()){
+            em.remove(u);
+        }
+        for(Building b : em.createNamedQuery("Building.findAll",Building.class).getResultList()){
+            em.remove(b);
+        }
+        em.getTransaction().commit();
     }
 
     @Test

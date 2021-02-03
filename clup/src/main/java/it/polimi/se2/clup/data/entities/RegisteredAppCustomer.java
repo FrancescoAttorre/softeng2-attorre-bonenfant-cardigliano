@@ -7,6 +7,7 @@ import java.util.List;
 @Entity
 @NamedQueries({
         @NamedQuery(name = "RegisteredAppCustomer.findUserByUsername", query = "SELECT u FROM RegisteredAppCustomer u WHERE u.username = :username"),
+        @NamedQuery(name = "RegisteredAppCustomer.findAll", query = "SELECT u FROM RegisteredAppCustomer u "),
 })
 public class RegisteredAppCustomer extends User {
 
@@ -16,10 +17,10 @@ public class RegisteredAppCustomer extends User {
     @Column
     private String password;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "registeredOwner")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "registeredOwner",orphanRemoval = true)
     private List<LineUpDigitalTicket> lineUpDigitalTickets = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner",orphanRemoval = true)
     private List<BookingDigitalTicket> bookingDigitalTickets = new ArrayList<>();
 
     @Column

@@ -5,6 +5,9 @@ import java.util.List;
 
 @Inheritance(strategy=InheritanceType.JOINED)
 @Entity
+@NamedQueries({
+        @NamedQuery(name = "User.findAll", query = "SELECT u FROM User u"),
+})
 public class User {
 
     @Id

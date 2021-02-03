@@ -24,12 +24,12 @@ public class TimeSlotManager {
 
         Map<Department, List<Integer>> bookedTimeSlots= dataAccess.retrieveTimeSlots(buildingId, date);
 
-        return computeAvailableTimeSlots(building,bookedTimeSlots,departments);
+        return computeAvailableTimeSlots(building,bookedTimeSlots,departments, permanenceTime);
 
     }
 
 
-    private Map<Department,List<Integer>> computeAvailableTimeSlots(Building building, Map<Department,List<Integer>> bookedTimeSlots, List<Department> departments){
+    private Map<Department,List<Integer>> computeAvailableTimeSlots(Building building, Map<Department,List<Integer>> bookedTimeSlots, List<Department> departments,Duration permanenceTime){
         Map<Department,List<Integer>> availableTimeSlots = new HashMap<>();
 
         for(Department d : departments){
@@ -38,6 +38,8 @@ public class TimeSlotManager {
             freeTimeSlots.removeAll(timeslots);
             availableTimeSlots.put(d,freeTimeSlots);
         }
+
+        //for (int i = 0, i )
 
         return availableTimeSlots;
     }
@@ -55,4 +57,11 @@ public class TimeSlotManager {
         return strippedTimeSlots;
     }
 
+    public BuildingDataAccess getDataAccess() {
+        return dataAccess;
+    }
+
+    public void setDataAccess(BuildingDataAccess dataAccess) {
+        this.dataAccess = dataAccess;
+    }
 }

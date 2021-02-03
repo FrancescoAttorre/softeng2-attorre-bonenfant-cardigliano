@@ -15,6 +15,6 @@ public interface BuildingManagerInterface {
     Map<Department, List<Integer>> getAvailableTimeSlots(int buildingId, LocalDate date, Duration permanenceTime, List<Department> departments);
     boolean checkTicketAvailability(int buildingId, List<Integer> timeSlots, List<Department> departments);
     boolean customerExit(int buildingId);
-    boolean insertBuilding(String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String,Integer> surplus);
+    boolean insertBuilding(String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String,Integer> surplus,String code);
     boolean insertInQueue(LineUpDigitalTicket ticket);
 }

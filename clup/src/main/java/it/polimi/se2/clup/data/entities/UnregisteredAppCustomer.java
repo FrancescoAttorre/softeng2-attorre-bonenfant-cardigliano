@@ -8,7 +8,7 @@ import java.util.List;
 
 @Entity
 @NamedQueries({
-        @NamedQuery(name = "UnregisteredAppCustomer.selectAll", query = "SELECT u FROM UnregisteredAppCustomer u "),
+        @NamedQuery(name = "UnregisteredAppCustomer.findAll", query = "SELECT u FROM UnregisteredAppCustomer u "),
 })
 public class UnregisteredAppCustomer extends User{
 
@@ -23,7 +23,7 @@ public class UnregisteredAppCustomer extends User{
     @Column
     private String meansOfTransport;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "unregisteredOwner")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "unregisteredOwner",orphanRemoval = true)
     private List<LineUpDigitalTicket> lineUpDigitalTickets = new ArrayList<>();
 
     public void addLineUpTicket(LineUpDigitalTicket lineUpTicket){

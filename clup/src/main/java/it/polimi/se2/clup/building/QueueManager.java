@@ -4,11 +4,12 @@ import it.polimi.se2.clup.data.BuildingDataAccess;
 import it.polimi.se2.clup.data.entities.Building;
 import it.polimi.se2.clup.data.entities.LineUpDigitalTicket;
 
+import javax.ejb.EJB;
 import java.util.List;
 
 public class QueueManager {
 
-    BuildingDataAccess dataAccess = new BuildingDataAccess();
+    BuildingDataAccess dataAccess;
 
     public boolean insertInQueue(LineUpDigitalTicket ticket){
         if(ticket.getBuilding() == null)
@@ -29,7 +30,15 @@ public class QueueManager {
             return null;
     }
 
+    public void removeFromQueue(int ticketId){
+        dataAccess.removeFromQueue(ticketId);
+    }
+
     public BuildingDataAccess getDataAccess() {
         return dataAccess;
+    }
+
+    public void setDataAccess(BuildingDataAccess dataAccess) {
+        this.dataAccess = dataAccess;
     }
 }

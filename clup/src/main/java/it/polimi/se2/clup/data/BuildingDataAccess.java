@@ -85,15 +85,15 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
         building.setAccessCode(accessCode);
         building.setQueue(queue);
         building.setDeltaExitTime(Duration.ZERO);
+        if(surplus != null) {
+            for (String deptName : surplus.keySet()) {
+                Department department = new Department();
+                department.setName(deptName);
+                department.setSurplusCapacity(surplus.get(deptName));
 
-        for (String deptName : surplus.keySet()){
-            Department department = new Department();
-            department.setName(deptName);
-            department.setSurplusCapacity(surplus.get(deptName));
-
-            building.addDepartment(department);
+                building.addDepartment(department);
+            }
         }
-
         em.persist(building);
         return building.getBuildingID();
     }
@@ -129,6 +129,8 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
             building.setDeltaExitTime(Duration.ofSeconds((long)(weightedNewDelta + weightedOldDelta)));
         }
 
+        building.setLastExitTime(lastExitTime);
+
         return true;
     }
 
@@ -141,4 +143,17 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
         building.setLastExitTime(lastExit); //should throw an exception ?
         return true;
     }
+
+    @Override
+    public void removeFromQueue(int ticketId){
+        LineUpDigitalTicket ticket = em.find(LineUpDigitalTicket.class, ticketId);
+
+        Queue queue = ticket.getQueue();
+
+        List<LineUpDigitalTicket> newQueue = queue.getQueueTickets();
+        newQueue.remove(ticket);
+
+        queue.setQueueTickets(newQueue);
+    }
+
 }
