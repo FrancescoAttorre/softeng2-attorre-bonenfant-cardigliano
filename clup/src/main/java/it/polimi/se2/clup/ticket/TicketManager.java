@@ -13,8 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static it.polimi.se2.clup.data.entities.TicketState.INVALID;
-
 
 public class TicketManager implements TicketManagerInterface {
 
@@ -47,9 +45,15 @@ public class TicketManager implements TicketManagerInterface {
     }
 
     @Override
-    public void acquireBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID,
-                                     int timeSlotLength, List<String> departments) {
-        ticketDataAccess.insertBookingTicket(userID, buildingID, date, timeSlotID, timeSlotLength, departments);
+    public boolean acquireBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID,
+                                        int timeSlotLength, List<Department> departments) {
+        try {
+            ticketDataAccess.insertBookingTicket(userID, buildingID, date, timeSlotID, timeSlotLength, departments);
+        }
+        catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -123,6 +127,17 @@ public class TicketManager implements TicketManagerInterface {
         ticketDataAccess.updateTicketState(ticketID, TicketState.VALID);
     }
 
+    @Override
+    public boolean validityCheck(int ticketID) {
+
+        LocalDateTime validationTime = ticketDataAccess.retrieveValidationTime(ticketID);
+
+        if ((ChronoUnit.MINUTES.between(LocalDateTime.now(), validationTime)) > 10)
+            ticketDataAccess.updateTicketState(ticketID, TicketState.EXPIRED);
+
+        return ticketDataAccess.retrieveTicketState(ticketID).equals(TicketState.VALID);
+    }
+
     /**
      * ComputeWaitingTime sets the waiting time to zero for valid tickets, changes their state to
      * expired when the ticket are valid from more than 10 minutes,
@@ -140,8 +155,8 @@ public class TicketManager implements TicketManagerInterface {
             case EXPIRED:
                 newWaitingTime = Duration.ZERO;
                 break;
+
             case VALID:
-                newWaitingTime = Duration.ZERO;
                 if ((ChronoUnit.MINUTES.between(LocalDateTime.now(), ticket.getValidationTime())) > 10)
                     ticketDataAccess.updateTicketState(ticket.getTicketID(), TicketState.EXPIRED);
                 break;

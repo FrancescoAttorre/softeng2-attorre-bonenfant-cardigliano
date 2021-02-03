@@ -11,8 +11,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<DigitalTicket> digitalTickets;
+    //@OneToMany(fetch = FetchType.LAZY)
+    //private List<DigitalTicket> digitalTickets;
 
     public int getId() {
         return id;

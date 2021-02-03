@@ -8,7 +8,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Stateless
@@ -83,8 +82,7 @@ public class TicketDataAccess implements TicketDataAccessInterface {
 
     @Override
     public BookingDigitalTicket insertBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID,
-                                                    int timeSlotLength, List<String> chosenDepartments)
-            throws NoResultException {
+                                                    int timeSlotLength, List<Department> chosenDepartments) throws Exception {
 
         BookingDigitalTicket newTicket = new BookingDigitalTicket();
 
@@ -98,12 +96,13 @@ public class TicketDataAccess implements TicketDataAccessInterface {
         newTicket.setTimeSlotID(timeSlotID);
         newTicket.setDate(date);
         newTicket.setTimeSlotLength(timeSlotLength);
-        List<Department> departments = new ArrayList<>();
-        for (Department buildingDep: building.getDepartments()) {
-            if (chosenDepartments.contains(buildingDep.getName()))
-                departments.add(buildingDep);
+
+        for (Department dep: chosenDepartments) {
+            if (!(building.getDepartments().contains(dep)))
+                throw new Exception();
         }
-        newTicket.setDepartments(departments);
+
+        newTicket.setDepartments(chosenDepartments);
         em.persist(newTicket);
         return newTicket;
     }
@@ -145,5 +144,17 @@ public class TicketDataAccess implements TicketDataAccessInterface {
     @Override
     public LocalDateTime retrieveAcquisitionTime (LineUpDigitalTicket lineUpTicket) {
         return lineUpTicket.getAcquisitionTime();
+    }
+
+    @Override
+    public LocalDateTime retrieveValidationTime (int ticketID) {
+        DigitalTicket ticket = em.find(DigitalTicket.class, ticketID);
+        return ticket.getValidationTime();
+    }
+
+    @Override
+    public TicketState retrieveTicketState (int ticketID) {
+        DigitalTicket ticket = em.find(DigitalTicket.class, ticketID);
+        return ticket.getState();
     }
 }

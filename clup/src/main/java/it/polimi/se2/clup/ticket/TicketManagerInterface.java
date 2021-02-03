@@ -11,7 +11,7 @@ public interface TicketManagerInterface {
 
     void acquireStoreManagerTicket(int userID);
 
-    void acquireBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength, List<String> departments);
+    boolean acquireBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength, List<Department> departments);
 
     void acquireUnregCustomerLineUpTicket(int userID, int buildingID);
 
@@ -29,4 +29,6 @@ public interface TicketManagerInterface {
     Map<LineUpDigitalTicket, Duration> getWaitingUpdateUnregCustomer(int userID) throws NotInQueueException;
 
     void validateTicket(int ticketID);
+
+    boolean validityCheck (int ticketID);
 }
