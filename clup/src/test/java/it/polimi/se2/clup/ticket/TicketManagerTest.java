@@ -1,5 +1,6 @@
 package it.polimi.se2.clup.ticket;
 
+import it.polimi.se2.clup.building.BuildingManager;
 import it.polimi.se2.clup.building.QueueManager;
 import it.polimi.se2.clup.data.BuildingDataAccess;
 import it.polimi.se2.clup.data.TicketDataAccess;
@@ -20,13 +21,16 @@ import java.util.Map;
 
 public class TicketManagerTest {
     static TicketManager tm;
-    static TicketDataAccess tda;
     static BuildingDataAccess bda;
     static UserDataAccessImpl uda;
+    static TicketDataAccess tda;
     static QueueManager qm;
+    static BuildingManager bm;
     private static int unregID1;
     private static int unregID2;
     private static int unregID3;
+    private static int unregID4;
+    private static int buildingID;
 
     @BeforeEach
     public void setup() {
@@ -38,18 +42,22 @@ public class TicketManagerTest {
 
         bda = new BuildingDataAccess();
         uda = new UserDataAccessImpl();
+        tda = new TicketDataAccess();
         qm = new QueueManager();
-
-        tda = tm.getTicketDataAccess();
+        bm = new BuildingManager();
 
         uda.em = em;
         bda.em = em;
         tda.em = em;
 
+        bm.setTicketManager(tm);
+        tm.setBuildingManager(bm);
+        tm.setTicketDataAccess(tda);
+
+        qm.setDataAccess(bda);
         tm.getBuildingManager().setDataAccess(bda);
         tm.getBuildingManager().setQueueManager(qm);
-        tm.getBuildingManager().getQueueManager().setDataAccess(bda);
-        tm.getBuildingManager().getQueueManager().getDataAccess().em = em;
+
 
         removeAllFromDatabase(em);
 
@@ -59,26 +67,22 @@ public class TicketManagerTest {
         unregID1 = uda.insertUnregisteredAppCustomer();
         unregID2 = uda.insertUnregisteredAppCustomer();
         unregID3 = uda.insertUnregisteredAppCustomer();
+        unregID4 = uda.insertUnregisteredAppCustomer();
 
         Map<String, Integer> surplus = new HashMap<>();
 
         //Creation of a building
-        int buildingID = bda.insertBuilding(
+        buildingID = bda.insertBuilding(
                 "EsselungaStore",
                 LocalTime.of(8, 0, 0),
                 LocalTime.of(21, 0, 0),
                 "via Roma,1",
-                3,
+                2,
                 surplus,
                 "AccessCODE");
 
         //considering full building
         bda.retrieveBuilding(buildingID).setActualCapacity(0);
-
-        //Creation of  3 lineUp tickets, one for each unregistered customer
-        tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID);
-        tm.acquireUnregCustomerLineUpTicket(unregID2, buildingID);
-        tm.acquireUnregCustomerLineUpTicket(unregID3, buildingID);
 
         em.getTransaction().commit();
     }
@@ -100,8 +104,16 @@ public class TicketManagerTest {
         em.getTransaction().commit();
     }
 
+    /**
+     * After validating a ticket, this test checks whether, with a validation time older than the
+     * the time interval in which a ticket remains valid, the ticket became correctly expired
+     * and the waiting time associated set to zero
+     */
     @Test
     public void checkTicketExpired() throws NotInQueueException {
+
+        //Creation of  3 lineUp tickets, one for each unregistered customer
+        tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID);
 
         LineUpDigitalTicket ticket = tm.getTicketsUnregisteredCustomer(unregID1).get(0);
         tm.validateTicket(ticket.getTicketID());
@@ -114,8 +126,14 @@ public class TicketManagerTest {
         Assertions.assertEquals(ticket.getState(), TicketState.EXPIRED);
     }
 
+    /**
+     * This test checks whether the validity check works properly, validating an invalid ticket
+     * and checking its validity before and after.
+     */
     @Test
     public void correctValidityCheck() {
+
+        tm.acquireUnregCustomerLineUpTicket(unregID2, buildingID);
 
         LineUpDigitalTicket ticket = tm.getTicketsUnregisteredCustomer(unregID2).get(0);
 
@@ -129,8 +147,16 @@ public class TicketManagerTest {
         Assertions.assertFalse(tm.validityCheck(ticket.getTicketID()));
     }
 
+    /**
+     * This test checks that the waiting time is computed correctly during the waiting in queue,
+     * without anyone entering/leaving the building
+     */
     @Test
     public void correctWaitingTimeInQueue() throws NotInQueueException {
+
+        tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID);
+        tm.acquireUnregCustomerLineUpTicket(unregID2, buildingID);
+        tm.acquireUnregCustomerLineUpTicket(unregID3, buildingID);
 
         //Setting the delta exit time, all tickets are related to the same building
 
@@ -138,9 +164,9 @@ public class TicketManagerTest {
 
         LineUpDigitalTicket firstInQueue = tm.getTicketsUnregisteredCustomer(unregID1).get(0);
 
-        Map<LineUpDigitalTicket, Duration> waitingTimes = tm.getWaitingUpdateUnregCustomer(unregID1);
         Building building = firstInQueue.getBuilding();
         building.setDeltaExitTime(deltaExitTime);
+        Map<LineUpDigitalTicket, Duration> waitingTimes = tm.getWaitingUpdateUnregCustomer(unregID1);
 
         //In the setup we have 3 tickets in queue
         //All the tickets are invalid, so they have to wait a time based on deltaExitTime and people with higher priority
@@ -161,8 +187,41 @@ public class TicketManagerTest {
 
         waitingTimes = tm.getWaitingUpdateUnregCustomer(unregID1);
         Assertions.assertEquals(waitingTimes.get(firstInQueue).toMinutes(), TicketManager.extraTime);
+    }
 
-        //TODO: control after one customer enters the building, the updated waiting times
+    @Test
+    public void waitingTimeAfterExit() throws NotInQueueException {
+
+        //considering an empty building
+        Building building = bda.retrieveBuilding(buildingID);
+
+        building.setActualCapacity(building.getCapacity());
+
+        //Creation of  3 lineUp tickets, one for each unregistered customer
+        tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID);
+        tm.acquireUnregCustomerLineUpTicket(unregID2, buildingID);
+        tm.acquireUnregCustomerLineUpTicket(unregID3, buildingID);
+        tm.acquireUnregCustomerLineUpTicket(unregID4, buildingID);
+
+        Assertions.assertEquals(tm.getTicketsUnregisteredCustomer(unregID1).get(0).getState(), TicketState.VALID);
+        Assertions.assertEquals(tm.getTicketsUnregisteredCustomer(unregID2).get(0).getState(), TicketState.VALID);
+        Assertions.assertEquals(tm.getTicketsUnregisteredCustomer(unregID3).get(0).getState(), TicketState.INVALID);
+        Assertions.assertEquals(tm.getTicketsUnregisteredCustomer(unregID4).get(0).getState(), TicketState.INVALID);
+
+        //delta is not set, so it is used the defaultWaitingTime
+        LineUpDigitalTicket lastInQueue = tm.getTicketsUnregisteredCustomer(unregID4).get(0);
+        Assertions.assertEquals(tm.getWaitingUpdateUnregCustomer(unregID4).get(lastInQueue).toMinutes(),
+                2 * TicketManager.defaultWaitingTime);
+
+        //someone exited the building
+        tm.getBuildingManager().customerExit(buildingID);
+
+        //the delta will be zero since the customer is exited instantaneously, so the waiting time is set to extraTime
+        Assertions.assertEquals(tm.getWaitingUpdateUnregCustomer(unregID4).get(tm.getTicketsUnregisteredCustomer(unregID4).get(0)).toMinutes(),
+                TicketManager.extraTime);
+        Assertions.assertEquals(tm.getWaitingUpdateUnregCustomer(unregID3).get(tm.getTicketsUnregisteredCustomer(unregID3).get(0)),
+                Duration.ZERO);
+        Assertions.assertEquals(tm.getTicketsUnregisteredCustomer(unregID3).get(0).getState(), TicketState.VALID);
     }
 
 }

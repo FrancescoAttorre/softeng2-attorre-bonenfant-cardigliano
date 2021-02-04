@@ -2,6 +2,7 @@ package it.polimi.se2.clup.data;
 
 import it.polimi.se2.clup.data.entities.*;
 import it.polimi.se2.clup.data.entities.Queue;
+import it.polimi.se2.clup.ticket.TicketManager;
 
 import javax.persistence.*;
 import java.time.Duration;
@@ -115,19 +116,21 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
         //simple version
         //weight 0.8 for old delta
         double weightedOldDelta;
-        double weightedNewDelta;
+        long weightedNewDelta;
         if(building.getDeltaExitTime().equals(Duration.ZERO)){
             //weightedNewDelta = (double)lastExitTime.get(ChronoField.SECOND_OF_DAY) - (double)building.getOpening().get(ChronoField.SECOND_OF_DAY);
-            weightedNewDelta = lastExitTime.toSecondOfDay() - building.getOpening().toSecondOfDay();
 
-            building.setDeltaExitTime(Duration.ofSeconds((long) weightedNewDelta));
+            //can become too big
+            //weightedNewDelta = Duration.between(building.getOpening(), lastExitTime).toMinutes();
+
+            //building.setDeltaExitTime(Duration.ofMinutes(weightedNewDelta));
+            building.setDeltaExitTime(Duration.ofMinutes(TicketManager.extraTime));
         }else {
-            weightedOldDelta = building.getDeltaExitTime().toSeconds() * 0.8 ;
+            weightedOldDelta = building.getDeltaExitTime().toMinutes() * 0.8 ;
             //weightedNewDelta = (double)lastExitTime.get(ChronoField.SECOND_OF_DAY) - (double)building.getLastExitTime() * 0.2;
-            weightedNewDelta = lastExitTime.toSecondOfDay() - lastExitTime.toSecondOfDay() * 0.2;
+            weightedNewDelta = Duration.ofSeconds((long) (lastExitTime.toSecondOfDay() - lastExitTime.toSecondOfDay() * 0.2)).toMinutes();
 
-            //TODO : check order of new delta
-            building.setDeltaExitTime(Duration.ofSeconds((long)(weightedNewDelta + weightedOldDelta)));
+            building.setDeltaExitTime(Duration.ofMinutes((long)(weightedNewDelta + weightedOldDelta)));
         }
 
         building.setLastExitTime(lastExitTime);

@@ -79,6 +79,9 @@ public class BuildingManagerTest {
                 surplus,
                 "AccessCODE");
 
+        //considering a full building
+        buildingDataAccess.retrieveBuilding(buildingID).setActualCapacity(0);
+
         //Creation of 2 tickets
         tm.acquireUnregCustomerLineUpTicket(firstUserId, buildingID);
         tm.acquireUnregCustomerLineUpTicket(secondUserId, buildingID);

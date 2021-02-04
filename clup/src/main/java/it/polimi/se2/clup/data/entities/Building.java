@@ -49,7 +49,7 @@ public class Building {
     private List<StoreManager> managers;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy="building")
-    private List<DigitalTicket> tickets;
+    private List<DigitalTicket> tickets = new ArrayList<>();
 
     @Column
     private int actualCapacity;
@@ -187,5 +187,9 @@ public class Building {
 
     public void setQueue(Queue queue) {
         this.queue = queue;
+    }
+
+    public void addTicket(DigitalTicket ticket) {
+        this.tickets.add(ticket);
     }
 }

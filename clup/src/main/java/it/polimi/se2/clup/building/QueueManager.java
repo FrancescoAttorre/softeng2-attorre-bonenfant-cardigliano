@@ -18,8 +18,10 @@ public class QueueManager {
         return true;
     }
 
+    //TODO
     public LineUpDigitalTicket getNext(int buildingId){
-        List<LineUpDigitalTicket> queue = dataAccess.retrieveTicketsInQueue(buildingId);
+        List<LineUpDigitalTicket> queue = dataAccess.retrieveBuilding(buildingId).getQueue().getQueueTickets();
+         //dataAccess.retrieveTicketsInQueue(buildingId);
         LineUpDigitalTicket ticket;
         if (queue.size() > 0) {
             ticket = queue.get(0);

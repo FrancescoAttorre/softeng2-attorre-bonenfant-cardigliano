@@ -1,6 +1,5 @@
 package it.polimi.se2.clup.building;
 
-import it.polimi.se2.clup.data.BuildingDataAccess;
 import it.polimi.se2.clup.data.BuildingDataAccessInterface;
 import it.polimi.se2.clup.data.entities.*;
 import it.polimi.se2.clup.ticket.TicketManager;
@@ -40,7 +39,8 @@ public class BuildingManager implements BuildingManagerInterface{
 
     @Override
     public boolean customerExit(int buildingId) {
-        LocalTime lastExitTime = LocalTime.ofInstant(Instant.now(),ZoneId.systemDefault()); //LocalTime.now()?
+
+        LocalTime lastExitTime = LocalTime.now();
 
         dataAccess.updateStatistics(buildingId, lastExitTime);
 
@@ -52,9 +52,12 @@ public class BuildingManager implements BuildingManagerInterface{
             ticketManager.validateTicket(ticket.getTicketID());
             queueManager.removeFromQueue(ticket.getTicketID());
             return true;
-        }else
-            return false;
-
+        }
+        else {
+            Building building = dataAccess.retrieveBuilding(buildingId);
+            building.setActualCapacity(building.getActualCapacity() + 1);
+        }
+        return false; //false means that no one else is allowed to enter the building?
     }
 
     @Override
@@ -96,11 +99,6 @@ public class BuildingManager implements BuildingManagerInterface{
     }
 
     @Override
-    public boolean checkBuildingNotFull (int buildingID) {
-        return dataAccess.retrieveBuilding(buildingID).getActualCapacity() > 0;
-    }
-
-    @Override
     public boolean insertBuilding(String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String, Integer> surplus, String code) {
 
         //TODO : add activity connection
@@ -133,8 +131,6 @@ public class BuildingManager implements BuildingManagerInterface{
 
     }
 
-
-
     public QueueManager getQueueManager() {
         return queueManager;
     }
@@ -166,4 +162,17 @@ public class BuildingManager implements BuildingManagerInterface{
     public void setDataAccess(BuildingDataAccessInterface dataAccess) {
         this.dataAccess = dataAccess;
     }
+
+    //methods used by ticket manager
+
+    public boolean checkBuildingNotFull (int buildingID) {
+        return dataAccess.retrieveBuilding(buildingID).getActualCapacity() > 0;
+    }
+
+    public void reduceCapacity(int buildingID) {
+        Building building = dataAccess.retrieveBuilding(buildingID);
+        int actualCapacity = building.getActualCapacity();
+        building.setActualCapacity(actualCapacity - 1);
+    }
+
 }

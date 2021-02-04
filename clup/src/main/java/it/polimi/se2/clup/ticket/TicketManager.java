@@ -19,8 +19,8 @@ public class TicketManager implements TicketManagerInterface {
     public static final int extraTime = 10;
     public static final int defaultWaitingTime = 15;
 
-    private TicketDataAccess ticketDataAccess = new TicketDataAccess();
-    private BuildingManager buildingManager = new BuildingManager();
+    private TicketDataAccess ticketDataAccess;
+    private BuildingManager buildingManager;
 
     public BuildingManager getBuildingManager() {
         return buildingManager;
@@ -40,11 +40,13 @@ public class TicketManager implements TicketManagerInterface {
 
     @Override
     public void acquireStoreManagerTicket(int userID, int buildingID) {
+
         LineUpDigitalTicket newTicket = ticketDataAccess.insertStoreManagerLineUpTicket(userID);
 
-
-        if (buildingManager.checkBuildingNotFull(buildingID))
+        if (buildingManager.checkBuildingNotFull(buildingID)) {
             validateTicket(newTicket.getTicketID());
+            buildingManager.reduceCapacity(buildingID);
+        }
         else
             buildingManager.insertInQueue(newTicket);
     }
@@ -65,8 +67,10 @@ public class TicketManager implements TicketManagerInterface {
     public void acquireRegCustomerLineUpTicket(int userID, int buildingID) {
         LineUpDigitalTicket newTicket = ticketDataAccess.insertRegCustomerLineUpTicket(userID, buildingID);
 
-        if (buildingManager.checkBuildingNotFull(buildingID))
+        if (buildingManager.checkBuildingNotFull(buildingID)) {
             validateTicket(newTicket.getTicketID());
+            buildingManager.reduceCapacity(buildingID);
+        }
         else
             buildingManager.insertInQueue(newTicket);
     }
@@ -75,8 +79,10 @@ public class TicketManager implements TicketManagerInterface {
     public void acquireUnregCustomerLineUpTicket(int userID, int buildingID) {
         LineUpDigitalTicket newTicket = ticketDataAccess.insertUnregCustomerLineUpTicket(userID, buildingID);
 
-        if (buildingManager.checkBuildingNotFull(buildingID))
+        if (buildingManager.checkBuildingNotFull(buildingID)) {
             validateTicket(newTicket.getTicketID());
+            buildingManager.reduceCapacity(buildingID);
+        }
         else
             buildingManager.insertInQueue(newTicket);
     }
@@ -126,6 +132,7 @@ public class TicketManager implements TicketManagerInterface {
 
     @Override
     public Map<LineUpDigitalTicket, Duration> getWaitingUpdateUnregCustomer(int userID) throws NotInQueueException {
+
         List<LineUpDigitalTicket> customerLineUpTickets = ticketDataAccess.retrieveTicketsUnregisteredCustomer(userID);
         Map<LineUpDigitalTicket, Duration> lineUpWaitingTimes = new HashMap<>();
 
@@ -173,7 +180,7 @@ public class TicketManager implements TicketManagerInterface {
                 break;
 
             case VALID:
-                if ((ChronoUnit.MINUTES.between(ticket.getValidationTime(), LocalDateTime.now())) > 10)
+                if (Duration.between(ticket.getValidationTime(), LocalDateTime.now()).toMinutes() > 10)
                     ticketDataAccess.updateTicketState(ticket.getTicketID(), TicketState.EXPIRED);
                 newWaitingTime = Duration.ZERO;
                 break;
@@ -196,7 +203,7 @@ public class TicketManager implements TicketManagerInterface {
                                 Duration.between(lastExitTime, now).toMinutes());
                     }
 
-                    else if (ticket.getBuilding().getDeltaExitTime() != null) {
+                    else if (!ticket.getBuilding().getDeltaExitTime().equals(Duration.ZERO)) {
 
                         newWaitingTime = Duration.ofMinutes(averageWait * (positionInQueue + 1) -
                                 Duration.between(acquisitionTime, now).toMinutes());
