@@ -1,11 +1,9 @@
 package it.polimi.se2.clup.building;
 
 import it.polimi.se2.clup.data.BuildingDataAccess;
-import it.polimi.se2.clup.data.BuildingDataAccessInterface;
 import it.polimi.se2.clup.data.TicketDataAccess;
 import it.polimi.se2.clup.data.UserDataAccessImpl;
 import it.polimi.se2.clup.data.entities.*;
-import it.polimi.se2.clup.data.entities.Queue;
 import it.polimi.se2.clup.ticket.TicketManager;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Assertions;
@@ -13,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
 import java.time.*;
 import java.util.*;
 
@@ -155,8 +152,8 @@ public class BuildingManagerTest {
         bm.customerExit(buildingID);
 
         //SHOULD REMOVE FROM QUEUE
-        Assertions.assertEquals(buildingDataAccess.retrieveTicketInQueue(buildingID).size(), 1);
-        Assertions.assertEquals(buildingDataAccess.retrieveTicketInQueue(buildingID).get(0).getUnregisteredOwner().getId(), secondUserId);
+        Assertions.assertEquals(buildingDataAccess.retrieveTicketsInQueue(buildingID).size(), 1);
+        Assertions.assertEquals(buildingDataAccess.retrieveTicketsInQueue(buildingID).get(0).getUnregisteredOwner().getId(), secondUserId);
 
         buildingDataAccess.em.getTransaction().commit();
     }

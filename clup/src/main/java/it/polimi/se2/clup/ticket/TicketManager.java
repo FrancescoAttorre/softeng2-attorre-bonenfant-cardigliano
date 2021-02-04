@@ -39,9 +39,14 @@ public class TicketManager implements TicketManagerInterface {
     }
 
     @Override
-    public void acquireStoreManagerTicket(int userID) {
+    public void acquireStoreManagerTicket(int userID, int buildingID) {
         LineUpDigitalTicket newTicket = ticketDataAccess.insertStoreManagerLineUpTicket(userID);
-        buildingManager.insertInQueue(newTicket);
+
+
+        if (buildingManager.checkBuildingNotFull(buildingID))
+            validateTicket(newTicket.getTicketID());
+        else
+            buildingManager.insertInQueue(newTicket);
     }
 
     @Override
@@ -59,13 +64,21 @@ public class TicketManager implements TicketManagerInterface {
     @Override
     public void acquireRegCustomerLineUpTicket(int userID, int buildingID) {
         LineUpDigitalTicket newTicket = ticketDataAccess.insertRegCustomerLineUpTicket(userID, buildingID);
-        buildingManager.insertInQueue(newTicket);
+
+        if (buildingManager.checkBuildingNotFull(buildingID))
+            validateTicket(newTicket.getTicketID());
+        else
+            buildingManager.insertInQueue(newTicket);
     }
 
     @Override
     public void acquireUnregCustomerLineUpTicket(int userID, int buildingID) {
         LineUpDigitalTicket newTicket = ticketDataAccess.insertUnregCustomerLineUpTicket(userID, buildingID);
-        buildingManager.insertInQueue(newTicket);
+
+        if (buildingManager.checkBuildingNotFull(buildingID))
+            validateTicket(newTicket.getTicketID());
+        else
+            buildingManager.insertInQueue(newTicket);
     }
 
     @Override
@@ -132,7 +145,7 @@ public class TicketManager implements TicketManagerInterface {
 
         LocalDateTime validationTime = ticketDataAccess.retrieveValidationTime(ticketID);
 
-        if ((ChronoUnit.MINUTES.between(LocalDateTime.now(), validationTime)) > 10)
+        if (validationTime != null && (ChronoUnit.MINUTES.between(validationTime, LocalDateTime.now())) > 10)
             ticketDataAccess.updateTicketState(ticketID, TicketState.EXPIRED);
 
         return ticketDataAccess.retrieveTicketState(ticketID).equals(TicketState.VALID);
@@ -142,14 +155,17 @@ public class TicketManager implements TicketManagerInterface {
      * ComputeWaitingTime sets the waiting time to zero for valid tickets, changes their state to
      * expired when the ticket are valid from more than 10 minutes,
      * for non valid tickets, instead, it updates the estimated waiting time, basing on the last exit
-     * from the ticket's building, the current time and the medium waiting time for that building
-     * @return new value of estimated waiting time
+     * from the ticket's building while in queue, the current time and the medium waiting time for that building
+     *
+     * In case of delays, the waiting time is fixed to the default waiting time
+     *
+     * @return new value of estimated waiting time with a precision of minutes
      * @throws NotInQueueException if the ticket is not found in the related queue
      */
 
     private Duration computeWaitingTime (LineUpDigitalTicket ticket) throws NotInQueueException {
 
-        Duration newWaitingTime = null;
+        Duration newWaitingTime;
 
         switch (ticket.getState()) {
             case EXPIRED:
@@ -157,25 +173,44 @@ public class TicketManager implements TicketManagerInterface {
                 break;
 
             case VALID:
-                if ((ChronoUnit.MINUTES.between(LocalDateTime.now(), ticket.getValidationTime())) > 10)
+                if ((ChronoUnit.MINUTES.between(ticket.getValidationTime(), LocalDateTime.now())) > 10)
                     ticketDataAccess.updateTicketState(ticket.getTicketID(), TicketState.EXPIRED);
+                newWaitingTime = Duration.ZERO;
                 break;
 
             case INVALID:
                 Duration additionalTime = Duration.ofMinutes(extraTime);
+                LocalTime now = LocalTime.now();
+
                 int positionInQueue = ticket.getQueue().getQueueTickets().indexOf(ticket);
+
                 if (positionInQueue != -1) {
+
                     long averageWait = ticket.getBuilding().getDeltaExitTime().toMinutes();
+                    LocalTime lastExitTime = ticket.getBuilding().getLastExitTime();
+                    LocalTime acquisitionTime = ticket.getAcquisitionTime().toLocalTime();
 
-                    if (ticket.getBuilding().getLastExitTime() != null)
+                    if (lastExitTime != null && lastExitTime.isAfter(acquisitionTime)) {
+
                         newWaitingTime = Duration.ofMinutes((averageWait * (positionInQueue + 1)) -
-                            (LocalTime.now().getMinute() - ticket.getBuilding().getLastExitTime().getMinute())); //if more than 1h doesn't work
-                    else
-                        newWaitingTime = Duration.ofMinutes(defaultWaitingTime -
-                                (LocalDateTime.now().getMinute() - ticket.getAcquisitionTime().getMinute()));
+                                Duration.between(lastExitTime, now).toMinutes());
+                    }
 
-                    if (newWaitingTime.toMinutes() <= 0)
-                        newWaitingTime = newWaitingTime.plus(additionalTime);
+                    else if (ticket.getBuilding().getDeltaExitTime() != null) {
+
+                        newWaitingTime = Duration.ofMinutes(averageWait * (positionInQueue + 1) -
+                                Duration.between(acquisitionTime, now).toMinutes());
+                    }
+
+                    else
+                        newWaitingTime = Duration.ofMinutes((long) defaultWaitingTime * (positionInQueue + 1) -
+                                Duration.between(acquisitionTime, now).toMinutes());
+
+                    //
+                    if (newWaitingTime.toMinutes() <= 0) {
+                        newWaitingTime = additionalTime;
+                    }
+
                 } else
                     throw new NotInQueueException();
                 break;

@@ -1,10 +1,8 @@
 package it.polimi.se2.clup.building;
 
 import it.polimi.se2.clup.data.BuildingDataAccess;
-import it.polimi.se2.clup.data.entities.Building;
 import it.polimi.se2.clup.data.entities.LineUpDigitalTicket;
 
-import javax.ejb.EJB;
 import java.util.List;
 
 public class QueueManager {
@@ -21,7 +19,7 @@ public class QueueManager {
     }
 
     public LineUpDigitalTicket getNext(int buildingId){
-        List<LineUpDigitalTicket> queue = dataAccess.retrieveTicketInQueue(buildingId);
+        List<LineUpDigitalTicket> queue = dataAccess.retrieveTicketsInQueue(buildingId);
         LineUpDigitalTicket ticket;
         if (queue.size() > 0) {
             ticket = queue.get(0);

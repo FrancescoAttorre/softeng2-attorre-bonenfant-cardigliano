@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface TicketManagerInterface {
 
-    void acquireStoreManagerTicket(int userID);
+    void acquireStoreManagerTicket(int userID, int buildingID);
 
     boolean acquireBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength, List<Department> departments);
 

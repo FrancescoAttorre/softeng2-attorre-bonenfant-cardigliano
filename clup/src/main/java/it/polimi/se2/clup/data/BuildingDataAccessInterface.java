@@ -18,7 +18,7 @@ public interface BuildingDataAccessInterface {
     boolean retrieveBuildingState(int id);
     boolean insertInQueue(LineUpDigitalTicket ticket);
     Map<Department,List<Integer>> retrieveTimeSlots(int buildingId, LocalDate date);
-    List<LineUpDigitalTicket> retrieveTicketInQueue(int buildingId);
+    List<LineUpDigitalTicket> retrieveTicketsInQueue(int buildingId);
     boolean updateStatistics(int buildingId, LocalTime lastExitTime);
     boolean updateLastExitTime(int buildingId, LocalTime lastExitTime);
 

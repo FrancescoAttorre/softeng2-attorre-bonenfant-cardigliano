@@ -82,6 +82,7 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
         building.setClosing(closing);
         building.setAddress(address);
         building.setCapacity(capacity);
+        building.setActualCapacity(capacity);
         building.setAccessCode(accessCode);
         building.setQueue(queue);
         building.setDeltaExitTime(Duration.ZERO);
@@ -99,7 +100,7 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
     }
 
     @Override
-    public List<LineUpDigitalTicket> retrieveTicketInQueue(int buildingId) {
+    public List<LineUpDigitalTicket> retrieveTicketsInQueue(int buildingId) {
         return em.createNamedQuery("Queue.selectTicketInQueueByBuildingId", LineUpDigitalTicket.class)
                 .setParameter("buildingId",buildingId)
                 .getResultList();

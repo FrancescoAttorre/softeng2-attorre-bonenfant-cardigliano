@@ -2,9 +2,7 @@ package it.polimi.se2.clup.building;
 
 import it.polimi.se2.clup.data.BuildingDataAccess;
 import it.polimi.se2.clup.data.BuildingDataAccessInterface;
-import it.polimi.se2.clup.data.entities.Building;
-import it.polimi.se2.clup.data.entities.Department;
-import it.polimi.se2.clup.data.entities.LineUpDigitalTicket;
+import it.polimi.se2.clup.data.entities.*;
 import it.polimi.se2.clup.ticket.TicketManager;
 
 import javax.ejb.EJB;
@@ -26,6 +24,7 @@ public class BuildingManager implements BuildingManagerInterface{
     @EJB
     protected TicketManager ticketManager;
 
+    public static final int minutesInASlot = 15;
 
     @Override
     public Map<Department, List<Integer>> getAvailableTimeSlots(int buildingId, LocalDate date, Duration permanenceTime, List<Department> departments) {
@@ -41,7 +40,7 @@ public class BuildingManager implements BuildingManagerInterface{
 
     @Override
     public boolean customerExit(int buildingId) {
-        LocalTime lastExitTime = LocalTime.ofInstant(Instant.now(),ZoneId.systemDefault());
+        LocalTime lastExitTime = LocalTime.ofInstant(Instant.now(),ZoneId.systemDefault()); //LocalTime.now()?
 
         dataAccess.updateStatistics(buildingId, lastExitTime);
 
@@ -56,6 +55,49 @@ public class BuildingManager implements BuildingManagerInterface{
         }else
             return false;
 
+    }
+
+    @Override
+    //method called by StoreManager to allow a customer to enter a building or prevent him from entering
+    public boolean customerEntry (int ticketID, int buildingID, int userID) {
+
+        boolean result = false;
+
+        List<BookingDigitalTicket> bookingTickets = ticketManager.getBookingTicketsRegCustomer(userID);
+        BookingDigitalTicket ticket = null;
+
+        if (bookingTickets != null) {
+            for (BookingDigitalTicket bookingTicket : bookingTickets)
+                if (bookingTicket.getTicketID() == ticketID)
+                    ticket = bookingTicket;
+        }
+
+        if (ticket != null) {
+            int startingMinute = ticket.getTimeSlotID() * minutesInASlot;
+            int hour = startingMinute / 60;
+            int minute = startingMinute % 60;
+
+            if (hour == LocalTime.now().getHour() &&
+                    Duration.between(LocalTime.of(hour, minute), LocalTime.now()).toMinutes() < 10) {
+
+                ticketManager.validateTicket(ticketID);
+                result = true;
+            }
+            if (Duration.between(LocalTime.of(hour, minute), LocalTime.now()).toMinutes() > 10)
+                ticketManager.setTicketState(ticketID, TicketState.EXPIRED);
+        }
+        else if (ticketManager.validityCheck(ticketID)) {
+
+            Building building = dataAccess.retrieveBuilding(buildingID);
+            building.setActualCapacity(building.getActualCapacity() - 1);
+            result = true;
+        }
+        return result;
+    }
+
+    @Override
+    public boolean checkBuildingNotFull (int buildingID) {
+        return dataAccess.retrieveBuilding(buildingID).getActualCapacity() > 0;
     }
 
     @Override
@@ -90,6 +132,7 @@ public class BuildingManager implements BuildingManagerInterface{
         return !accessCodes.contains(code);
 
     }
+
 
 
     public QueueManager getQueueManager() {
