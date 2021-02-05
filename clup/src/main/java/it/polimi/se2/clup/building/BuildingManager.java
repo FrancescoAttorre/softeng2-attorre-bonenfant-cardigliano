@@ -34,8 +34,8 @@ public class BuildingManager implements BuildingManagerInterface{
     }
 
     @Override
-    public boolean checkTicketAvailability(int buildingId, List<Integer> timeSlots, List<Department> departments) {
-        return false;
+    public boolean checkTicketAvailability(int buildingId, LocalDate date, List<Integer> timeSlots, List<Department> departments) {
+        return timeSlotManager.checkTicketAvailability(buildingId,date,timeSlots,departments);
     }
 
     @Override
@@ -110,15 +110,15 @@ public class BuildingManager implements BuildingManagerInterface{
     }
 
     @Override
-    public boolean insertBuilding(String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String, Integer> surplus, String code) {
+    public boolean insertBuilding(int activityId,String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String, Integer> surplus, String code) {
 
         //TODO : add activity connection
 
         if (name == null || opening == null || closing == null || address == null || capacity <= 0)
             return false;
 
-        if (isAccessCodeAvailability(code)){
-            dataAccess.insertBuilding(name, opening, closing, address, capacity, surplus, code);
+        if (isAccessCodeAvailable(code)){
+            dataAccess.insertBuilding(activityId,name, opening, closing, address, capacity, surplus, code);
             return true;
         } else
             return false;
@@ -129,9 +129,7 @@ public class BuildingManager implements BuildingManagerInterface{
         return queueManager.insertInQueue(ticket);
     }
 
-    private boolean isAccessCodeAvailability(String code){
-        //TODO: should check the hashed ?
-        
+    private boolean isAccessCodeAvailable(String code){
         List<String> accessCodes = new ArrayList<>();
 
         for (Building b : dataAccess.retrieveBuildings()){

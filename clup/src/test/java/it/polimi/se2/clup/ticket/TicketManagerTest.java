@@ -30,6 +30,7 @@ public class TicketManagerTest {
     private static int unregID4;
     private static int buildingID;
     private static EntityManager em;
+    private static int activityId;
 
     @BeforeEach
     public void setup() {
@@ -62,6 +63,9 @@ public class TicketManagerTest {
 
         em.getTransaction().begin();
 
+        uda.insertActivity("EsselungaActivity","PIVAEsselunga","EsselungaPassword");
+        activityId = uda.retrieveActivity("PIVAEsselunga").getId();
+
         //Creation of unregistered customers
         unregID1 = uda.insertUnregisteredAppCustomer();
         unregID2 = uda.insertUnregisteredAppCustomer();
@@ -72,6 +76,7 @@ public class TicketManagerTest {
 
         //Creation of a building
         buildingID = bda.insertBuilding(
+                activityId,
                 "EsselungaStore",
                 LocalTime.of(8, 0, 0),
                 LocalTime.of(21, 0, 0),
@@ -99,6 +104,9 @@ public class TicketManagerTest {
         }
         for(Building b : em.createNamedQuery("Building.findAll",Building.class).getResultList()){
             em.remove(b);
+        }
+        for(Activity a : em.createNamedQuery("Activity.selectAll",Activity.class).getResultList()){
+            em.remove(a);
         }
         em.getTransaction().commit();
     }

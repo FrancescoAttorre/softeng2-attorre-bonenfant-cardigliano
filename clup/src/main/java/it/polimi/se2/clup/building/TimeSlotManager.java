@@ -17,6 +17,17 @@ public class TimeSlotManager {
     private static final int TIMESLOTDURATION = 15;
     BuildingDataAccess dataAccess = new BuildingDataAccess();
 
+    public boolean checkTicketAvailability(int buildingId, LocalDate date, List<Integer> timeSlots, List<Department> departments){
+        Map<Department, List<Integer>> availableTimeSlots = getAvailableTimeSlots(buildingId,date,Duration.ofMinutes(timeSlots.size() * 15 ),departments);
+        for(Department department : departments){
+            for(Integer requestedSlot : timeSlots){
+                if(!availableTimeSlots.get(department).contains(requestedSlot))
+                    return false;
+            }
+        }
+        return true;
+    }
+
     public Map<Department, List<Integer>> getAvailableTimeSlots(int buildingId, LocalDate date, Duration permanenceTime, List<Department> departments) {
         Building building = dataAccess.retrieveBuilding(buildingId);
 

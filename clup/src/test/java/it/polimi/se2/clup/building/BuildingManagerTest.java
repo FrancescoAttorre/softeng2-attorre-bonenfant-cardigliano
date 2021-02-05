@@ -1,5 +1,6 @@
 package it.polimi.se2.clup.building;
 
+import it.polimi.se2.clup.auth.AuthManager;
 import it.polimi.se2.clup.data.BuildingDataAccess;
 import it.polimi.se2.clup.data.TicketDataAccess;
 import it.polimi.se2.clup.data.UserDataAccessImpl;
@@ -20,14 +21,15 @@ public class BuildingManagerTest {
     static TicketManager tm;
     static QueueManager qm;
     static TimeSlotManager tsm;
+    static AuthManager am;
     static BuildingDataAccess buildingDataAccess;
     static UserDataAccessImpl userDataAccess;
 
     int buildingID;
     int firstUserId;
-    int secondUserId;
     int regUserId;
-
+    int secondUserId;
+    int activityId;
     @BeforeEach
     public void setup(){
 
@@ -41,7 +43,9 @@ public class BuildingManagerTest {
         bm.setDataAccess(buildingDataAccess);
 
         userDataAccess = new UserDataAccessImpl();
+        am = new AuthManager();
         userDataAccess.em = em;
+        am.setUserDAO(userDataAccess);
 
         TicketDataAccess ticketDataAccess = new TicketDataAccess();
         ticketDataAccess.em = em;
@@ -61,7 +65,8 @@ public class BuildingManagerTest {
         removeAllFromDatabase(em);
 
         em.getTransaction().begin();
-
+        userDataAccess.insertActivity("EsselungaActivity","PIVAEsselunga","EsselungaPassword");
+        activityId = userDataAccess.retrieveActivity("PIVAEsselunga").getId();
 
         firstUserId = userDataAccess.insertUnregisteredAppCustomer();
         secondUserId = userDataAccess.insertUnregisteredAppCustomer();
@@ -74,6 +79,7 @@ public class BuildingManagerTest {
         surplus.put("Bevande",12);
 
         buildingID = buildingDataAccess.insertBuilding(
+                activityId,
                 "EsselungaStore",
                 LocalTime.of(8, 0, 0),
                 LocalTime.of(21, 0, 0),
@@ -126,6 +132,9 @@ public class BuildingManagerTest {
         }
         for(Building b : em.createNamedQuery("Building.findAll",Building.class).getResultList()){
             em.remove(b);
+        }
+        for(Activity a : em.createNamedQuery("Activity.selectAll",Activity.class).getResultList()){
+            em.remove(a);
         }
         em.getTransaction().commit();
     }
@@ -184,7 +193,9 @@ public class BuildingManagerTest {
     public void shouldInsertBuilding(){
         buildingDataAccess.em.getTransaction().begin();
 
-        boolean ret = bm.insertBuilding("IkeaMilano",
+        boolean ret = bm.insertBuilding(
+                activityId,
+                "IkeaMilano",
                 LocalTime.of(8,0,0),
                 LocalTime.of(20,0,0),
                 "via Poeti,1",
@@ -205,7 +216,9 @@ public class BuildingManagerTest {
     public void shouldNotInsertBuildingWithMissingParameters(){
         buildingDataAccess.em.getTransaction().begin();
 
-        boolean ret = bm.insertBuilding("IkeaMilano",
+        boolean ret = bm.insertBuilding(
+                activityId,
+                "IkeaMilano",
                 LocalTime.of(8,0,0),
                 LocalTime.of(20,0,0),
                 null,
@@ -224,7 +237,9 @@ public class BuildingManagerTest {
     public void shouldNotInsertBuildingWithAlreadyPickedCode(){
         buildingDataAccess.em.getTransaction().begin();
 
-        boolean ret = bm.insertBuilding("IkeaMilano",
+        boolean ret = bm.insertBuilding(
+                activityId,
+                "IkeaMilano",
                 LocalTime.of(8,0,0),
                 LocalTime.of(20,0,0),
                 "via Poesia,1",
@@ -267,7 +282,6 @@ public class BuildingManagerTest {
         buildingDataAccess.em.getTransaction().begin();
 
         List<Department> departments = buildingDataAccess.retrieveBuilding(buildingID).getDepartments();
-        //departments = buildingDataAccess.em.merge(departments);
 
         Map<Department,List<Integer>> timeSlots = bm.getAvailableTimeSlots(
                 buildingID,
@@ -330,13 +344,46 @@ public class BuildingManagerTest {
 
         buildingDataAccess.em.getTransaction().commit();
 
-        LineUpDigitalTicket firstTicket = buildingDataAccess.em.createNamedQuery("LineUpDigitalTicket.selectWithUnregID",LineUpDigitalTicket.class)
+        LineUpDigitalTicket firstTicket = buildingDataAccess.em.createNamedQuery("LineUpDigitalTicket.selectWithUnregID", LineUpDigitalTicket.class)
                 .setParameter("unregID", thirdUserId).getResultList().get(0);
 
-        LineUpDigitalTicket secondTicket = buildingDataAccess.em.createNamedQuery("LineUpDigitalTicket.selectWithUnregID",LineUpDigitalTicket.class)
+        LineUpDigitalTicket secondTicket = buildingDataAccess.em.createNamedQuery("LineUpDigitalTicket.selectWithUnregID", LineUpDigitalTicket.class)
                 .setParameter("unregID", fourthUserId).getResultList().get(0);
 
         Assertions.assertTrue(bm.customerEntry(firstTicket.getTicketID(), buildingID, thirdUserId));
-        Assertions.assertTrue(bm.customerEntry(secondTicket.getTicketID(),  buildingID,fourthUserId));
+        Assertions.assertTrue(bm.customerEntry(secondTicket.getTicketID(), buildingID, fourthUserId));
+
+    }
+
+    @Test
+    public void bookingDigitalTicketShouldBeAvailable() {
+        buildingDataAccess.em.getTransaction().begin();
+
+        List<Integer> requestedTimeSlots = new ArrayList<>();
+        requestedTimeSlots.add(36);
+
+        List<Department> departments = buildingDataAccess.retrieveBuilding(buildingID).getDepartments();
+
+        boolean requestedTimeSlotIsAvailable = bm.checkTicketAvailability(buildingID,LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault()),requestedTimeSlots,departments);
+
+        Assertions.assertTrue(requestedTimeSlotIsAvailable);
+
+        buildingDataAccess.em.getTransaction().commit();
+    }
+
+    @Test
+    public void bookingDigitalTicketShouldNotBeAvailable(){
+        buildingDataAccess.em.getTransaction().begin();
+
+        List<Integer> requestedTimeSlots = new ArrayList<>();
+        requestedTimeSlots.add(48);
+
+        List<Department> departments = buildingDataAccess.retrieveBuilding(buildingID).getDepartments();
+
+        boolean requestedTimeSlotIsAvailable = bm.checkTicketAvailability(buildingID,LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault()),requestedTimeSlots,departments);
+
+        Assertions.assertFalse(requestedTimeSlotIsAvailable);
+
+        buildingDataAccess.em.getTransaction().commit();
     }
 }

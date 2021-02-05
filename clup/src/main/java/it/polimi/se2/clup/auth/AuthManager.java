@@ -120,5 +120,11 @@ public class AuthManager implements AuthManagerInt{
         return new String[]{accessCode, Hash.simpleHash(accessCode)};
     }
 
+    public UserDataAccessInt getUserDAO() {
+        return userDAO;
+    }
 
+    public void setUserDAO(UserDataAccessInt userDAO) {
+        this.userDAO = userDAO;
+    }
 }

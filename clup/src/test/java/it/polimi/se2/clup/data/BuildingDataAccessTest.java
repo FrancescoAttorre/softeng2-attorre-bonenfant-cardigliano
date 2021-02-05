@@ -1,9 +1,7 @@
 package it.polimi.se2.clup.data;
 
-import it.polimi.se2.clup.data.entities.Building;
-import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
-import it.polimi.se2.clup.data.entities.StoreManager;
-import it.polimi.se2.clup.data.entities.UnregisteredAppCustomer;
+import it.polimi.se2.clup.auth.AuthManager;
+import it.polimi.se2.clup.data.entities.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +18,8 @@ public class BuildingDataAccessTest {
 
     private static BuildingDataAccess dm;
 
+    int activityId;
+
     @BeforeEach
     public void setup() {
 
@@ -32,6 +32,11 @@ public class BuildingDataAccessTest {
         dm.em.getTransaction().begin();
 
         //creation of EsselungaStore
+        UserDataAccessImpl userDataAccess  = new UserDataAccessImpl();
+        userDataAccess.em = dm.em;
+
+        userDataAccess.insertActivity("EsselungaActivity","PIVAEsselunga","EsselungaPassword");
+        activityId = userDataAccess.retrieveActivity("PIVAEsselunga").getId();
 
         Map<String,Integer> surplus = new HashMap<>();
         surplus.put("Macelleria",10);
@@ -39,6 +44,7 @@ public class BuildingDataAccessTest {
         surplus.put("Bevande",12);
 
         dm.insertBuilding(
+                activityId,
                 "EsselungaStore",
                 LocalTime.of(8,0,0),
                 LocalTime.of(21,0,0),
@@ -66,6 +72,9 @@ public class BuildingDataAccessTest {
         }
         for(Building b : em.createNamedQuery("Building.findAll",Building.class).getResultList()){
             em.remove(b);
+        }
+        for(Activity a : em.createNamedQuery("Activity.selectAll",Activity.class).getResultList()){
+            em.remove(a);
         }
         em.getTransaction().commit();
     }

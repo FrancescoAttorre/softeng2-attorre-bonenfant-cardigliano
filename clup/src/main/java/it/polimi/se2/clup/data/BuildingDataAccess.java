@@ -71,13 +71,18 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
     }
 
     @Override
-    public int insertBuilding(String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String, Integer> surplus,String accessCode) {
+    public int insertBuilding(int activityId, String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String, Integer> surplus,String accessCode) {
         Building building = new Building();
         Queue queue = new Queue();
         building.setQueue(queue);
         queue.setBuilding(building);
 
-        em.persist(queue);
+        //should persist with cascade on persist building
+        //em.persist(queue);
+
+        Activity activity = em.find(Activity.class,activityId);
+        building.setActivity(activity);
+
 
         building.setName(name); //TODO: name should be unique ? check or catch exception ?
         building.setOpening(opening);

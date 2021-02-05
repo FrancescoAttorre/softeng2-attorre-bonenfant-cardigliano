@@ -42,6 +42,9 @@ public class UserDataAccessImplTest {
         for(Building b : em.createNamedQuery("Building.findAll",Building.class).getResultList()){
             em.remove(b);
         }
+        for(Activity a : em.createNamedQuery("Activity.selectAll",Activity.class).getResultList()){
+            em.remove(a);
+        }
         em.getTransaction().commit();
     }
 

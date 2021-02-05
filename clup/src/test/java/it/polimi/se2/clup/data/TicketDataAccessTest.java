@@ -22,6 +22,7 @@ public class TicketDataAccessTest {
     private static int unregID;
     private static int buildingID;
     private static int smID;
+    private static int activityId;
 
     @BeforeEach
     public void setup() {
@@ -41,6 +42,11 @@ public class TicketDataAccessTest {
 
         em.getTransaction().begin();
 
+        UserDataAccessImpl userDataAccess  = new UserDataAccessImpl();
+        userDataAccess.em = dm.em;
+        userDataAccess.insertActivity("EsselungaActivity","PIVAEsselunga","EsselungaPassword");
+        activityId = userDataAccess.retrieveActivity("PIVAEsselunga").getId();
+
         //Creation of an unregistered customer
         unregID = uda.insertUnregisteredAppCustomer();
 
@@ -54,6 +60,7 @@ public class TicketDataAccessTest {
         surplus.put("Pescheria",3);
 
         buildingID = bdm.insertBuilding(
+                activityId,
                 "EsselungaStore",
                 LocalTime.of(8,0,0),
                 LocalTime.of(21,0,0),
@@ -81,6 +88,9 @@ public class TicketDataAccessTest {
         }
         for(Building b : em.createNamedQuery("Building.findAll",Building.class).getResultList()){
             em.remove(b);
+        }
+        for(Activity a : em.createNamedQuery("Activity.selectAll",Activity.class).getResultList()){
+            em.remove(a);
         }
         em.getTransaction().commit();
     }
