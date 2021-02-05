@@ -12,9 +12,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.time.*;
-import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.*;
 
 public class BuildingManagerTest {
@@ -23,10 +21,12 @@ public class BuildingManagerTest {
     static QueueManager qm;
     static TimeSlotManager tsm;
     static BuildingDataAccess buildingDataAccess;
+    static UserDataAccessImpl userDataAccess;
 
     int buildingID;
     int firstUserId;
     int secondUserId;
+    int regUserId;
 
     @BeforeEach
     public void setup(){
@@ -40,7 +40,7 @@ public class BuildingManagerTest {
         buildingDataAccess.em = em;
         bm.setDataAccess(buildingDataAccess);
 
-        UserDataAccessImpl userDataAccess = new UserDataAccessImpl();
+        userDataAccess = new UserDataAccessImpl();
         userDataAccess.em = em;
 
         TicketDataAccess ticketDataAccess = new TicketDataAccess();
@@ -78,14 +78,11 @@ public class BuildingManagerTest {
                 LocalTime.of(8, 0, 0),
                 LocalTime.of(21, 0, 0),
                 "via Roma,1",
-                3,
+                2,
                 surplus,
                 "AccessCODE");
 
-
-        //considering a full building
-        buildingDataAccess.retrieveBuilding(buildingID).setActualCapacity(0);
-
+        //considering an empty building
         //Creation of 2 tickets
         tm.acquireUnregCustomerLineUpTicket(firstUserId, buildingID);
         tm.acquireUnregCustomerLineUpTicket(secondUserId, buildingID);
@@ -94,7 +91,9 @@ public class BuildingManagerTest {
         em.getTransaction().begin();
 
         //acquire ticket with time slot of 12.00 that is 12*60/15 = 48 and for only one slot for all departments
-        RegisteredAppCustomer registeredAppCustomer = em.createNamedQuery("RegisteredAppCustomer.findUserByUsername",RegisteredAppCustomer.class).setParameter("username","firstReg").getSingleResult();
+        RegisteredAppCustomer registeredAppCustomer = em.createNamedQuery("RegisteredAppCustomer.findUserByUsername",RegisteredAppCustomer.class)
+                .setParameter("username","firstReg").getSingleResult();
+        regUserId = registeredAppCustomer.getId();
 
 
         Building building = buildingDataAccess.retrieveBuilding(buildingID);
@@ -159,17 +158,23 @@ public class BuildingManagerTest {
         buildingDataAccess.em.getTransaction().commit();
     }
 
-
-
     @Test
     public void shouldRemoveFromQueueNextTicket(){
         buildingDataAccess.em.getTransaction().begin();
+
+        //the building in setup had first and second users inside, full
+        int thirdUserId = userDataAccess.insertUnregisteredAppCustomer();
+        int fourthUserId = userDataAccess.insertUnregisteredAppCustomer();
+
+        //two tickets in queue
+        tm.acquireUnregCustomerLineUpTicket(thirdUserId, buildingID);
+        tm.acquireUnregCustomerLineUpTicket(fourthUserId, buildingID);
 
         bm.customerExit(buildingID);
 
         //SHOULD REMOVE FROM QUEUE
         Assertions.assertEquals(buildingDataAccess.retrieveTicketsInQueue(buildingID).size(), 1);
-        Assertions.assertEquals(buildingDataAccess.retrieveTicketsInQueue(buildingID).get(0).getUnregisteredOwner().getId(), secondUserId);
+        Assertions.assertEquals(buildingDataAccess.retrieveTicketsInQueue(buildingID).get(0).getUnregisteredOwner().getId(), fourthUserId);
 
         buildingDataAccess.em.getTransaction().commit();
     }
@@ -285,4 +290,53 @@ public class BuildingManagerTest {
         buildingDataAccess.em.getTransaction().commit();
     }
 
+    @Test
+    public void shouldPreventCustomerWithInvalidBookingTicketToEnter() {
+
+        BookingDigitalTicket setupTicket = buildingDataAccess.em.createNamedQuery("BookingDigitalTicket.selectWithRegID",BookingDigitalTicket.class)
+                .setParameter("regID", regUserId).getResultList().get(0);
+
+        int startingMinute = setupTicket.getTimeSlotID() * BuildingManager.minutesInASlot;
+        int hour = startingMinute / 60;
+        int minute = startingMinute % 60;
+
+        if (Duration.between(LocalTime.of(hour, minute), LocalTime.now()).toMinutes() > 10 ||
+                setupTicket.getDate().getYear() != LocalDateTime.now().getYear() ||
+                setupTicket.getDate().getMonthValue() != LocalDateTime.now().getMonthValue() ||
+                setupTicket.getDate().getDayOfMonth() != LocalDateTime.now().getDayOfMonth())
+
+            Assertions.assertFalse(bm.customerEntry(setupTicket.getTicketID(), buildingID, regUserId));
+    }
+
+    @Test
+    public void shouldAllowCustomerWithValidLineUpTicketToEnter() {
+
+        buildingDataAccess.em.getTransaction().begin();
+
+        Building building = buildingDataAccess.retrieveBuilding(buildingID);
+
+        int thirdUserId = userDataAccess.insertUnregisteredAppCustomer();
+        int fourthUserId = userDataAccess.insertUnregisteredAppCustomer();
+
+        //considering an empty building
+        bm.customerExit(buildingID);
+        bm.customerExit(buildingID);
+
+        Assertions.assertEquals(building.getActualCapacity(), 2);
+
+        //Creation of 2 tickets ready to enter
+        tm.acquireUnregCustomerLineUpTicket(thirdUserId, buildingID);
+        tm.acquireUnregCustomerLineUpTicket(fourthUserId, buildingID);
+
+        buildingDataAccess.em.getTransaction().commit();
+
+        LineUpDigitalTicket firstTicket = buildingDataAccess.em.createNamedQuery("LineUpDigitalTicket.selectWithUnregID",LineUpDigitalTicket.class)
+                .setParameter("unregID", thirdUserId).getResultList().get(0);
+
+        LineUpDigitalTicket secondTicket = buildingDataAccess.em.createNamedQuery("LineUpDigitalTicket.selectWithUnregID",LineUpDigitalTicket.class)
+                .setParameter("unregID", fourthUserId).getResultList().get(0);
+
+        Assertions.assertTrue(bm.customerEntry(firstTicket.getTicketID(), buildingID, thirdUserId));
+        Assertions.assertTrue(bm.customerEntry(secondTicket.getTicketID(),  buildingID,fourthUserId));
+    }
 }

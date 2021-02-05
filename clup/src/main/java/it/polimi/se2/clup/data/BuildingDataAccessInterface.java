@@ -2,11 +2,9 @@ package it.polimi.se2.clup.data;
 
 import it.polimi.se2.clup.data.entities.Building;
 import it.polimi.se2.clup.data.entities.Department;
-import it.polimi.se2.clup.data.entities.DigitalTicket;
 import it.polimi.se2.clup.data.entities.LineUpDigitalTicket;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;

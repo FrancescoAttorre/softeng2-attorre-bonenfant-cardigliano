@@ -24,6 +24,7 @@ public class BuildingManager implements BuildingManagerInterface{
     protected TicketManager ticketManager;
 
     public static final int minutesInASlot = 15;
+    public static final int expirationTime = 10;
 
     @Override
     public Map<Department, List<Integer>> getAvailableTimeSlots(int buildingId, LocalDate date, Duration permanenceTime, List<Department> departments) {
@@ -60,8 +61,12 @@ public class BuildingManager implements BuildingManagerInterface{
         return false; //false means that no one else is allowed to enter the building?
     }
 
+    /**
+     * Method called by StoreManager to allow a customer to enter a building or prevent him from entering
+     * LineUp tickets are set to valid during exits/ticket acquisition, while booking ticket are validated in this method
+     * @return true if the customer has a valid ticket
+     */
     @Override
-    //method called by StoreManager to allow a customer to enter a building or prevent him from entering
     public boolean customerEntry (int ticketID, int buildingID, int userID) {
 
         boolean result = false;
@@ -77,21 +82,27 @@ public class BuildingManager implements BuildingManagerInterface{
 
         if (ticket != null) {
             int startingMinute = ticket.getTimeSlotID() * minutesInASlot;
+            int year = ticket.getDate().getYear();
+            int month = ticket.getDate().getMonthValue();
+            int day = ticket.getDate().getDayOfMonth();
             int hour = startingMinute / 60;
             int minute = startingMinute % 60;
 
-            if (hour == LocalTime.now().getHour() &&
-                    Duration.between(LocalTime.of(hour, minute), LocalTime.now()).toMinutes() < 10) {
+            if (year == LocalDateTime.now().getYear() && month == LocalDateTime.now().getMonthValue() &&
+                    day == LocalDateTime.now().getDayOfMonth() && hour == LocalTime.now().getHour() &&
+                    Duration.between(LocalTime.of(hour, minute), LocalTime.now()).toMinutes() < expirationTime) {
 
                 ticketManager.validateTicket(ticketID);
                 result = true;
             }
-            if (Duration.between(LocalTime.of(hour, minute), LocalTime.now()).toMinutes() > 10)
+            if (Duration.between(LocalTime.of(hour, minute), LocalTime.now()).toMinutes() > expirationTime)
                 ticketManager.setTicketState(ticketID, TicketState.EXPIRED);
         }
         else if (ticketManager.validityCheck(ticketID)) {
 
             Building building = dataAccess.retrieveBuilding(buildingID);
+            if (building == null)
+                return false;
             building.setActualCapacity(building.getActualCapacity() - 1);
             result = true;
         }

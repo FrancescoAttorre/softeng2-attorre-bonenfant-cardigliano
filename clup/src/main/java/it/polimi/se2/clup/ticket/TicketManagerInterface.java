@@ -13,9 +13,9 @@ public interface TicketManagerInterface {
 
     boolean acquireBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength, List<Department> departments);
 
-    void acquireUnregCustomerLineUpTicket(int userID, int buildingID);
+    boolean acquireUnregCustomerLineUpTicket(int userID, int buildingID);
 
-    void acquireRegCustomerLineUpTicket(int userID, int buildingID);
+    boolean acquireRegCustomerLineUpTicket(int userID, int buildingID);
 
     List<BookingDigitalTicket> getBookingTicketsRegCustomer(int userID);
     List<LineUpDigitalTicket> getLineUpTicketsRegCustomer (int userID);

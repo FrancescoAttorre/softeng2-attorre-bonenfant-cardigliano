@@ -30,24 +30,34 @@ public class UserDataAccessImpl implements UserDataAccessInt{
     }
 
     @Override
-    public void insertUser(String username, String password) throws EntityExistsException {
+    public boolean insertUser(String username, String password) throws EntityExistsException {
+
         RegisteredAppCustomer appCustomer = new RegisteredAppCustomer();
+
+        if (username == null || password == null)
+            return false;
+
         appCustomer.setUsername(username);
         appCustomer.setPassword(password);
-
         em.persist(appCustomer);
+        return true;
     }
 
 
 
     @Override
-    public void insertActivity(String name, String pIva, String password) throws EntityExistsException{
+    public boolean insertActivity(String name, String pIva, String password) throws EntityExistsException{
         Activity activity = new Activity();
+
+        if (name == null || pIva == null || password == null)
+            return false;
+
         activity.setName(name);
         activity.setpIva(pIva);
         activity.setPassword(password);
 
         em.persist(activity);
+        return true;
     }
 
     @Override

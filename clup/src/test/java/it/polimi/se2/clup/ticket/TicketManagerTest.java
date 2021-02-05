@@ -13,9 +13,7 @@ import org.junit.jupiter.api.Test;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -225,21 +223,6 @@ public class TicketManagerTest {
 
         tm.getBuildingManager().customerExit(buildingID); //customer exit will simulate an exit in the current time
 
-        /*
-        LocalTime lastExitTime = LocalTime.now().minus(Duration.ofMinutes(10));
-        bda.updateStatistics(buildingID, lastExitTime);
-        building.setLastExitTime(lastExitTime);
-        List<LineUpDigitalTicket> queue = bda.retrieveBuilding(buildingID).getQueue().getQueueTickets();
-        LineUpDigitalTicket ticket = null;
-        if (queue.size() > 0)
-            ticket = queue.get(0);
-        if (ticket != null) {
-            tm.validateTicket(ticket.getTicketID());
-            qm.removeFromQueue(ticket.getTicketID());
-        }
-        building.setActualCapacity(building.getActualCapacity() + 1);*/
-
-
         Assertions.assertEquals(tm.getWaitingUpdateUnregCustomer(unregID4).get(tm.getTicketsUnregisteredCustomer(unregID4).get(0)).toMinutes(),
                 TicketManager.defaultWaitingTime);
         Assertions.assertEquals(tm.getWaitingUpdateUnregCustomer(unregID3).get(tm.getTicketsUnregisteredCustomer(unregID3).get(0)),
@@ -247,4 +230,88 @@ public class TicketManagerTest {
         Assertions.assertEquals(tm.getTicketsUnregisteredCustomer(unregID3).get(0).getState(), TicketState.VALID);
     }
 
+    @Test
+    public void bookingsMustNotOverlap () {
+        em.getTransaction().begin();
+
+        Assertions.assertTrue(tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID));
+        uda.insertUser("user","pass");
+
+        int regAppCustomerID = em.createNamedQuery("RegisteredAppCustomer.findUserByUsername",RegisteredAppCustomer.class)
+                .setParameter("username","user").getSingleResult().getId();
+
+        Assertions.assertTrue(tm.acquireBookingTicket(regAppCustomerID,
+                buildingID,
+                LocalDate.ofInstant(Instant.now(),ZoneId.systemDefault()),
+                48,
+                2,
+                null));
+
+        Assertions.assertFalse(tm.acquireBookingTicket(regAppCustomerID,
+                buildingID,
+                LocalDate.ofInstant(Instant.now(),ZoneId.systemDefault()),
+                49,
+                1,
+                null));
+
+        Assertions.assertFalse(tm.acquireBookingTicket(regAppCustomerID,
+                buildingID,
+                LocalDate.ofInstant(Instant.now(),ZoneId.systemDefault()),
+                45,
+                8,
+                null));
+
+        em.getTransaction().commit();
+    }
+
+    @Test
+    public void sameCustomerCannotAcquire2TicketsSameBuildingSameDay () {
+
+        em.getTransaction().begin();
+
+        Assertions.assertTrue(tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID));
+        Assertions.assertFalse(tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID));
+
+        Assertions.assertTrue(uda.insertUser("user","firstPass"));
+
+        em.getTransaction().commit();
+
+        RegisteredAppCustomer registeredAppCustomer = em.createNamedQuery("RegisteredAppCustomer.findUserByUsername",RegisteredAppCustomer.class)
+                .setParameter("username","user").getSingleResult();
+
+        Building building = bda.retrieveBuilding(buildingID);
+        Assertions.assertTrue(tm.acquireBookingTicket(registeredAppCustomer.getId(),
+                buildingID,
+                LocalDate.ofInstant(Instant.now(),ZoneId.systemDefault()),
+                48,
+                1,
+                building.getDepartments()));
+
+        Assertions.assertFalse(tm.acquireBookingTicket(registeredAppCustomer.getId(),
+                buildingID,
+                LocalDate.ofInstant(Instant.now(),ZoneId.systemDefault()),
+                48,
+                1,
+                building.getDepartments()));
+    }
+
+    @Test
+    public void shouldNotInsertBookingTicketWithMissingDate() {
+
+        tda.em.getTransaction().begin();
+
+        Assertions.assertTrue(uda.insertUser("user","firstPass"));
+
+        RegisteredAppCustomer registeredAppCustomer = em.createNamedQuery("RegisteredAppCustomer.findUserByUsername",RegisteredAppCustomer.class)
+                .setParameter("username","user").getSingleResult();
+
+        Assertions.assertFalse(tm.acquireBookingTicket(registeredAppCustomer.getId(),
+                buildingID,
+                null,
+                48,
+                1,
+                null));
+
+        tda.em.getTransaction().commit();
+    }
 }

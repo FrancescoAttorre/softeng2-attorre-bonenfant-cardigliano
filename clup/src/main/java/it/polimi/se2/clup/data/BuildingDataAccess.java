@@ -7,9 +7,7 @@ import it.polimi.se2.clup.ticket.TicketManager;
 import javax.persistence.*;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoField;
 import java.util.*;
 
 public class BuildingDataAccess implements BuildingDataAccessInterface{
@@ -19,7 +17,7 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
 
     @Override
     public Building retrieveBuilding(int buildingId){
-        //exception if null ???
+
         return em.find(Building.class,buildingId);
     }
 

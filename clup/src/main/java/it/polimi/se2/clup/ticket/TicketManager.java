@@ -1,6 +1,7 @@
 package it.polimi.se2.clup.ticket;
 
 import it.polimi.se2.clup.building.BuildingManager;
+import it.polimi.se2.clup.data.InvalidDepartmentException;
 import it.polimi.se2.clup.data.TicketDataAccess;
 import it.polimi.se2.clup.data.entities.*;
 
@@ -8,7 +9,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,17 +54,66 @@ public class TicketManager implements TicketManagerInterface {
     @Override
     public boolean acquireBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID,
                                         int timeSlotLength, List<Department> departments) {
+
+        if (date == null)
+            return false;
+
+        List<BookingDigitalTicket> bookingTickets = ticketDataAccess.retrieveBookingTicketsRegCustomer(userID);
+        if (bookingTickets != null) {
+
+            for (BookingDigitalTicket ticket : bookingTickets) {
+
+                if (ticket.getBuilding().getBuildingID() == buildingID &&
+                        (ticket.getDate().getDayOfMonth() == date.getDayOfMonth() && ticket.getDate().getMonth() == date.getMonth()
+                        && ticket.getDate().getYear() == date.getYear()))
+                    return false;
+
+                if (checkTimeSlotsOverlaps(bookingTickets, ticket))
+                    return false;
+            }
+        }
         try {
             ticketDataAccess.insertBookingTicket(userID, buildingID, date, timeSlotID, timeSlotLength, departments);
         }
-        catch (Exception e) {
+        catch (InvalidDepartmentException invalidDep) {
             return false;
         }
         return true;
     }
 
+    private boolean checkTimeSlotsOverlaps(List<BookingDigitalTicket> bookingTickets, BookingDigitalTicket ticket) {
+
+        for (BookingDigitalTicket ticketToCompare : bookingTickets) {
+
+            if (!ticketToCompare.equals(ticket)) {
+
+                int startingTimeSlot = ticket.getTimeSlotID();
+                int endingTimeSlot = ticket.getTimeSlotID() + ticket.getTimeSlotLength();
+                int startingTimeSlotToCompare = ticketToCompare.getTimeSlotID();
+                int endingTimeSlotToCompare = ticketToCompare.getTimeSlotID() + ticketToCompare.getTimeSlotLength();
+
+                if ((startingTimeSlotToCompare > startingTimeSlot && startingTimeSlotToCompare < endingTimeSlot) ||
+                        (startingTimeSlotToCompare < endingTimeSlot && endingTimeSlotToCompare > startingTimeSlot) ||
+                        (startingTimeSlotToCompare < startingTimeSlot && endingTimeSlotToCompare > startingTimeSlot))
+                    return true;
+            }
+        }
+        return false;
+    }
+
     @Override
-    public void acquireRegCustomerLineUpTicket(int userID, int buildingID) {
+    public boolean acquireRegCustomerLineUpTicket(int userID, int buildingID) {
+
+        List<LineUpDigitalTicket> lineUpTickets = ticketDataAccess.retrieveLineUpTicketsRegCustomer(userID);
+        if (lineUpTickets != null) {
+
+            for (LineUpDigitalTicket ticket : lineUpTickets) {
+
+                if (ticket.getBuilding().getBuildingID() == buildingID && !ticket.getState().equals(TicketState.EXPIRED))
+                    return false;
+            }
+        }
+
         LineUpDigitalTicket newTicket = ticketDataAccess.insertRegCustomerLineUpTicket(userID, buildingID);
 
         if (buildingManager.checkBuildingNotFull(buildingID)) {
@@ -73,10 +122,20 @@ public class TicketManager implements TicketManagerInterface {
         }
         else
             buildingManager.insertInQueue(newTicket);
+        return true;
     }
 
     @Override
-    public void acquireUnregCustomerLineUpTicket(int userID, int buildingID) {
+    public boolean acquireUnregCustomerLineUpTicket(int userID, int buildingID) {
+
+        List<LineUpDigitalTicket> lineUpTickets = ticketDataAccess.retrieveTicketsUnregisteredCustomer(userID);
+        if (lineUpTickets != null) {
+            for (LineUpDigitalTicket ticket : lineUpTickets) {
+                if (ticket.getBuilding().getBuildingID() == buildingID)
+                    return false;
+            }
+        }
+
         LineUpDigitalTicket newTicket = ticketDataAccess.insertUnregCustomerLineUpTicket(userID, buildingID);
 
         if (buildingManager.checkBuildingNotFull(buildingID)) {
@@ -85,10 +144,12 @@ public class TicketManager implements TicketManagerInterface {
         }
         else
             buildingManager.insertInQueue(newTicket);
+        return true;
     }
 
     @Override
     public List<BookingDigitalTicket> getBookingTicketsRegCustomer(int userID) {
+
         return ticketDataAccess.retrieveBookingTicketsRegCustomer(userID);
     }
 
@@ -152,7 +213,7 @@ public class TicketManager implements TicketManagerInterface {
 
         LocalDateTime validationTime = ticketDataAccess.retrieveValidationTime(ticketID);
 
-        if (validationTime != null && (ChronoUnit.MINUTES.between(validationTime, LocalDateTime.now())) > 10)
+        if (validationTime != null && (Duration.between(validationTime, LocalDateTime.now()).toMinutes() > 10))
             ticketDataAccess.updateTicketState(ticketID, TicketState.EXPIRED);
 
         return ticketDataAccess.retrieveTicketState(ticketID).equals(TicketState.VALID);

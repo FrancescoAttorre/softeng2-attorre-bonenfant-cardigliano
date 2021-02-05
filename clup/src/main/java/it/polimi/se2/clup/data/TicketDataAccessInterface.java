@@ -18,7 +18,7 @@ public interface TicketDataAccessInterface {
     LineUpDigitalTicket insertStoreManagerLineUpTicket (int userID);
     BookingDigitalTicket insertBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength,
                                              List<Department> chosenDepartments) throws Exception;
-    void updateTicketState(int ticketID, TicketState state);
+    boolean updateTicketState(int ticketID, TicketState state);
     List<LineUpDigitalTicket> retrieveLineUpTicketsRegCustomer(int userID);
     List<BookingDigitalTicket> retrieveBookingTicketsRegCustomer(int userID);
     List<LineUpDigitalTicket> retrieveTicketsUnregisteredCustomer(int userID);

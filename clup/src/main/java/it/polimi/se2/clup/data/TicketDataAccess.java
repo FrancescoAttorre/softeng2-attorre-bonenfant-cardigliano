@@ -84,7 +84,7 @@ public class TicketDataAccess implements TicketDataAccessInterface {
 
     @Override
     public BookingDigitalTicket insertBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID,
-                                                    int timeSlotLength, List<Department> chosenDepartments) throws Exception {
+                                                    int timeSlotLength, List<Department> chosenDepartments) throws InvalidDepartmentException {
 
         BookingDigitalTicket newTicket = new BookingDigitalTicket();
 
@@ -110,15 +110,17 @@ public class TicketDataAccess implements TicketDataAccessInterface {
 
         List<Department> referencedDept = new ArrayList<>();
 
-        for (Department dep: chosenDepartments) {
-            Department dept = em.find(Department.class,dep.getDepartmentID());
-            if (!(building.getDepartments().contains(dept)))
-                throw new Exception();
+        if (chosenDepartments != null) {
+            for (Department dep : chosenDepartments) {
+                Department dept = em.find(Department.class, dep.getDepartmentID());
+                if (!(building.getDepartments().contains(dept)))
+                    throw new InvalidDepartmentException();
 
-            //
-            dept.addTicket(newTicket);
-            //
-            referencedDept.add(dept);
+                //
+                dept.addTicket(newTicket);
+                //
+                referencedDept.add(dept);
+            }
         }
 
         newTicket.setDepartments(referencedDept);
@@ -127,37 +129,53 @@ public class TicketDataAccess implements TicketDataAccessInterface {
     }
 
     @Override
-    public void updateTicketState(int ticketID, TicketState state) throws NoResultException {
+    public boolean updateTicketState(int ticketID, TicketState state) {
          DigitalTicket ticketToUpdate = em.createNamedQuery("DigitalTicket.retrieveTicketById", DigitalTicket.class)
                 .setParameter("ticketID", ticketID)
                 .getSingleResult();
-         ticketToUpdate.setState(state);
-         if (state.equals(TicketState.VALID))
-            ticketToUpdate.setValidationTime(LocalDateTime.now());
+         if (ticketToUpdate != null) {
+             ticketToUpdate.setState(state);
+             if (state.equals(TicketState.VALID))
+                 ticketToUpdate.setValidationTime(LocalDateTime.now());
+             return true;
+         }
+         return false;
     }
 
     @Override
     public List<BookingDigitalTicket> retrieveBookingTicketsRegCustomer(int userID) throws NoResultException {
         RegisteredAppCustomer registeredAppCustomer = em.find(RegisteredAppCustomer.class, userID);
-        return registeredAppCustomer.getBookingDigitalTickets();
+        if (registeredAppCustomer != null)
+            return registeredAppCustomer.getBookingDigitalTickets();
+        else
+            return null;
     }
 
     @Override
     public List<LineUpDigitalTicket> retrieveLineUpTicketsRegCustomer(int userID) throws NoResultException {
         RegisteredAppCustomer registeredAppCustomer = em.find(RegisteredAppCustomer.class, userID);
-        return registeredAppCustomer.getLineUpDigitalTickets();
+        if (registeredAppCustomer != null)
+            return registeredAppCustomer.getLineUpDigitalTickets();
+        else
+            return null;
     }
 
     @Override
     public List<LineUpDigitalTicket> retrieveTicketsUnregisteredCustomer(int userID) throws NoResultException {
         UnregisteredAppCustomer unregisteredAppCustomer = em.find(UnregisteredAppCustomer.class, userID);
-        return unregisteredAppCustomer.getLineUpDigitalTickets();
+        if (unregisteredAppCustomer != null)
+            return unregisteredAppCustomer.getLineUpDigitalTickets();
+        else
+            return null;
     }
 
     @Override
     public List<LineUpDigitalTicket> retrieveLineUpTicketsStoreManager(int userID) throws NoResultException {
         StoreManager storeManager = em.find(StoreManager.class, userID);
-        return storeManager.getLineUpDigitalTickets();
+        if (storeManager != null)
+            return storeManager.getLineUpDigitalTickets();
+        else
+            return null;
     }
 
     @Override
