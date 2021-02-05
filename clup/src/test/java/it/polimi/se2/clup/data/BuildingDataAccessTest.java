@@ -1,6 +1,5 @@
 package it.polimi.se2.clup.data;
 
-import it.polimi.se2.clup.auth.AuthManager;
 import it.polimi.se2.clup.data.entities.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
