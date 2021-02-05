@@ -93,7 +93,6 @@ public class TicketDataAccess implements TicketDataAccessInterface {
         owner.addBookingTicket(newTicket);
 
         Building building = em.find(Building.class, buildingID);
-        building.addTicket(newTicket);
 
         //
         building.addTicket(newTicket);
@@ -111,14 +110,15 @@ public class TicketDataAccess implements TicketDataAccessInterface {
         List<Department> referencedDept = new ArrayList<>();
 
         if (chosenDepartments != null) {
+
             for (Department dep : chosenDepartments) {
+
                 Department dept = em.find(Department.class, dep.getDepartmentID());
+
                 if (!(building.getDepartments().contains(dept)))
                     throw new InvalidDepartmentException();
 
-                //
                 dept.addTicket(newTicket);
-                //
                 referencedDept.add(dept);
             }
         }

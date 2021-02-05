@@ -2,6 +2,7 @@ package it.polimi.se2.clup.building;
 
 import it.polimi.se2.clup.data.BuildingDataAccessInterface;
 import it.polimi.se2.clup.data.entities.*;
+import it.polimi.se2.clup.ticket.NotInQueueException;
 import it.polimi.se2.clup.ticket.TicketManager;
 
 import javax.ejb.Stateless;
@@ -12,12 +13,10 @@ import java.util.List;
 import java.util.Map;
 
 @Stateless
-public class BuildingManager implements BuildingManagerInterface{
+public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt {
+
     @EJB
     protected BuildingDataAccessInterface dataAccess;
-
-    //TODO : EJB also for internal ???
-
     @EJB
     protected QueueManager queueManager;
     @EJB
@@ -27,6 +26,8 @@ public class BuildingManager implements BuildingManagerInterface{
 
     public static final int minutesInASlot = 15;
     public static final int expirationTime = 10;
+    public static final int defaultWaitingTime = 15;
+    public static final int extraTime = 10;
 
     @Override
     public Map<Department, List<Integer>> getAvailableTimeSlots(int buildingId, LocalDate date, Duration permanenceTime, List<Department> departments) {
@@ -112,15 +113,13 @@ public class BuildingManager implements BuildingManagerInterface{
     }
 
     @Override
-    public boolean insertBuilding(int activityId,String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String, Integer> surplus, String code) {
-
-        //TODO : add activity connection
+    public boolean insertBuilding(int activityId, String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String, Integer> surplus, String code) {
 
         if (name == null || opening == null || closing == null || address == null || capacity <= 0)
             return false;
 
         if (isAccessCodeAvailable(code)){
-            dataAccess.insertBuilding(activityId,name, opening, closing, address, capacity, surplus, code);
+            dataAccess.insertBuilding(activityId, name, opening, closing, address, capacity, surplus, code);
             return true;
         } else
             return false;
@@ -140,6 +139,75 @@ public class BuildingManager implements BuildingManagerInterface{
 
         return !accessCodes.contains(code);
 
+    }
+
+    /**
+     * ComputeWaitingTime sets the waiting time to zero for valid tickets, changes their state to
+     * expired when the ticket are valid from more than 10 minutes,
+     * for non valid tickets, instead, it updates the estimated waiting time, basing on the last exit
+     * from the ticket's building while in queue, the current time and the medium waiting time for that building
+     *
+     * In case of delays, the waiting time is fixed to the default waiting time
+     *
+     * @return new value of estimated waiting time with a precision of minutes
+     * @throws NotInQueueException if the ticket is not found in the related queue
+     */
+    @Override
+    public Duration computeWaitingTime (LineUpDigitalTicket ticket) throws NotInQueueException {
+
+        Duration newWaitingTime;
+
+        switch (ticket.getState()) {
+            case EXPIRED:
+                newWaitingTime = Duration.ZERO;
+                break;
+
+            case VALID:
+                if (Duration.between(ticket.getValidationTime(), LocalDateTime.now()).toMinutes() > 10)
+                    ticketManager.setTicketState(ticket.getTicketID(), TicketState.EXPIRED);
+                newWaitingTime = Duration.ZERO;
+                break;
+
+            case INVALID:
+                Duration additionalTime = Duration.ofMinutes(extraTime);
+                LocalTime now = LocalTime.now();
+
+                int positionInQueue = ticket.getQueue().getQueueTickets().indexOf(ticket);
+
+                if (positionInQueue != -1) {
+
+                    long averageWait = ticket.getBuilding().getDeltaExitTime().toMinutes();
+                    LocalTime lastExitTime = ticket.getBuilding().getLastExitTime();
+                    LocalTime acquisitionTime = ticket.getAcquisitionTime().toLocalTime();
+
+                    if (lastExitTime != null && lastExitTime.isAfter(acquisitionTime)) {
+
+                        newWaitingTime = Duration.ofMinutes((averageWait * (positionInQueue + 1)) -
+                                Duration.between(lastExitTime, now).toMinutes());
+                    }
+
+                    else if (!ticket.getBuilding().getDeltaExitTime().equals(Duration.ZERO)) {
+
+                        newWaitingTime = Duration.ofMinutes(averageWait * (positionInQueue + 1) -
+                                Duration.between(acquisitionTime, now).toMinutes());
+                    }
+
+                    else
+                        newWaitingTime = Duration.ofMinutes((long) defaultWaitingTime * (positionInQueue + 1) -
+                                Duration.between(acquisitionTime, now).toMinutes());
+
+                    //
+                    if (newWaitingTime.toMinutes() <= 0) {
+                        newWaitingTime = additionalTime;
+                    }
+
+                } else
+                    throw new NotInQueueException();
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + ticket.getState());
+        }
+        return newWaitingTime;
     }
 
     public QueueManager getQueueManager() {

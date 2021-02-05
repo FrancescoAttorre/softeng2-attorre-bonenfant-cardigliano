@@ -1,15 +1,17 @@
 package it.polimi.se2.clup.data;
 
+import it.polimi.se2.clup.building.BuildingManager;
 import it.polimi.se2.clup.data.entities.*;
 import it.polimi.se2.clup.data.entities.Queue;
-import it.polimi.se2.clup.ticket.TicketManager;
 
+import javax.ejb.Stateless;
 import javax.persistence.*;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
+@Stateless
 public class BuildingDataAccess implements BuildingDataAccessInterface{
 
     @PersistenceContext(unitName = "clup")
@@ -130,7 +132,7 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
             //weightedNewDelta = Duration.between(building.getOpening(), lastExitTime).toMinutes();
 
             //building.setDeltaExitTime(Duration.ofMinutes(weightedNewDelta));
-            building.setDeltaExitTime(Duration.ofMinutes(TicketManager.defaultWaitingTime));
+            building.setDeltaExitTime(Duration.ofMinutes(BuildingManager.defaultWaitingTime));
 
         }else {
             weightedOldDelta = building.getDeltaExitTime().toMinutes() * 0.8 ;

@@ -196,7 +196,7 @@ public class TicketManagerTest {
         building.setLastExitTime(LocalTime.now().minus(Duration.ofMinutes(15)));
 
         waitingTimes = tm.getWaitingUpdateUnregCustomer(unregID1);
-        Assertions.assertEquals(waitingTimes.get(firstInQueue).toMinutes(), TicketManager.extraTime);
+        Assertions.assertEquals(waitingTimes.get(firstInQueue).toMinutes(), BuildingManager.extraTime);
     }
 
     @Test
@@ -224,7 +224,7 @@ public class TicketManagerTest {
         //delta is not set, so it is used the defaultWaitingTime
         LineUpDigitalTicket lastInQueue = tm.getTicketsUnregisteredCustomer(unregID4).get(0);
         Assertions.assertEquals(tm.getWaitingUpdateUnregCustomer(unregID4).get(lastInQueue).toMinutes(),
-                2 * TicketManager.defaultWaitingTime);
+                2 * BuildingManager.defaultWaitingTime);
 
         //simulating someone exiting the building 10 minutes ago
         //------------------------------------------------------
@@ -232,7 +232,7 @@ public class TicketManagerTest {
         tm.getBuildingManager().customerExit(buildingID); //customer exit will simulate an exit in the current time
 
         Assertions.assertEquals(tm.getWaitingUpdateUnregCustomer(unregID4).get(tm.getTicketsUnregisteredCustomer(unregID4).get(0)).toMinutes(),
-                TicketManager.defaultWaitingTime);
+                BuildingManager.defaultWaitingTime);
         Assertions.assertEquals(tm.getWaitingUpdateUnregCustomer(unregID3).get(tm.getTicketsUnregisteredCustomer(unregID3).get(0)),
                 Duration.ZERO);
         Assertions.assertEquals(tm.getTicketsUnregisteredCustomer(unregID3).get(0).getState(), TicketState.VALID);
@@ -298,7 +298,7 @@ public class TicketManagerTest {
         Assertions.assertFalse(tm.acquireBookingTicket(registeredAppCustomer.getId(),
                 buildingID,
                 LocalDate.ofInstant(Instant.now(),ZoneId.systemDefault()),
-                48,
+                60,
                 1,
                 building.getDepartments()));
     }

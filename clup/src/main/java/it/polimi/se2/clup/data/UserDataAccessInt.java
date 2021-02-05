@@ -7,7 +7,6 @@ import it.polimi.se2.clup.data.entities.UnregisteredAppCustomer;
 
 import javax.ejb.Local;
 
-@Local
 public interface UserDataAccessInt {
     RegisteredAppCustomer retrieveUser(String username);
     boolean insertUser(String username, String password);

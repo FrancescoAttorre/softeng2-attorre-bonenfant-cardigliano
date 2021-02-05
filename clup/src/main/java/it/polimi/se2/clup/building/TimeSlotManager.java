@@ -4,6 +4,7 @@ import it.polimi.se2.clup.data.BuildingDataAccess;
 import it.polimi.se2.clup.data.entities.Building;
 import it.polimi.se2.clup.data.entities.Department;
 
+import javax.ejb.Stateless;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Stateless
 public class TimeSlotManager {
     private static final int TOTALTIMESLOT = 96;
     private static final int TIMESLOTDURATION = 15;

@@ -11,8 +11,8 @@ import javax.ejb.Stateless;
 
 @Stateless
 public class AuthManager implements AuthManagerInt{
-    @EJB protected UserDataAccessInt userDAO;
 
+    @EJB protected UserDataAccessInt userDAO;
 
     TokenManager tokenManager = new TokenManager();
 

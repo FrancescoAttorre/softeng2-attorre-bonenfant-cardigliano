@@ -9,16 +9,12 @@ import javax.ejb.Stateless;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Stateless
-public class TicketManager implements TicketManagerInterface {
-
-    public static final int extraTime = 10;
-    public static final int defaultWaitingTime = 15;
+public class TicketManager implements TicketManagerInterface, TicketValidationInt {
 
     private TicketDataAccess ticketDataAccess;
     private BuildingManager buildingManager;
@@ -175,7 +171,7 @@ public class TicketManager implements TicketManagerInterface {
         Map<LineUpDigitalTicket, Duration> lineUpWaitingTimes = new HashMap<>();
 
         for (LineUpDigitalTicket ticket : customerLineUpTickets) {
-            lineUpWaitingTimes.put(ticket, computeWaitingTime(ticket));
+            lineUpWaitingTimes.put(ticket, buildingManager.computeWaitingTime(ticket));
         }
 
         return lineUpWaitingTimes;
@@ -187,7 +183,7 @@ public class TicketManager implements TicketManagerInterface {
         Map<LineUpDigitalTicket, Duration> lineUpWaitingTimes = new HashMap<>();
 
         for (LineUpDigitalTicket ticket : customerLineUpTickets) {
-            lineUpWaitingTimes.put(ticket, computeWaitingTime(ticket));
+            lineUpWaitingTimes.put(ticket, buildingManager.computeWaitingTime(ticket));
         }
         return lineUpWaitingTimes;
     }
@@ -199,14 +195,14 @@ public class TicketManager implements TicketManagerInterface {
         Map<LineUpDigitalTicket, Duration> lineUpWaitingTimes = new HashMap<>();
 
         for (LineUpDigitalTicket ticket : customerLineUpTickets)
-            lineUpWaitingTimes.put(ticket, computeWaitingTime(ticket));
+            lineUpWaitingTimes.put(ticket, buildingManager.computeWaitingTime(ticket));
 
         return lineUpWaitingTimes;
     }
 
     @Override
-    public void validateTicket(int ticketID) {
-        ticketDataAccess.updateTicketState(ticketID, TicketState.VALID);
+    public boolean validateTicket(int ticketID) {
+        return ticketDataAccess.updateTicketState(ticketID, TicketState.VALID);
     }
 
     @Override
@@ -218,75 +214,6 @@ public class TicketManager implements TicketManagerInterface {
             ticketDataAccess.updateTicketState(ticketID, TicketState.EXPIRED);
 
         return ticketDataAccess.retrieveTicketState(ticketID).equals(TicketState.VALID);
-    }
-
-    /**
-     * ComputeWaitingTime sets the waiting time to zero for valid tickets, changes their state to
-     * expired when the ticket are valid from more than 10 minutes,
-     * for non valid tickets, instead, it updates the estimated waiting time, basing on the last exit
-     * from the ticket's building while in queue, the current time and the medium waiting time for that building
-     *
-     * In case of delays, the waiting time is fixed to the default waiting time
-     *
-     * @return new value of estimated waiting time with a precision of minutes
-     * @throws NotInQueueException if the ticket is not found in the related queue
-     */
-
-    private Duration computeWaitingTime (LineUpDigitalTicket ticket) throws NotInQueueException {
-
-        Duration newWaitingTime;
-
-        switch (ticket.getState()) {
-            case EXPIRED:
-                newWaitingTime = Duration.ZERO;
-                break;
-
-            case VALID:
-                if (Duration.between(ticket.getValidationTime(), LocalDateTime.now()).toMinutes() > 10)
-                    ticketDataAccess.updateTicketState(ticket.getTicketID(), TicketState.EXPIRED);
-                newWaitingTime = Duration.ZERO;
-                break;
-
-            case INVALID:
-                Duration additionalTime = Duration.ofMinutes(extraTime);
-                LocalTime now = LocalTime.now();
-
-                int positionInQueue = ticket.getQueue().getQueueTickets().indexOf(ticket);
-
-                if (positionInQueue != -1) {
-
-                    long averageWait = ticket.getBuilding().getDeltaExitTime().toMinutes();
-                    LocalTime lastExitTime = ticket.getBuilding().getLastExitTime();
-                    LocalTime acquisitionTime = ticket.getAcquisitionTime().toLocalTime();
-
-                    if (lastExitTime != null && lastExitTime.isAfter(acquisitionTime)) {
-
-                        newWaitingTime = Duration.ofMinutes((averageWait * (positionInQueue + 1)) -
-                                Duration.between(lastExitTime, now).toMinutes());
-                    }
-
-                    else if (!ticket.getBuilding().getDeltaExitTime().equals(Duration.ZERO)) {
-
-                        newWaitingTime = Duration.ofMinutes(averageWait * (positionInQueue + 1) -
-                                Duration.between(acquisitionTime, now).toMinutes());
-                    }
-
-                    else
-                        newWaitingTime = Duration.ofMinutes((long) defaultWaitingTime * (positionInQueue + 1) -
-                                Duration.between(acquisitionTime, now).toMinutes());
-
-                    //
-                    if (newWaitingTime.toMinutes() <= 0) {
-                        newWaitingTime = additionalTime;
-                    }
-
-                } else
-                    throw new NotInQueueException();
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + ticket.getState());
-        }
-        return newWaitingTime;
     }
 
     @Override

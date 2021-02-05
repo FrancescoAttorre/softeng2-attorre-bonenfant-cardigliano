@@ -3,8 +3,10 @@ package it.polimi.se2.clup.building;
 import it.polimi.se2.clup.data.BuildingDataAccess;
 import it.polimi.se2.clup.data.entities.LineUpDigitalTicket;
 
+import javax.ejb.Stateless;
 import java.util.List;
 
+@Stateless
 public class QueueManager {
 
     BuildingDataAccess dataAccess;
