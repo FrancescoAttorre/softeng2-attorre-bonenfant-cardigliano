@@ -7,9 +7,9 @@ public class Position {
     private final BigDecimal eastLongitude;
     private final BigDecimal northLatitude;
 
-    public Position (BigDecimal coordinateNorth, BigDecimal coordinateWest) {
-        this.eastLongitude = coordinateNorth;
-        this.northLatitude = coordinateWest;
+    public Position (BigDecimal northLatitude, BigDecimal eastLongitude) {
+        this.eastLongitude = northLatitude;
+        this.northLatitude = eastLongitude;
     }
 
     public BigDecimal getNorthLatitude() {
