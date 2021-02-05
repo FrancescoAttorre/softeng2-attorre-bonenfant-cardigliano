@@ -8,6 +8,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Stateless
@@ -88,23 +89,39 @@ public class TicketDataAccess implements TicketDataAccessInterface {
         BookingDigitalTicket newTicket = new BookingDigitalTicket();
 
         RegisteredAppCustomer owner = em.find(RegisteredAppCustomer.class, userID);
+
         owner.addBookingTicket(newTicket);
+
         Building building = em.find(Building.class, buildingID);
         building.addTicket(newTicket);
+
+        //
+        building.addTicket(newTicket);
+        //
 
         newTicket.setOwner(owner);
         newTicket.setState(TicketState.INVALID);
         newTicket.setBuilding(building);
+
+
         newTicket.setTimeSlotID(timeSlotID);
         newTicket.setDate(date);
         newTicket.setTimeSlotLength(timeSlotLength);
 
+        List<Department> referencedDept = new ArrayList<>();
+
         for (Department dep: chosenDepartments) {
-            if (!(building.getDepartments().contains(dep)))
+            Department dept = em.find(Department.class,dep.getDepartmentID());
+            if (!(building.getDepartments().contains(dept)))
                 throw new Exception();
+
+            //
+            dept.addTicket(newTicket);
+            //
+            referencedDept.add(dept);
         }
 
-        newTicket.setDepartments(chosenDepartments);
+        newTicket.setDepartments(referencedDept);
         em.persist(newTicket);
         return newTicket;
     }

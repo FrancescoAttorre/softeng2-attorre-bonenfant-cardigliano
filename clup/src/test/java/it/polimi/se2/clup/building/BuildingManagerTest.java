@@ -12,6 +12,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.time.*;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.*;
 
 public class BuildingManagerTest {
@@ -79,6 +82,7 @@ public class BuildingManagerTest {
                 surplus,
                 "AccessCODE");
 
+
         //considering a full building
         buildingDataAccess.retrieveBuilding(buildingID).setActualCapacity(0);
 
@@ -86,23 +90,32 @@ public class BuildingManagerTest {
         tm.acquireUnregCustomerLineUpTicket(firstUserId, buildingID);
         tm.acquireUnregCustomerLineUpTicket(secondUserId, buildingID);
 
+        em.getTransaction().commit();
+        em.getTransaction().begin();
 
-        //acquire ticket with time slot of 12.00 that is 12*60/15 = 48 and for only one slot
+        //acquire ticket with time slot of 12.00 that is 12*60/15 = 48 and for only one slot for all departments
         RegisteredAppCustomer registeredAppCustomer = em.createNamedQuery("RegisteredAppCustomer.findUserByUsername",RegisteredAppCustomer.class).setParameter("username","firstReg").getSingleResult();
-        /*
+
+
+        Building building = buildingDataAccess.retrieveBuilding(buildingID);
+
         tm.acquireBookingTicket(registeredAppCustomer.getId(),
                 buildingID,
                 LocalDate.ofInstant(Instant.now(),ZoneId.systemDefault()),
                 48,
                 1,
-                Arrays.asList("Macelleria","Pescheria","Bevande"));
-*/
+                building.getDepartments());
 
         em.getTransaction().commit();
     }
 
     private void removeAllFromDatabase(EntityManager em) {
         em.getTransaction().begin();
+
+        for(BookingDigitalTicket b : em.createNamedQuery("BookingDigitalTicket.findAll",BookingDigitalTicket.class).getResultList()){
+            em.remove(b);
+        }
+
         for(RegisteredAppCustomer u : em.createNamedQuery("RegisteredAppCustomer.findAll",RegisteredAppCustomer.class).getResultList()){
             em.remove(u);
         }
@@ -222,10 +235,52 @@ public class BuildingManagerTest {
     }
 
     @Test
-    public void shouldComputeAvailableTimeSlots(){
+    public void shouldRemoveClosedHoursTimeSlots(){
         buildingDataAccess.em.getTransaction().begin();
 
-        //bm.getAvailableTimeSlots(buildingID,LocalDate.ofInstant(Instant.now(),ZoneId.systemDefault()),)
+        List<Department> departments = buildingDataAccess.retrieveBuilding(buildingID).getDepartments();
+        departments.remove(2);
+        Map<Department,List<Integer>> timeSlots = bm.getAvailableTimeSlots(
+                buildingID,
+                LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault()),
+                Duration.of(31, ChronoUnit.MINUTES),
+                departments);
+
+        Department firstDep = departments.get(0);
+
+        Assertions.assertEquals(32,timeSlots.get(firstDep).get(0));
+        Assertions.assertEquals(83,timeSlots.get(firstDep).get(timeSlots.get(firstDep).size() - 1 ));
+        // (32,83) compresi
+        Assertions.assertEquals(52,timeSlots.get(firstDep).size());
+
+
+        buildingDataAccess.em.getTransaction().commit();
+    }
+
+    @Test
+    public void shouldNotReturnTimeSlotOfFullDepartment(){
+        buildingDataAccess.em.getTransaction().begin();
+
+        List<Department> departments = buildingDataAccess.retrieveBuilding(buildingID).getDepartments();
+        //departments = buildingDataAccess.em.merge(departments);
+
+        Map<Department,List<Integer>> timeSlots = bm.getAvailableTimeSlots(
+                buildingID,
+                LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault()),
+                Duration.of(31, ChronoUnit.MINUTES),
+                departments);
+
+        Department macelleria = departments.get(0);
+        Department pescheria = departments.get(2);
+
+        //as setup was already picked the timeSlot number 48
+        //should not contains time slot 48
+        Assertions.assertFalse(timeSlots.get(pescheria).contains(48));
+        //should not contain time slot 47 as well because we are requesting 2 time slot as we want to stay for 31 minutes
+        Assertions.assertFalse(timeSlots.get(pescheria).contains(47));
+
+        //check if this two time slots are the only one removed
+        Assertions.assertEquals(timeSlots.get(pescheria).size(),timeSlots.get(macelleria).size() - 2 );
 
         buildingDataAccess.em.getTransaction().commit();
     }

@@ -20,7 +20,7 @@ public class RegisteredAppCustomer extends User {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "registeredOwner",orphanRemoval = true)
     private List<LineUpDigitalTicket> lineUpDigitalTickets = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner",orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner",orphanRemoval = true, cascade = CascadeType.ALL)
     private List<BookingDigitalTicket> bookingDigitalTickets = new ArrayList<>();
 
     @Column

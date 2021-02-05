@@ -60,6 +60,10 @@ public class Building {
     @Column
     private LocalTime lastExitTime; // seconds between 00:00 and actual time
 
+    public void addTicket(DigitalTicket ticket){
+        tickets.add(ticket);
+    }
+
     public Duration getDeltaExitTime() {
         return deltaExitTime;
     }
@@ -187,9 +191,5 @@ public class Building {
 
     public void setQueue(Queue queue) {
         this.queue = queue;
-    }
-
-    public void addTicket(DigitalTicket ticket) {
-        this.tickets.add(ticket);
     }
 }

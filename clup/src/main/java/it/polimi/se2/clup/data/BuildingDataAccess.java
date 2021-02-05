@@ -59,9 +59,11 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
 
         for(Department d : building.getDepartments()){
             List<Integer> timeSlots = new ArrayList<>();
-            for (BookingDigitalTicket b: d.getTickets() ){
-                for(int i = 0; i < b.getTimeSlotLength(); i++){
-                    timeSlots.add(b.getTimeSlotID() + i);
+            for (BookingDigitalTicket b: tickets ){
+                if(b.getDepartments().contains(d)){
+                    for(int i = 0; i < b.getTimeSlotLength(); i++){
+                        timeSlots.add(b.getTimeSlotID() + i);
+                    }
                 }
             }
             bookedTimeSlots.put(d,timeSlots);
@@ -93,7 +95,7 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
                 Department department = new Department();
                 department.setName(deptName);
                 department.setSurplusCapacity(surplus.get(deptName));
-
+                department.setBuilding(building);
                 building.addDepartment(department);
             }
         }

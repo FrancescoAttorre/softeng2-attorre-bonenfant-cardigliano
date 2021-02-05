@@ -28,21 +28,51 @@ public class TimeSlotManager {
 
     }
 
-
+    //compute available time slot of each department
     private Map<Department,List<Integer>> computeAvailableTimeSlots(Building building, Map<Department,List<Integer>> bookedTimeSlots, List<Department> departments,Duration permanenceTime){
         Map<Department,List<Integer>> availableTimeSlots = new HashMap<>();
 
         for(Department d : departments){
-            List<Integer> timeslots = bookedTimeSlots.get(d);
+
+            List<Integer> bookedForDepartment = bookedTimeSlots.get(d);
             List<Integer> freeTimeSlots = stripTimeSlots(building);
-            freeTimeSlots.removeAll(timeslots);
+
+            //compute number book for a specific time slot.
+            //key time slot identifier (number)
+            //value time slot cardinality
+            Map<Integer,Integer> occurrencesOfTimeSlots = computeOccurrences(bookedForDepartment);
+
+            //remove from freetimeslots only the one that are == max for that dept.
+            removeTimeSlotsOfFullDepartment(occurrencesOfTimeSlots,freeTimeSlots,d.getSurplusCapacity());
+
+            removeSmallerThanPermanence(permanenceTime,freeTimeSlots);
             availableTimeSlots.put(d,freeTimeSlots);
         }
 
-        //for (int i = 0, i )
-
         return availableTimeSlots;
     }
+
+    private void removeTimeSlotsOfFullDepartment(Map<Integer, Integer> occurrencesOfTimeSlots, List<Integer> freeTimeSlots, int surplusCapacity) {
+        for(Integer timeSlot : occurrencesOfTimeSlots.keySet()){
+            if(occurrencesOfTimeSlots.get(timeSlot) >= surplusCapacity)
+                freeTimeSlots.remove(timeSlot);
+        }
+    }
+
+    private Map<Integer, Integer> computeOccurrences(List<Integer> bookedForDepartment) {
+        Map<Integer,Integer> occurrencesOfTimeSlots = new HashMap<>();
+
+        for(Integer slot : bookedForDepartment){
+            if(occurrencesOfTimeSlots.containsKey(slot))
+                occurrencesOfTimeSlots.replace(slot,occurrencesOfTimeSlots.get(slot)+1);
+            else
+                occurrencesOfTimeSlots.put(slot,1);
+        }
+
+        return occurrencesOfTimeSlots;
+    }
+
+    //remove all time slots that do not respect opening and closing time of Buildings
 
     private List<Integer> stripTimeSlots(Building building){
         //number of TS before opening
@@ -55,6 +85,32 @@ public class TimeSlotManager {
             strippedTimeSlots.add(i);
         }
         return strippedTimeSlots;
+    }
+
+
+    //remove all time slots that do not have a sequence of duration equal to the required one
+
+    private List<Integer> removeSmallerThanPermanence(Duration permanenceTime, List<Integer> timeSlots){
+        int requiredSlots = (int) (permanenceTime.toMinutes() / 15);
+
+        List<Integer> toBeRemoved = new ArrayList<>();
+
+        for(int i=0; i < timeSlots.size(); i++){
+            int start = timeSlots.get(i);
+            boolean canPick = true;
+            for(int j = i+1 ,x=1; j < i + requiredSlots && j < timeSlots.size() ; j++,x++){
+                if (!timeSlots.get(j).equals(start + x)) {
+                    canPick = false;
+                    break;
+                }
+            }
+
+            if(!canPick)
+                toBeRemoved.add(start);
+        }
+
+        timeSlots.removeAll(toBeRemoved);
+        return timeSlots;
     }
 
     public BuildingDataAccess getDataAccess() {

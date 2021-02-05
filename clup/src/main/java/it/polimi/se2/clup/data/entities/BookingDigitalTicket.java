@@ -6,9 +6,10 @@ import java.util.List;
 
 @Entity
 @NamedQueries({
-        @NamedQuery(name = "BookingDigitalTicket.selectByBuildingIdAndDate", query = "SELECT b FROM BookingDigitalTicket b WHERE b.date = :date AND b.building = :buildingId "),
+        @NamedQuery(name = "BookingDigitalTicket.selectByBuildingIdAndDate", query = "SELECT b FROM BookingDigitalTicket b WHERE b.date = :date AND b.building.id = :buildingId "),
         @NamedQuery(name = "BookingDigitalTicket.selectWithRegID",
                 query = "select t from BookingDigitalTicket t where t.owner.id = :regID"),
+        @NamedQuery(name = "BookingDigitalTicket.findAll", query = "SELECT b FROM BookingDigitalTicket b  "),
 })
 public class BookingDigitalTicket extends DigitalTicket{
 
@@ -25,10 +26,10 @@ public class BookingDigitalTicket extends DigitalTicket{
     @Column
     private int timeSlotLength;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL )
     private RegisteredAppCustomer owner;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<Department> departments;
 
     public List<Department> getDepartments() {

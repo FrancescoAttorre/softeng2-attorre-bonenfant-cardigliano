@@ -2,6 +2,7 @@ package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Department {
@@ -48,5 +49,38 @@ public class Department {
 
     public void setTickets(List<BookingDigitalTicket> tickets) {
         this.tickets = tickets;
+    }
+
+    public Building getBuilding() {
+        return building;
+    }
+
+    public void setBuilding(Building building) {
+        this.building = building;
+    }
+
+    public void addTicket(BookingDigitalTicket ticket){
+        this.tickets.add(ticket);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (obj.getClass() != this.getClass()) {
+            return false;
+        }
+
+        final Department other = (Department) obj;
+        if (!this.name.equals(other.name)) {
+            return false;
+        }
+
+        if(this.building == null || other.building == null)
+            return false;
+
+        return this.building.getBuildingID() == other.building.getBuildingID();
     }
 }
