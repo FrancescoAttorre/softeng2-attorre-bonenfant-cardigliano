@@ -2,14 +2,12 @@ package it.polimi.se2.clup.data;
 
 import it.polimi.se2.clup.data.entities.*;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -20,6 +18,7 @@ import java.util.Map;
 public class TicketDataAccessTest {
 
     private static TicketDataAccess dm;
+    private static BuildingDataAccess bdm;
     private static int unregID;
     private static int buildingID;
     private static int smID;
@@ -31,7 +30,7 @@ public class TicketDataAccessTest {
         EntityManager em = emf.createEntityManager();
 
         UserDataAccessImpl uda = new UserDataAccessImpl();
-        BuildingDataAccess bdm = new BuildingDataAccess();
+        bdm = new BuildingDataAccess();
 
         dm = new TicketDataAccess();
         dm.em = em;
@@ -95,16 +94,16 @@ public class TicketDataAccessTest {
 
         dm.em.getTransaction().commit();
 
-        Query query = dm.em.createNamedQuery("LineUpDigitalTicket.selectWithSMID").setParameter("SMID", smID);
-        List<LineUpDigitalTicket> result = query.getResultList();
+        List<LineUpDigitalTicket> result = dm.em.createNamedQuery("LineUpDigitalTicket.selectWithSMID", LineUpDigitalTicket.class)
+                .setParameter("SMID", smID).getResultList();
         Assertions.assertTrue(result.contains(newTicket));
 
         Assertions.assertNotNull(newTicket.getAssociatedPhysicalTicket());
         Assertions.assertNotNull(newTicket.getStoreManagerOwner());
         Assertions.assertNotNull(newTicket.getAcquisitionTime());
-        Assertions.assertNotNull(newTicket.getQueue());
         Assertions.assertNotNull(newTicket.getBuilding());
-        Assertions.assertEquals(newTicket.getQueue(), newTicket.getBuilding().getQueue());
+        if (newTicket.getQueue()!= null)
+            Assertions.assertEquals(newTicket.getQueue(), newTicket.getBuilding().getQueue());
         Assertions.assertNull(newTicket.getRegisteredOwner());
         Assertions.assertNull(newTicket.getUnregisteredOwner());
 
@@ -120,8 +119,9 @@ public class TicketDataAccessTest {
 
         dm.em.getTransaction().commit();
 
-        Query query = dm.em.createNamedQuery("LineUpDigitalTicket.selectWithUnregID").setParameter("unregID", unregID);
-        List<LineUpDigitalTicket> result = query.getResultList();
+        List<LineUpDigitalTicket> result = dm.em.createNamedQuery("LineUpDigitalTicket.selectWithUnregID", LineUpDigitalTicket.class)
+                .setParameter("unregID", unregID).getResultList();
+
         Assertions.assertTrue(result.contains(newTicket));
 
         Assertions.assertNull(newTicket.getAssociatedPhysicalTicket());
@@ -129,19 +129,17 @@ public class TicketDataAccessTest {
         Assertions.assertNull(newTicket.getRegisteredOwner());
         Assertions.assertNotNull(newTicket.getUnregisteredOwner());
         Assertions.assertNotNull(newTicket.getAcquisitionTime());
-        Assertions.assertNotNull(newTicket.getQueue());
         Assertions.assertNotNull(newTicket.getBuilding());
         Assertions.assertEquals(newTicket.getBuilding().getBuildingID(), buildingID);
         Assertions.assertEquals(newTicket.getUnregisteredOwner().getId(), unregID);
-        Assertions.assertEquals(newTicket.getQueue(), newTicket.getBuilding().getQueue());
-
-        List<LineUpDigitalTicket> tickets = dm.retrieveTicketsUnregisteredCustomer(unregID);
+        if (newTicket.getQueue()!= null)
+            Assertions.assertEquals(newTicket.getQueue(), newTicket.getBuilding().getQueue());
 
         Assertions.assertTrue(dm.retrieveTicketsUnregisteredCustomer(unregID).contains(newTicket));
     }
-    /*
+
     @Test
-    public void bookingTicketEnteredProperly() {
+    public void bookingTicketEnteredProperly() throws Exception {
 
         dm.em.getTransaction().begin();
 
@@ -149,14 +147,17 @@ public class TicketDataAccessTest {
                 RegisteredAppCustomer.class).setParameter("username", "user").getSingleResult().getId();
 
         //Booking ticket from 8:00 a.m. to 9:00 a.m.
-        List<String> chosenDepartments = new ArrayList<>();
-        chosenDepartments.add("Macelleria");
+        List<Department> chosenDepartments = new ArrayList<>();
+
+        List<Department> availableDep = bdm.retrieveBuilding(buildingID).getDepartments();
+
+        chosenDepartments.add(availableDep.get(0));
         BookingDigitalTicket newTicket = dm.insertBookingTicket(regID, buildingID, LocalDate.now(), 32, 4, chosenDepartments);
 
         dm.em.getTransaction().commit();
 
-        Query query = dm.em.createNamedQuery("BookingDigitalTicket.selectWithRegID").setParameter("regID", regID);
-        List<BookingDigitalTicket> result = query.getResultList();
+        List<BookingDigitalTicket> result = dm.em.createNamedQuery("BookingDigitalTicket.selectWithRegID", BookingDigitalTicket.class)
+                .setParameter("regID", regID).getResultList();
         Assertions.assertTrue(result.contains(newTicket));
 
         Assertions.assertNotNull(newTicket.getOwner());
@@ -168,7 +169,7 @@ public class TicketDataAccessTest {
 
         Assertions.assertTrue(dm.retrieveBookingTicketsRegCustomer(regID).contains(newTicket));
     }
-    */
+
 
     @Test
     public void ticketStateUpdate() {

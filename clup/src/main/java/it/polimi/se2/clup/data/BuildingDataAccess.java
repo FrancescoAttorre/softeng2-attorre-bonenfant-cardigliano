@@ -43,6 +43,7 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
 
         if(queue == null) return false;
 
+        ticket.setQueue(queue);
         queue.addQueueTickets(ticket);
         return true;
     }
@@ -118,13 +119,14 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
         double weightedOldDelta;
         long weightedNewDelta;
         if(building.getDeltaExitTime().equals(Duration.ZERO)){
-            //weightedNewDelta = (double)lastExitTime.get(ChronoField.SECOND_OF_DAY) - (double)building.getOpening().get(ChronoField.SECOND_OF_DAY);
 
+            //weightedNewDelta = (double)lastExitTime.get(ChronoField.SECOND_OF_DAY) - (double)building.getOpening().get(ChronoField.SECOND_OF_DAY);
             //can become too big
             //weightedNewDelta = Duration.between(building.getOpening(), lastExitTime).toMinutes();
 
             //building.setDeltaExitTime(Duration.ofMinutes(weightedNewDelta));
-            building.setDeltaExitTime(Duration.ofMinutes(TicketManager.extraTime));
+            building.setDeltaExitTime(Duration.ofMinutes(TicketManager.defaultWaitingTime));
+
         }else {
             weightedOldDelta = building.getDeltaExitTime().toMinutes() * 0.8 ;
             //weightedNewDelta = (double)lastExitTime.get(ChronoField.SECOND_OF_DAY) - (double)building.getLastExitTime() * 0.2;

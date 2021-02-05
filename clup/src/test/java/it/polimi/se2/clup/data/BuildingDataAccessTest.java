@@ -5,16 +5,13 @@ import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
 import it.polimi.se2.clup.data.entities.StoreManager;
 import it.polimi.se2.clup.data.entities.UnregisteredAppCustomer;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;

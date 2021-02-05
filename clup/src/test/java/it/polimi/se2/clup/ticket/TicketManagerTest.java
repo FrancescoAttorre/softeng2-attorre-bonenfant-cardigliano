@@ -31,12 +31,13 @@ public class TicketManagerTest {
     private static int unregID3;
     private static int unregID4;
     private static int buildingID;
+    private static EntityManager em;
 
     @BeforeEach
     public void setup() {
 
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("clupTest");
-        EntityManager em = emf.createEntityManager();
+        em = emf.createEntityManager();
 
         tm = new TicketManager();
 
@@ -154,6 +155,9 @@ public class TicketManagerTest {
     @Test
     public void correctWaitingTimeInQueue() throws NotInQueueException {
 
+        //Creation of  3 lineUp tickets
+        //-----------------------------
+
         tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID);
         tm.acquireUnregCustomerLineUpTicket(unregID2, buildingID);
         tm.acquireUnregCustomerLineUpTicket(unregID3, buildingID);
@@ -166,9 +170,9 @@ public class TicketManagerTest {
 
         Building building = firstInQueue.getBuilding();
         building.setDeltaExitTime(deltaExitTime);
+
         Map<LineUpDigitalTicket, Duration> waitingTimes = tm.getWaitingUpdateUnregCustomer(unregID1);
 
-        //In the setup we have 3 tickets in queue
         //All the tickets are invalid, so they have to wait a time based on deltaExitTime and people with higher priority
 
         Assertions.assertEquals(waitingTimes.get(firstInQueue).toMinutes(), deltaExitTime.toMinutes());
@@ -192,16 +196,19 @@ public class TicketManagerTest {
     @Test
     public void waitingTimeAfterExit() throws NotInQueueException {
 
-        //considering an empty building
+        //considering an empty building (actualCapacity = capacity)
         Building building = bda.retrieveBuilding(buildingID);
-
         building.setActualCapacity(building.getCapacity());
 
-        //Creation of  3 lineUp tickets, one for each unregistered customer
+        em.getTransaction().begin();
+
+        //Creation of  4 lineUp tickets, one for each unregistered customer
         tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID);
         tm.acquireUnregCustomerLineUpTicket(unregID2, buildingID);
         tm.acquireUnregCustomerLineUpTicket(unregID3, buildingID);
         tm.acquireUnregCustomerLineUpTicket(unregID4, buildingID);
+
+        em.getTransaction().commit();
 
         Assertions.assertEquals(tm.getTicketsUnregisteredCustomer(unregID1).get(0).getState(), TicketState.VALID);
         Assertions.assertEquals(tm.getTicketsUnregisteredCustomer(unregID2).get(0).getState(), TicketState.VALID);
@@ -213,12 +220,28 @@ public class TicketManagerTest {
         Assertions.assertEquals(tm.getWaitingUpdateUnregCustomer(unregID4).get(lastInQueue).toMinutes(),
                 2 * TicketManager.defaultWaitingTime);
 
-        //someone exited the building
-        tm.getBuildingManager().customerExit(buildingID);
+        //simulating someone exiting the building 10 minutes ago
+        //------------------------------------------------------
 
-        //the delta will be zero since the customer is exited instantaneously, so the waiting time is set to extraTime
+        tm.getBuildingManager().customerExit(buildingID); //customer exit will simulate an exit in the current time
+
+        /*
+        LocalTime lastExitTime = LocalTime.now().minus(Duration.ofMinutes(10));
+        bda.updateStatistics(buildingID, lastExitTime);
+        building.setLastExitTime(lastExitTime);
+        List<LineUpDigitalTicket> queue = bda.retrieveBuilding(buildingID).getQueue().getQueueTickets();
+        LineUpDigitalTicket ticket = null;
+        if (queue.size() > 0)
+            ticket = queue.get(0);
+        if (ticket != null) {
+            tm.validateTicket(ticket.getTicketID());
+            qm.removeFromQueue(ticket.getTicketID());
+        }
+        building.setActualCapacity(building.getActualCapacity() + 1);*/
+
+
         Assertions.assertEquals(tm.getWaitingUpdateUnregCustomer(unregID4).get(tm.getTicketsUnregisteredCustomer(unregID4).get(0)).toMinutes(),
-                TicketManager.extraTime);
+                TicketManager.defaultWaitingTime);
         Assertions.assertEquals(tm.getWaitingUpdateUnregCustomer(unregID3).get(tm.getTicketsUnregisteredCustomer(unregID3).get(0)),
                 Duration.ZERO);
         Assertions.assertEquals(tm.getTicketsUnregisteredCustomer(unregID3).get(0).getState(), TicketState.VALID);

@@ -30,7 +30,6 @@ public class TicketDataAccess implements TicketDataAccessInterface {
         newTicket.setAcquisitionTime(LocalDateTime.now());
         newTicket.setState(TicketState.INVALID);
         newTicket.setBuilding(building);
-        newTicket.setQueue(building.getQueue());
 
         em.persist(newTicket);
         return newTicket;
@@ -50,7 +49,6 @@ public class TicketDataAccess implements TicketDataAccessInterface {
         newTicket.setAcquisitionTime(LocalDateTime.now());
         newTicket.setState(TicketState.INVALID);
         newTicket.setBuilding(building);
-        newTicket.setQueue(building.getQueue());
 
         em.persist(newTicket);
         return newTicket;
@@ -71,7 +69,6 @@ public class TicketDataAccess implements TicketDataAccessInterface {
 
         newPhysicalTicket.setStoreManager(owner);
         newPhysicalTicket.setAssociatedDigitalTicket(newTicket);
-        newTicket.setQueue(building.getQueue());
 
         newTicket.setStoreManagerOwner(owner);
         newTicket.setAcquisitionTime(LocalDateTime.now());
