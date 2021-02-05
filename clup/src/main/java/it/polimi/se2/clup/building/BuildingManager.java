@@ -4,12 +4,14 @@ import it.polimi.se2.clup.data.BuildingDataAccessInterface;
 import it.polimi.se2.clup.data.entities.*;
 import it.polimi.se2.clup.ticket.TicketManager;
 
+import javax.ejb.Stateless;
 import javax.ejb.EJB;
 import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Stateless
 public class BuildingManager implements BuildingManagerInterface{
     @EJB
     protected BuildingDataAccessInterface dataAccess;

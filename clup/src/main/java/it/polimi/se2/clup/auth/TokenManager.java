@@ -42,7 +42,7 @@ class TokenManager {
         int id;
         try {
             DecodedJWT jwt = verifier.verify(token);
-            if(jwt.getClaim("auth").asInt() == auth.ordinal())
+            if(jwt.getClaim("auth").asInt() >= auth.ordinal())
                 id = jwt.getClaim("id").asInt();
             else
                 throw new AuthorizationException();

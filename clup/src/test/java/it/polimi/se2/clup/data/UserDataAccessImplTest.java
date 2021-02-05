@@ -52,9 +52,7 @@ public class UserDataAccessImplTest {
     public void insertActivity() {
 
         dm.em.getTransaction().begin();
-
         dm.insertActivity("Esselunga", "abc123", "abc123");
-
         dm.em.getTransaction().commit();
 
         //dm.em.getTransaction().begin();

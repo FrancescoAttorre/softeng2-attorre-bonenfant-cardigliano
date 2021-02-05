@@ -5,6 +5,7 @@ import it.polimi.se2.clup.data.InvalidDepartmentException;
 import it.polimi.se2.clup.data.TicketDataAccess;
 import it.polimi.se2.clup.data.entities.*;
 
+import javax.ejb.Stateless;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+@Stateless
 public class TicketManager implements TicketManagerInterface {
 
     public static final int extraTime = 10;

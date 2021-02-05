@@ -13,26 +13,23 @@ import javax.ejb.Stateless;
 public class AuthManager implements AuthManagerInt{
     @EJB protected UserDataAccessInt userDAO;
 
-    //TODO: Handle specific exception and not general Exception type
 
     TokenManager tokenManager = new TokenManager();
 
     private final long regExpiration = 60 * 1000; //1m
     private final long unregExpiration = 1000 * 60 * 60 * 24; //24h
+    private final long activityExpiration = 30 * 60 * 1000; //30m
 
     @Override
     public boolean registerUser(String username, String password) {
-        boolean result = true;
+        boolean result;
 
         if(username != null && password != null) {
 
             String hashedPassword = Hash.hash(password);
 
-            try {
-                userDAO.insertUser(username, hashedPassword);
-            } catch (Exception e) {
-                result = false;
-            }
+            result = userDAO.insertUser(username, hashedPassword);
+
         } else
             result = false;
 
@@ -41,17 +38,14 @@ public class AuthManager implements AuthManagerInt{
 
     @Override
     public boolean registerActivity(String name, String pIVA, String password) {
-        boolean result = true;
+        boolean result;
 
         if(name != null && pIVA != null && password != null) {
 
             String hashedPassword = Hash.hash(password);
 
-            try {
-                userDAO.insertActivity(name, pIVA, hashedPassword);
-            } catch (Exception e) {
-                result = false;
-            }
+            result = userDAO.insertActivity(name, pIVA, hashedPassword);
+
         } else
             result = false;
 
@@ -91,11 +85,14 @@ public class AuthManager implements AuthManagerInt{
     public String authenticateActivity(String pIVA, String password) throws CredentialsException {
         Activity activity = userDAO.retrieveActivity(pIVA);
 
+        if(activity == null)
+            throw new CredentialsException("Activity does not exist");
+
         String hashedPassword = activity.getPassword();
         String token;
 
         if(Hash.verifyHash(password, hashedPassword)) {
-            token = tokenManager.createToken(activity.getId(), regExpiration, AuthFlag.ACTIVITY);
+            token = tokenManager.createToken(activity.getId(), activityExpiration, AuthFlag.ACTIVITY);
         } else
             throw new CredentialsException("Wrong credentials");
 

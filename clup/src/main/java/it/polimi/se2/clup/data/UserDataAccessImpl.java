@@ -30,34 +30,46 @@ public class UserDataAccessImpl implements UserDataAccessInt{
     }
 
     @Override
-    public boolean insertUser(String username, String password) throws EntityExistsException {
+    public boolean insertUser(String username, String password) {
 
-        RegisteredAppCustomer appCustomer = new RegisteredAppCustomer();
+        boolean result = true;
 
-        if (username == null || password == null)
-            return false;
+        System.out.println("Adding user " + username);
 
-        appCustomer.setUsername(username);
-        appCustomer.setPassword(password);
-        em.persist(appCustomer);
-        return true;
+        if(em.createNamedQuery("RegisteredAppCustomer.findUserByUsername").setParameter("username", username).getResultList().size() > 0)
+            result = false;
+        else {
+
+            System.out.println("Persisting user " + username);
+
+            RegisteredAppCustomer appCustomer = new RegisteredAppCustomer();
+            appCustomer.setUsername(username);
+            appCustomer.setPassword(password);
+
+            em.persist(appCustomer);
+        }
+
+        return result;
     }
 
 
 
     @Override
-    public boolean insertActivity(String name, String pIva, String password) throws EntityExistsException{
-        Activity activity = new Activity();
+    public boolean insertActivity(String name, String pIva, String password) {
+        boolean result = true;
 
-        if (name == null || pIva == null || password == null)
-            return false;
+        if(em.createNamedQuery("Activity.selectWithPIVA").setParameter("pIva", pIva).getResultList().size() > 0)
+            result = false;
+        else {
+            Activity activity = new Activity();
+            activity.setName(name);
+            activity.setpIva(pIva);
+            activity.setPassword(password);
 
-        activity.setName(name);
-        activity.setpIva(pIva);
-        activity.setPassword(password);
+            em.persist(activity);
+        }
 
-        em.persist(activity);
-        return true;
+        return result;
     }
 
     @Override
@@ -82,7 +94,7 @@ public class UserDataAccessImpl implements UserDataAccessInt{
     }
 
     @Override
-    public Activity retrieveActivity(String pIva) throws NonUniqueResultException, NoResultException {
+    public Activity retrieveActivity(String pIva) throws NonUniqueResultException {
 
         Activity activity;
 
@@ -97,23 +109,25 @@ public class UserDataAccessImpl implements UserDataAccessInt{
         return  activity;
     }
 
-    //TODO
     @Override
     public StoreManager retrieveStoreManager(int id) {
-        return null;
+        return em.find(StoreManager.class, id);
     }
 
     @Override
-    public UnregisteredAppCustomer retrieveUnregisteredAppCustomer(int userId) {
-        return em.find(UnregisteredAppCustomer.class,userId);
-    }
+    public Integer insertUnregisteredAppCustomer() {
 
-    @Override
-    public int insertUnregisteredAppCustomer() {
+        Integer result;
+
         UnregisteredAppCustomer customer = new UnregisteredAppCustomer();
         customer.setDate(LocalDateTime.now());
-        em.persist(customer);
+        try {
+            em.persist(customer);
+            result = customer.getId();
+        } catch (Exception e) {
+            result = null;
+        }
 
-        return customer.getId();
+        return result;
     }
 }

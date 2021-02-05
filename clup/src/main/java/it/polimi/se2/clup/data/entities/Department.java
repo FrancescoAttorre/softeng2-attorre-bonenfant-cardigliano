@@ -1,17 +1,23 @@
 package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 import java.util.Objects;
 
+@XmlRootElement
 @Entity
 public class Department {
+    @XmlElement
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int departmentID;
 
     @Column
     private int surplusCapacity;
+
+    @XmlElement
     @Column
     private String name;
 
