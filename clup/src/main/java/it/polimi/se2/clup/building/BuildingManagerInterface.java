@@ -19,9 +19,9 @@ public interface BuildingManagerInterface {
     boolean customerExit(int buildingId, int ticketID);
     boolean registeredCustomerExit(int buildingId, BookingDigitalTicket bookingDigitalTicket);
     boolean insertBuilding(int activityId, String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String,Integer> surplus,String code);
-    boolean insertInQueue(LineUpDigitalTicket ticket);
     boolean customerEntry (int ticketID, int buildingID, int userID, List<BookingDigitalTicket> bookingDigitalTickets);
     void reduceCapacity(int buildingID);
     boolean checkBuildingNotFull (int buildingID);
+    boolean insertInQueue(LineUpDigitalTicket ticket);
 
 }

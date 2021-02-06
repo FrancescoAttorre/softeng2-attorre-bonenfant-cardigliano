@@ -54,8 +54,8 @@ public class TicketManagerTest {
         tm.setTicketDataAccess(tda);
 
         qm.setDataAccess(bda);
-        tm.getBuildingManager().setDataAccess(bda);
-        tm.getBuildingManager().setQueueManager(qm);
+        bm.setDataAccess(bda);
+        bm.setQueueManager(qm);
 
 
         removeAllFromDatabase(em);
@@ -119,10 +119,10 @@ public class TicketManagerTest {
      * and the waiting time associated set to zero
      */
     @Test
-    public void checkTicketExpired() throws NotInQueueException {
+    public void checkTicketExpired() throws NotInQueueException, InvalidTicketInsertionException {
 
         //Creation of  3 lineUp tickets, one for each unregistered customer
-        tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID);
+        tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID, false);
 
         LineUpDigitalTicket ticket = tm.getTicketsUnregisteredCustomer(unregID1).get(0);
         tm.validateTicket(ticket.getTicketID());
@@ -140,9 +140,9 @@ public class TicketManagerTest {
      * and checking its validity before and after.
      */
     @Test
-    public void correctValidityCheck() {
+    public void correctValidityCheck() throws InvalidTicketInsertionException {
 
-        tm.acquireUnregCustomerLineUpTicket(unregID2, buildingID);
+        tm.acquireUnregCustomerLineUpTicket(unregID2, buildingID, true);
 
         LineUpDigitalTicket ticket = tm.getTicketsUnregisteredCustomer(unregID2).get(0);
 
@@ -155,20 +155,20 @@ public class TicketManagerTest {
         ticket.setState(TicketState.EXPIRED);
         Assertions.assertFalse(tm.validityCheck(ticket.getTicketID()));
     }
-
+    /*
     /**
      * This test checks that the waiting time is computed correctly during the waiting in queue,
      * without anyone entering/leaving the building
-     */
+
     @Test
-    public void correctWaitingTimeInQueue() throws NotInQueueException {
+    public void correctWaitingTimeInQueue() throws NotInQueueException, InvalidTicketInsertionException {
 
         //Creation of  3 lineUp tickets
         //-----------------------------
 
-        tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID);
-        tm.acquireUnregCustomerLineUpTicket(unregID2, buildingID);
-        tm.acquireUnregCustomerLineUpTicket(unregID3, buildingID);
+        tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID, false);
+        tm.acquireUnregCustomerLineUpTicket(unregID2, buildingID, false);
+        tm.acquireUnregCustomerLineUpTicket(unregID3, buildingID, true);
 
         //Setting the delta exit time, all tickets are related to the same building
 
@@ -202,7 +202,7 @@ public class TicketManagerTest {
     }
 
     @Test
-    public void waitingTimeAfterExit() throws NotInQueueException {
+    public void waitingTimeAfterExit() throws NotInQueueException, InvalidTicketInsertionException {
 
         //considering an empty building (actualCapacity = capacity)
         Building building = bda.retrieveBuilding(buildingID);
@@ -211,10 +211,10 @@ public class TicketManagerTest {
         em.getTransaction().begin();
 
         //Creation of  4 lineUp tickets, one for each unregistered customer
-        tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID);
-        tm.acquireUnregCustomerLineUpTicket(unregID2, buildingID);
-        tm.acquireUnregCustomerLineUpTicket(unregID3, buildingID);
-        tm.acquireUnregCustomerLineUpTicket(unregID4, buildingID);
+        tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID, false);
+        tm.acquireUnregCustomerLineUpTicket(unregID2, buildingID, false);
+        tm.acquireUnregCustomerLineUpTicket(unregID3, buildingID, true);
+        tm.acquireUnregCustomerLineUpTicket(unregID4, buildingID, true);
 
         em.getTransaction().commit();
 
@@ -232,20 +232,20 @@ public class TicketManagerTest {
         //simulating someone exiting the building 10 minutes ago
         //------------------------------------------------------
 
-        tm.getBuildingManager().customerExit(buildingID, ticket1.getTicketID()); //customer exit will simulate an exit in the current time
+        bm.customerExit(buildingID, ticket1.getTicketID()); //customer exit will simulate an exit in the current time
 
         Assertions.assertEquals(tm.getWaitingUpdateUnregCustomer(unregID4).get(tm.getTicketsUnregisteredCustomer(unregID4).get(0)).toMinutes(),
                 BuildingManager.defaultWaitingTime);
         Assertions.assertEquals(tm.getWaitingUpdateUnregCustomer(unregID3).get(tm.getTicketsUnregisteredCustomer(unregID3).get(0)),
                 Duration.ZERO);
         Assertions.assertEquals(tm.getTicketsUnregisteredCustomer(unregID3).get(0).getState(), TicketState.VALID);
-    }
+    }*/
 
     @Test
-    public void bookingsMustNotOverlap () {
+    public void bookingsMustNotOverlap () throws Exception {
         em.getTransaction().begin();
 
-        Assertions.assertTrue(tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID));
+        tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID, false);
         uda.insertUser("user","pass");
 
         int regAppCustomerID = em.createNamedQuery("RegisteredAppCustomer.findUserByUsername",RegisteredAppCustomer.class)
@@ -276,12 +276,13 @@ public class TicketManagerTest {
     }
 
     @Test
-    public void sameCustomerCannotAcquire2TicketsSameBuildingSameDay () {
+    public void sameCustomerCannotAcquire2TicketsSameBuildingSameDay () throws Exception {
 
         em.getTransaction().begin();
 
-        Assertions.assertTrue(tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID));
-        Assertions.assertFalse(tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID));
+        // the first 2 tickets are not to be inserted in queue
+        Assertions.assertNull(tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID, false));
+        Assertions.assertThrows(InvalidTicketInsertionException.class, () -> tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID, false));
 
         Assertions.assertTrue(uda.insertUser("user","firstPass"));
 
@@ -307,7 +308,7 @@ public class TicketManagerTest {
     }
 
     @Test
-    public void shouldNotInsertBookingTicketWithMissingDate() {
+    public void shouldNotInsertBookingTicketWithMissingDate() throws Exception {
 
         tda.em.getTransaction().begin();
 

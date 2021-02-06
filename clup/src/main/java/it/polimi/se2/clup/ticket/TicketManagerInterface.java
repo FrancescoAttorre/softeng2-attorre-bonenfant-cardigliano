@@ -10,13 +10,13 @@ import java.util.Map;
 @Local
 public interface TicketManagerInterface {
 
-    void acquireStoreManagerTicket(int userID, int buildingID);
+    LineUpDigitalTicket acquireStoreManagerTicket(int userID, int buildingID, boolean buildingIsFull);
 
-    boolean acquireBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength, List<Department> departments);
+    boolean acquireBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength, List<Department> departments) throws Exception;
 
-    boolean acquireUnregCustomerLineUpTicket(int userID, int buildingID);
+    LineUpDigitalTicket acquireUnregCustomerLineUpTicket(int userID, int buildingID, boolean buildingIsFull) throws InvalidTicketInsertionException;
 
-    boolean acquireRegCustomerLineUpTicket(int userID, int buildingID);
+    LineUpDigitalTicket acquireRegCustomerLineUpTicket(int userID, int buildingID, boolean buildingIsFull) throws InvalidTicketInsertionException;
 
     List<BookingDigitalTicket> getBookingTicketsRegCustomer(int userID);
     List<LineUpDigitalTicket> getLineUpTicketsRegCustomer (int userID);

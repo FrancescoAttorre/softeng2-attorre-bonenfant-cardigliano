@@ -5,6 +5,7 @@ import it.polimi.se2.clup.data.BuildingDataAccess;
 import it.polimi.se2.clup.data.TicketDataAccess;
 import it.polimi.se2.clup.data.UserDataAccessImpl;
 import it.polimi.se2.clup.data.entities.*;
+import it.polimi.se2.clup.ticket.InvalidTicketInsertionException;
 import it.polimi.se2.clup.ticket.TicketManager;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Assertions;
@@ -33,7 +34,7 @@ public class BuildingManagerTest {
     private int secondTicketID;
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws Exception {
 
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("clupTest");
         EntityManager em = emf.createEntityManager();
@@ -95,8 +96,8 @@ public class BuildingManagerTest {
 
         //considering an empty building
         //Creation of 2 tickets
-        tm.acquireUnregCustomerLineUpTicket(firstUserId, buildingID);
-        tm.acquireUnregCustomerLineUpTicket(secondUserId, buildingID);
+        tm.acquireUnregCustomerLineUpTicket(firstUserId, buildingID, false);
+        tm.acquireUnregCustomerLineUpTicket(secondUserId, buildingID, false);
 
         firstTicketID = buildingDataAccess.em.createNamedQuery("LineUpDigitalTicket.selectWithUnregID", LineUpDigitalTicket.class)
                 .setParameter("unregID", firstUserId).getResultList().get(0).getTicketID();
@@ -181,7 +182,7 @@ public class BuildingManagerTest {
     }
 
     @Test
-    public void shouldRemoveFromQueueNextTicket(){
+    public void shouldRemoveFromQueueNextTicket() throws InvalidTicketInsertionException {
         buildingDataAccess.em.getTransaction().begin();
 
         //the building in setup had first and second users inside, full
@@ -189,8 +190,14 @@ public class BuildingManagerTest {
         int fourthUserId = userDataAccess.insertUnregisteredAppCustomer();
 
         //two tickets in queue
-        tm.acquireUnregCustomerLineUpTicket(thirdUserId, buildingID);
-        tm.acquireUnregCustomerLineUpTicket(fourthUserId, buildingID);
+        Assertions.assertNotNull(tm.acquireUnregCustomerLineUpTicket(thirdUserId, buildingID, true));
+        Assertions.assertNotNull(tm.acquireUnregCustomerLineUpTicket(fourthUserId, buildingID, true));
+        LineUpDigitalTicket thirdTicket = buildingDataAccess.em.createNamedQuery("LineUpDigitalTicket.selectWithUnregID", LineUpDigitalTicket.class)
+                .setParameter("unregID", thirdUserId).getResultList().get(0);
+        LineUpDigitalTicket fourthTicket = buildingDataAccess.em.createNamedQuery("LineUpDigitalTicket.selectWithUnregID", LineUpDigitalTicket.class)
+                .setParameter("unregID", fourthUserId).getResultList().get(0);
+        bm.insertInQueue(thirdTicket);
+        bm.insertInQueue(fourthTicket);
 
         bm.customerExit(buildingID,firstTicketID);
 
@@ -336,7 +343,7 @@ public class BuildingManagerTest {
     }
 
     @Test
-    public void shouldAllowCustomerWithValidLineUpTicketToEnter() {
+    public void shouldAllowCustomerWithValidLineUpTicketToEnter() throws InvalidTicketInsertionException {
 
         buildingDataAccess.em.getTransaction().begin();
 
@@ -352,8 +359,8 @@ public class BuildingManagerTest {
         Assertions.assertEquals(building.getActualCapacity(), 2);
 
         //Creation of 2 tickets ready to enter
-        tm.acquireUnregCustomerLineUpTicket(thirdUserId, buildingID);
-        tm.acquireUnregCustomerLineUpTicket(fourthUserId, buildingID);
+        tm.acquireUnregCustomerLineUpTicket(thirdUserId, buildingID, false);
+        tm.acquireUnregCustomerLineUpTicket(fourthUserId, buildingID, false);
 
         buildingDataAccess.em.getTransaction().commit();
 

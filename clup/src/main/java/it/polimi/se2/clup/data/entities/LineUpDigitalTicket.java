@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
                 query = "select t from LineUpDigitalTicket t where t.storeManagerOwner.id = :SMID"),
         @NamedQuery(name = "LineUpDigitalTicket.selectWithBuildingID",
                 query = "select t from LineUpDigitalTicket t where t.building.id = :buildingID ORDER BY t.validationTime"),
-        @NamedQuery (name = "LineUpDigitalTicket.findAll", query = "select t from LineUpDigitalTicket t"),
+        @NamedQuery (name = "LineUpDigitalTicket.findAllForBuilding", query = "select t from LineUpDigitalTicket t " +
+                "where t.building.id = :buildingID"),
 })
 
 @Entity

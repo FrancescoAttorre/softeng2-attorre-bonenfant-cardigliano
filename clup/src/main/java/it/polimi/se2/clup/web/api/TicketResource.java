@@ -3,7 +3,9 @@ package it.polimi.se2.clup.web.api;
 import it.polimi.se2.clup.auth.AuthFlag;
 import it.polimi.se2.clup.auth.AuthManagerInt;
 import it.polimi.se2.clup.auth.exceptions.TokenException;
+import it.polimi.se2.clup.building.BuildingManagerInterface;
 import it.polimi.se2.clup.data.entities.LineUpDigitalTicket;
+import it.polimi.se2.clup.ticket.InvalidTicketInsertionException;
 import it.polimi.se2.clup.ticket.NotInQueueException;
 import it.polimi.se2.clup.ticket.TicketManagerInterface;
 import it.polimi.se2.clup.web.api.serial.BookingRequest;
@@ -28,6 +30,9 @@ public class TicketResource {
     @EJB
     TicketManagerInterface tm;
 
+    @EJB
+    BuildingManagerInterface bm;
+
     @Path("/{buildingID}/")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -35,7 +40,6 @@ public class TicketResource {
                               @PathParam("buildingID") int buildingID) {
 
         int id;
-        boolean result;
         Response response;
 
         if(token != null) {
@@ -46,25 +50,32 @@ public class TicketResource {
                 return response;
             }
 
-            switch(am.getAuthFlag(token)) {
-                case REGISTERED:
-                    result = tm.acquireRegCustomerLineUpTicket(id, buildingID);
-                    break;
-                case UNREGISTERED:
-                    result = tm.acquireUnregCustomerLineUpTicket(id, buildingID);
-                    break;
-                case MANAGER:
-                    tm.acquireStoreManagerTicket(id, buildingID);
-                    result = true;
-                    break;
-                default:
-                    result = false;
+            boolean notFull = bm.checkBuildingNotFull(buildingID);
+            LineUpDigitalTicket ticketToAddInQueue = null;
+
+            try {
+                switch (am.getAuthFlag(token)) {
+                    case REGISTERED:
+                        ticketToAddInQueue = tm.acquireRegCustomerLineUpTicket(id, buildingID, notFull);
+                        break;
+                    case UNREGISTERED:
+                        ticketToAddInQueue = tm.acquireUnregCustomerLineUpTicket(id, buildingID, notFull);
+                        break;
+                    case MANAGER:
+                        ticketToAddInQueue = tm.acquireStoreManagerTicket(id, buildingID, notFull);
+                        break;
+                    default:
+                }
+            }
+            catch (InvalidTicketInsertionException e) {
+                return Response.status(Response.Status.CONFLICT).entity(new Message (e.getMessage())).build();
             }
 
-            if(result)
-                response = Response.status(Response.Status.OK).build();
-            else
-                response = Response.status(Response.Status.CONFLICT).build();
+            if(ticketToAddInQueue != null) {
+                bm.insertInQueue(ticketToAddInQueue);
+            }
+
+            response = Response.status(Response.Status.OK).build();
 
         } else
             response = Response.status(Response.Status.BAD_REQUEST).build();
@@ -77,7 +88,7 @@ public class TicketResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getBookingTicket(@HeaderParam(HttpHeaders.AUTHORIZATION) String token,
-                                     BookingRequest request) {
+                                     BookingRequest request) throws Exception {
 
         int id;
 

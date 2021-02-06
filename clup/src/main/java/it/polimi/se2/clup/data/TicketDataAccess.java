@@ -179,9 +179,11 @@ public class TicketDataAccess implements TicketDataAccessInterface {
     }
 
     @Override
-    public List<LineUpDigitalTicket> retrieveAllLineUpTickets() {
+    public List<LineUpDigitalTicket> retrieveAllLineUpTickets(int buildingID) {
 
-        return em.createNamedQuery("LineUpDigitalTicket.findAll", LineUpDigitalTicket.class).getResultList();
+        return em.createNamedQuery("LineUpDigitalTicket.findAllForBuilding", LineUpDigitalTicket.class)
+                .setParameter("buildingID", buildingID)
+                .getResultList();
     }
 
     @Override
