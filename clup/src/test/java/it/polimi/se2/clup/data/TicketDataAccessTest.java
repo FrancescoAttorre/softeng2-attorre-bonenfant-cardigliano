@@ -59,7 +59,7 @@ public class TicketDataAccessTest {
         surplus.put("Macelleria",1);
         surplus.put("Pescheria",3);
 
-        buildingID = bdm.insertBuilding(
+        bdm.insertBuilding(
                 activityId,
                 "EsselungaStore",
                 LocalTime.of(8,0,0),
@@ -68,6 +68,8 @@ public class TicketDataAccessTest {
                 3,
                 surplus,
                 "ESSL9821");
+
+        buildingID = bdm.retrieveBuilding("EsselungaStore").getBuildingID();
 
         smID = uda.insertStoreManager("ESSL9821");
 

@@ -20,13 +20,19 @@ public class TimeSlotManager {
     BuildingDataAccess dataAccess = new BuildingDataAccess();
 
     public boolean checkTicketAvailability(int buildingId, LocalDate date, List<Integer> timeSlots, List<Department> departments){
-        Map<Department, List<Integer>> availableTimeSlots = getAvailableTimeSlots(buildingId,date,Duration.ofMinutes(timeSlots.size() * 15 ),departments);
+        Map<Department, List<Integer>> availableTimeSlots = getAvailableTimeSlots(buildingId,date,Duration.ofMinutes((long) timeSlots.size() * TIMESLOTDURATION ),departments);
+
         for(Department department : departments){
+
+            if(!availableTimeSlots.containsKey(department)) return false;
+
             for(Integer requestedSlot : timeSlots){
                 if(!availableTimeSlots.get(department).contains(requestedSlot))
                     return false;
             }
+
         }
+
         return true;
     }
 
@@ -35,7 +41,7 @@ public class TimeSlotManager {
 
         if (building == null) return null;
 
-        Map<Department, List<Integer>> bookedTimeSlots= dataAccess.retrieveTimeSlots(buildingId, date);
+        Map<Department, List<Integer>> bookedTimeSlots = dataAccess.retrieveTimeSlots(buildingId, date);
 
         return computeAvailableTimeSlots(building,bookedTimeSlots,departments, permanenceTime);
 

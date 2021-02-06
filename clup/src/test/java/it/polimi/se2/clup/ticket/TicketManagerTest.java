@@ -75,15 +75,18 @@ public class TicketManagerTest {
         Map<String, Integer> surplus = new HashMap<>();
 
         //Creation of a building
-        buildingID = bda.insertBuilding(
-                activityId,
-                "EsselungaStore",
-                LocalTime.of(8, 0, 0),
-                LocalTime.of(21, 0, 0),
-                "via Roma,1",
-                2,
-                surplus,
-                "AccessCODE");
+
+        bda.insertBuilding(
+                    activityId,
+                    "EsselungaStore",
+                    LocalTime.of(8, 0, 0),
+                    LocalTime.of(21, 0, 0),
+                    "via Roma,1",
+                    2,
+                    surplus,
+                    "AccessCODE");
+
+        buildingID = bda.retrieveBuilding("EsselungaStore").getBuildingID();
 
         //considering full building
         bda.retrieveBuilding(buildingID).setActualCapacity(0);

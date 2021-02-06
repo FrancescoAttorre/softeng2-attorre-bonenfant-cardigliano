@@ -11,9 +11,9 @@ import java.util.Map;
 
 public interface BuildingDataAccessInterface {
     List<Building> retrieveBuildings();
-    int insertBuilding(int activityId, String name, LocalTime opening, LocalTime closing, String address, int capacity,
-                       Map<String,Integer> surplus, String accessCode);
+    boolean insertBuilding(int activityId, String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String,Integer> surplus, String accessCode);
     Building retrieveBuilding(int buildingId);
+    Building retrieveBuilding(String name);
     boolean retrieveBuildingState(int id);
     boolean insertInQueue(LineUpDigitalTicket ticket);
     Map<Department,List<Integer>> retrieveTimeSlots(int buildingId, LocalDate date);

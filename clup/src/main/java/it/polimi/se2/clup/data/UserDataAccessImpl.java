@@ -60,7 +60,9 @@ public class UserDataAccessImpl implements UserDataAccessInt{
 
         if(em.createNamedQuery("Activity.selectWithPIVA").setParameter("pIva", pIva).getResultList().size() > 0)
             result = false;
-        else {
+        else if (em.createNamedQuery("Activity.selectWithName").setParameter("name", pIva).getResultList().size() > 0){
+            result = false;
+        } else {
             Activity activity = new Activity();
             activity.setName(name);
             activity.setpIva(pIva);

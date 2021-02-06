@@ -2,6 +2,7 @@ package it.polimi.se2.clup.building;
 
 import it.polimi.se2.clup.data.BuildingDataAccessInterface;
 import it.polimi.se2.clup.data.entities.*;
+import it.polimi.se2.clup.externalServices.Position;
 import it.polimi.se2.clup.ticket.NotInQueueException;
 import it.polimi.se2.clup.ticket.TicketManager;
 
@@ -28,17 +29,42 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
     public static final int expirationTime = 10;
     public static final int defaultWaitingTime = 15;
     public static final int extraTime = 10;
+    public static final int maxDistance = 20;
+    public static final double percentage = 0.4;
 
     @Override
     public Map<Department, List<Integer>> getAvailableTimeSlots(int buildingId, LocalDate date, Duration permanenceTime, List<Department> departments) {
-
-        return timeSlotManager.getAvailableTimeSlots(buildingId, date, permanenceTime, departments);
-
+        //add malformed
+        if(departments != null)
+            return timeSlotManager.getAvailableTimeSlots(buildingId, date, permanenceTime, departments);
+        else
+            return timeSlotManager.getAvailableTimeSlots(buildingId, date, permanenceTime, dataAccess.retrieveBuilding(buildingId).getDepartments());
     }
 
     @Override
     public boolean checkTicketAvailability(int buildingId, LocalDate date, List<Integer> timeSlots, List<Department> departments) {
-        return timeSlotManager.checkTicketAvailability(buildingId,date,timeSlots,departments);
+        if( date == null || timeSlots == null) return false; //malformed
+
+        if(departments != null)
+
+            //controllo sui dept che appartengano tutti
+
+            return timeSlotManager.checkTicketAvailability(buildingId,date,timeSlots,departments);
+        else
+            if(date.getDayOfMonth() == LocalDate.now().getDayOfMonth() && date.getMonth() == LocalDate.now().getMonth()){
+                return false;   //cannot book for same day
+            }else{
+                //should check if 40 percent of capacity is already booked
+
+                Building building = dataAccess.retrieveBuilding(buildingId);
+
+                List<DigitalTicket> tickets = building.getTickets();
+                tickets.removeIf(t -> t.getClass() != LineUpDigitalTicket.class);
+
+                return tickets.size() < percentage * building.getCapacity();
+
+            }
+
     }
 
     @Override
@@ -119,8 +145,9 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
             return false;
 
         if (isAccessCodeAvailable(code)){
-            dataAccess.insertBuilding(activityId, name, opening, closing, address, capacity, surplus, code);
-            return true;
+
+            return dataAccess.insertBuilding(activityId, name, opening, closing, address, capacity, surplus, code);
+
         } else
             return false;
     }
@@ -208,6 +235,27 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
                 throw new IllegalStateException("Unexpected value: " + ticket.getState());
         }
         return newWaitingTime;
+    }
+
+    @Override
+    public List<Building> getAvailableBuildings(Position position, String meansOfTransport) {
+
+        //TODO : adapter
+
+        for(Building building : dataAccess.retrieveBuildings()){
+
+            // return of following on DD is time .
+            //if(mapsAdapter.retrieveBuildingDistance(position ,building.getPosition) > maxDistance )
+
+
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<Building> retrieveBuilding(int activityId) {
+        return null;
     }
 
     public QueueManager getQueueManager() {

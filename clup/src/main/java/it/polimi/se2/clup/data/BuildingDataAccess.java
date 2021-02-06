@@ -74,7 +74,14 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
     }
 
     @Override
-    public int insertBuilding(int activityId, String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String, Integer> surplus,String accessCode) {
+    public boolean insertBuilding(int activityId, String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String, Integer> surplus,String accessCode)  {
+        if(em.createNamedQuery("Building.retrieveBuildingByName",Building.class).setParameter("buildingName",name).getResultList().size() > 0)
+            return false;
+
+        //access code already checked
+
+        //start insertion
+
         Building building = new Building();
         Queue queue = new Queue();
         building.setQueue(queue);
@@ -87,7 +94,7 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
         building.setActivity(activity);
 
 
-        building.setName(name); //TODO: name should be unique ? check or catch exception ?
+        building.setName(name);
         building.setOpening(opening);
         building.setClosing(closing);
         building.setAddress(address);
@@ -106,7 +113,12 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
             }
         }
         em.persist(building);
-        return building.getBuildingID();
+        return true;
+    }
+
+    @Override
+    public Building retrieveBuilding(String name){
+        return em.createNamedQuery("Building.retrieveBuildingByName",Building.class).setParameter("buildingName",name).getSingleResult();
     }
 
     @Override

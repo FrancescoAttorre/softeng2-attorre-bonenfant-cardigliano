@@ -31,7 +31,7 @@ public class BuildingManagerTest {
     int secondUserId;
     int activityId;
     @BeforeEach
-    public void setup(){
+    public void setup() {
 
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("clupTest");
         EntityManager em = emf.createEntityManager();
@@ -78,7 +78,7 @@ public class BuildingManagerTest {
         surplus.put("Pescheria",1);
         surplus.put("Bevande",12);
 
-        buildingID = buildingDataAccess.insertBuilding(
+        buildingDataAccess.insertBuilding(
                 activityId,
                 "EsselungaStore",
                 LocalTime.of(8, 0, 0),
@@ -87,6 +87,10 @@ public class BuildingManagerTest {
                 2,
                 surplus,
                 "AccessCODE");
+
+        buildingID = buildingDataAccess.retrieveBuilding("EsselungaStore").getBuildingID();
+
+
 
         //considering an empty building
         //Creation of 2 tickets
