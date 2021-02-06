@@ -182,4 +182,10 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
         queue.setQueueTickets(newQueue);
     }
 
+    @Override
+    public DigitalTicket retrieveTicket(int ticketID){
+
+        return em.find(DigitalTicket.class,ticketID);
+    }
+
 }

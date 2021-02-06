@@ -30,7 +30,6 @@ public class TicketManagerTest {
     private static int unregID4;
     private static int buildingID;
     private static EntityManager em;
-    private static int activityId;
 
     @BeforeEach
     public void setup() {
@@ -64,7 +63,7 @@ public class TicketManagerTest {
         em.getTransaction().begin();
 
         uda.insertActivity("EsselungaActivity","PIVAEsselunga","EsselungaPassword");
-        activityId = uda.retrieveActivity("PIVAEsselunga").getId();
+        int activityId = uda.retrieveActivity("PIVAEsselunga").getId();
 
         //Creation of unregistered customers
         unregID1 = uda.insertUnregisteredAppCustomer();
@@ -77,7 +76,7 @@ public class TicketManagerTest {
         //Creation of a building
 
         bda.insertBuilding(
-                    activityId,
+                activityId,
                     "EsselungaStore",
                     LocalTime.of(8, 0, 0),
                     LocalTime.of(21, 0, 0),
@@ -219,7 +218,8 @@ public class TicketManagerTest {
 
         em.getTransaction().commit();
 
-        Assertions.assertEquals(tm.getTicketsUnregisteredCustomer(unregID1).get(0).getState(), TicketState.VALID);
+        LineUpDigitalTicket ticket1 = tm.getTicketsUnregisteredCustomer(unregID1).get(0);
+        Assertions.assertEquals(ticket1.getState(), TicketState.VALID);
         Assertions.assertEquals(tm.getTicketsUnregisteredCustomer(unregID2).get(0).getState(), TicketState.VALID);
         Assertions.assertEquals(tm.getTicketsUnregisteredCustomer(unregID3).get(0).getState(), TicketState.INVALID);
         Assertions.assertEquals(tm.getTicketsUnregisteredCustomer(unregID4).get(0).getState(), TicketState.INVALID);
@@ -232,7 +232,7 @@ public class TicketManagerTest {
         //simulating someone exiting the building 10 minutes ago
         //------------------------------------------------------
 
-        tm.getBuildingManager().customerExit(buildingID); //customer exit will simulate an exit in the current time
+        tm.getBuildingManager().customerExit(buildingID, ticket1.getTicketID()); //customer exit will simulate an exit in the current time
 
         Assertions.assertEquals(tm.getWaitingUpdateUnregCustomer(unregID4).get(tm.getTicketsUnregisteredCustomer(unregID4).get(0)).toMinutes(),
                 BuildingManager.defaultWaitingTime);

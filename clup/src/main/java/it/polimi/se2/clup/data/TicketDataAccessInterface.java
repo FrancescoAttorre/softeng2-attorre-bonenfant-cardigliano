@@ -22,7 +22,9 @@ public interface TicketDataAccessInterface {
     List<LineUpDigitalTicket> retrieveTicketsUnregisteredCustomer(int userID);
     List<LineUpDigitalTicket> retrieveLineUpTicketsStoreManager(int userID);
 
+    List<LineUpDigitalTicket> retrieveAllLineUpTickets();
     LocalDateTime retrieveAcquisitionTime (LineUpDigitalTicket lineUpTicket);
     LocalDateTime retrieveValidationTime (int ticketID);
     TicketState retrieveTicketState (int ticketID);
+    int retrieveCapacity (int buildingID);
 }

@@ -3,6 +3,8 @@ package it.polimi.se2.clup.auth;
 import it.polimi.se2.clup.auth.exceptions.CredentialsException;
 import it.polimi.se2.clup.auth.exceptions.TokenException;
 
+import java.util.List;
+
 
 public interface AuthManagerInt {
     /**
@@ -45,7 +47,10 @@ public interface AuthManagerInt {
      * @return id contained in the token
      * @throws TokenException
      */
-    int verifyToken(String token, AuthFlag auth) throws TokenException;
+    int verifyToken(String token, List<AuthFlag> authList) throws TokenException;
+
+    AuthFlag getAuthFlag(String token);
+
 
     /**
      * Generates an Array containing an access code and its hash (no salt)

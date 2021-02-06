@@ -41,7 +41,7 @@ public class BuildingResource {
 
         if (token != null && meansOfTransport != null && address != null) {
             try {
-                id = am.verifyToken(token, AuthFlag.UNREGISTERED);
+                id = am.verifyToken(token, List.of(AuthFlag.REGISTERED, AuthFlag.UNREGISTERED));
             } catch (TokenException e) {
                 return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
             }
@@ -69,7 +69,7 @@ public class BuildingResource {
 
         if(token != null && meansOfTransport != null && coordinates != null) {
             try {
-                id = am.verifyToken(token, AuthFlag.UNREGISTERED);
+                id = am.verifyToken(token, List.of(AuthFlag.UNREGISTERED, AuthFlag.REGISTERED));
             } catch (TokenException e) {
                 return Response.status(Response.Status.UNAUTHORIZED).entity(new Message(e.getMessage())).build();
             }

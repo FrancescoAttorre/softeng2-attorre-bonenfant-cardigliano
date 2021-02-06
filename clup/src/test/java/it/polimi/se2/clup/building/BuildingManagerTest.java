@@ -25,11 +25,13 @@ public class BuildingManagerTest {
     static BuildingDataAccess buildingDataAccess;
     static UserDataAccessImpl userDataAccess;
 
-    int buildingID;
-    int firstUserId;
-    int regUserId;
-    int secondUserId;
-    int activityId;
+    private int buildingID;
+    private int regUserId;
+    private int secondUserId;
+    private int activityId;
+    private int firstTicketID;
+    private int secondTicketID;
+
     @BeforeEach
     public void setup() {
 
@@ -68,7 +70,7 @@ public class BuildingManagerTest {
         userDataAccess.insertActivity("EsselungaActivity","PIVAEsselunga","EsselungaPassword");
         activityId = userDataAccess.retrieveActivity("PIVAEsselunga").getId();
 
-        firstUserId = userDataAccess.insertUnregisteredAppCustomer();
+        int firstUserId = userDataAccess.insertUnregisteredAppCustomer();
         secondUserId = userDataAccess.insertUnregisteredAppCustomer();
 
         userDataAccess.insertUser("firstReg","firstPass");
@@ -91,11 +93,18 @@ public class BuildingManagerTest {
         buildingID = buildingDataAccess.retrieveBuilding("EsselungaStore").getBuildingID();
 
 
-
         //considering an empty building
         //Creation of 2 tickets
         tm.acquireUnregCustomerLineUpTicket(firstUserId, buildingID);
         tm.acquireUnregCustomerLineUpTicket(secondUserId, buildingID);
+
+        firstTicketID = buildingDataAccess.em.createNamedQuery("LineUpDigitalTicket.selectWithUnregID", LineUpDigitalTicket.class)
+                .setParameter("unregID", firstUserId).getResultList().get(0).getTicketID();
+        secondTicketID = buildingDataAccess.em.createNamedQuery("LineUpDigitalTicket.selectWithUnregID", LineUpDigitalTicket.class)
+                .setParameter("unregID", secondUserId).getResultList().get(0).getTicketID();
+
+        bm.customerEntry(firstTicketID, buildingID, firstUserId, null);
+        bm.customerEntry(secondTicketID, buildingID, secondUserId, null);
 
         em.getTransaction().commit();
         em.getTransaction().begin();
@@ -150,7 +159,7 @@ public class BuildingManagerTest {
         LocalTime oldLastExitTime = buildingDataAccess.retrieveBuilding(buildingID).getLastExitTime();
         Duration oldLastDeltaExitTime = buildingDataAccess.retrieveBuilding(buildingID).getDeltaExitTime();
 
-        bm.customerExit(buildingID);
+        bm.customerExit(buildingID, firstTicketID);
 
         //SHOULD UPDATE STATISTICS
         Assertions.assertNotEquals(oldLastDeltaExitTime,buildingDataAccess.retrieveBuilding(buildingID).getDeltaExitTime());
@@ -163,10 +172,10 @@ public class BuildingManagerTest {
     public void shouldValidateNextTicket(){
         buildingDataAccess.em.getTransaction().begin();
 
-        bm.customerExit(buildingID);
+        bm.customerExit(buildingID, firstTicketID);
 
         //SHOULD VALIDATE NEXT
-        Assertions.assertEquals(TicketState.VALID,tm.getTicketsUnregisteredCustomer(firstUserId).get(0).getState());
+        Assertions.assertEquals(TicketState.VALID,tm.getTicketsUnregisteredCustomer(secondUserId).get(0).getState());
 
         buildingDataAccess.em.getTransaction().commit();
     }
@@ -183,7 +192,7 @@ public class BuildingManagerTest {
         tm.acquireUnregCustomerLineUpTicket(thirdUserId, buildingID);
         tm.acquireUnregCustomerLineUpTicket(fourthUserId, buildingID);
 
-        bm.customerExit(buildingID);
+        bm.customerExit(buildingID,firstTicketID);
 
         //SHOULD REMOVE FROM QUEUE
         Assertions.assertEquals(buildingDataAccess.retrieveTicketsInQueue(buildingID).size(), 1);
@@ -337,8 +346,8 @@ public class BuildingManagerTest {
         int fourthUserId = userDataAccess.insertUnregisteredAppCustomer();
 
         //considering an empty building
-        bm.customerExit(buildingID);
-        bm.customerExit(buildingID);
+        bm.customerExit(buildingID, firstTicketID);
+        bm.customerExit(buildingID, secondTicketID);
 
         Assertions.assertEquals(building.getActualCapacity(), 2);
 

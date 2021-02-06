@@ -10,6 +10,7 @@ import it.polimi.se2.clup.auth.exceptions.AuthorizationException;
 import it.polimi.se2.clup.auth.exceptions.TokenException;
 
 import java.util.Date;
+import java.util.List;
 
 class TokenManager {
     private final String SECRET = "secretCode";
@@ -37,12 +38,18 @@ class TokenManager {
         return token;
     }
 
-    public int verify(String token, AuthFlag auth) throws TokenException {
+    public int verify(String token, List<AuthFlag> authList) throws TokenException {
 
         int id;
+        boolean found = false;
         try {
             DecodedJWT jwt = verifier.verify(token);
-            if(jwt.getClaim("auth").asInt() >= auth.ordinal())
+
+            for(AuthFlag flag : authList)
+                if(jwt.getClaim("auth").asInt() >= flag.ordinal())
+                    found = true;
+
+            if(found)
                 id = jwt.getClaim("id").asInt();
             else
                 throw new AuthorizationException();
@@ -54,6 +61,9 @@ class TokenManager {
         return id;
     }
 
-
+    public AuthFlag getAuthFlag(String token) {
+        DecodedJWT jwt = JWT.decode(token);
+        return AuthFlag.values()[jwt.getClaim("auth").asInt()];
+    }
 
 }

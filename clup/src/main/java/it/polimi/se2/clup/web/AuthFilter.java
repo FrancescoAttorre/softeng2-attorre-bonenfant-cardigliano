@@ -11,6 +11,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @Stateless
 public class AuthFilter {
@@ -43,7 +44,7 @@ public class AuthFilter {
                 try {
                     if(am == null)
                         System.err.println("AuthFilter: AuthManagerInt not injected!");
-                    activityID = am.verifyToken(jwt.getValue(), auth);
+                    activityID = am.verifyToken(jwt.getValue(), List.of(auth));
                 } catch (TokenException e) {
                     req.setAttribute("error", e.getMessage());
                     jwt.setMaxAge(0); //delete cookie
