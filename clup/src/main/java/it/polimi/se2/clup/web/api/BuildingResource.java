@@ -4,6 +4,8 @@ import it.polimi.se2.clup.auth.AuthFlag;
 import it.polimi.se2.clup.auth.AuthManagerInt;
 import it.polimi.se2.clup.auth.exceptions.TokenException;
 import it.polimi.se2.clup.building.BuildingManagerInterface;
+import it.polimi.se2.clup.data.entities.Building;
+import it.polimi.se2.clup.externalServices.Position;
 import it.polimi.se2.clup.web.api.serial.Coordinates;
 import it.polimi.se2.clup.web.api.serial.Message;
 
@@ -13,6 +15,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 @Path("/buildings")
@@ -40,7 +45,7 @@ public class BuildingResource {
                 return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
             }
 
-            //retrieve building list
+
 
             response = Response.status(Response.Status.OK).build();
 
@@ -68,7 +73,12 @@ public class BuildingResource {
                 return Response.status(Response.Status.UNAUTHORIZED).entity(new Message(e.getMessage())).build();
             }
 
-            response = Response.status(Response.Status.OK).build();
+            BigDecimal latitude = new BigDecimal(coordinates.latitude);
+            BigDecimal longitude = new BigDecimal(coordinates.longitude);
+
+            List<Building> availableBuildings = bm.getAvailableBuildings(new Position(latitude, longitude), meansOfTransport);
+
+            response = Response.status(Response.Status.OK).entity(availableBuildings).build();
         } else
             response = Response.status(Response.Status.BAD_REQUEST).build();
 

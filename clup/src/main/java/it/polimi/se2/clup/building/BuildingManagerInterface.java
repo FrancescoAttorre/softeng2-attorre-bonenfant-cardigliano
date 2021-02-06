@@ -5,12 +5,13 @@ import it.polimi.se2.clup.data.entities.Department;
 import it.polimi.se2.clup.data.entities.LineUpDigitalTicket;
 import it.polimi.se2.clup.externalServices.Position;
 
+import javax.ejb.Local;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
-
+@Local
 public interface BuildingManagerInterface {
 
     List<Building> retrieveBuilding(int activityId);

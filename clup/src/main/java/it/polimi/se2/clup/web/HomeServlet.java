@@ -19,51 +19,20 @@ import java.io.IOException;
 public class HomeServlet extends HttpServlet {
 
     @EJB
-    AuthManagerInt am;
+    BuildingManagerInterface bm;
 
     @EJB
-    BuildingManagerInterface bm;
+    AuthFilter filter;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Cookie[] cookies = req.getCookies();
-        Integer activityID;
 
-        Cookie jwt = null;
+        Integer activityID = filter.checkCookie(req, resp, AuthFlag.ACTIVITY);
 
-        //if there are no cookies just visualize the index page
-        if(cookies == null) {
-            req.getRequestDispatcher("/index.html").forward(req,resp);
+        if(activityID == null)
             return;
-        }
 
-
-
-        for(Cookie cookie : cookies) {
-            if(cookie.getName().equals("token")) {
-                jwt = cookie;
-                System.out.println("Found Cookie: " + jwt.getValue());
-                break;
-            }
-        }
-
-        if(jwt != null) {
-            try {
-                activityID = am.verifyToken(jwt.getValue(), AuthFlag.ACTIVITY);
-            } catch (TokenException e) {
-                req.setAttribute("error", e.getMessage());
-                jwt.setMaxAge(0); //delete cookie
-                resp.addCookie(jwt);
-                req.getRequestDispatcher("/error.jsp").forward(req, resp);
-                return;
-            }
-
-            //TODO: retrieve buildings
-            req.getRequestDispatcher("/welcome.jsp").forward(req, resp);
-
-        } else {
-            req.getRequestDispatcher("/login").forward(req, resp);
-        }
+        req.getRequestDispatcher("welcome.jsp").forward(req, resp);
 
     }
 }

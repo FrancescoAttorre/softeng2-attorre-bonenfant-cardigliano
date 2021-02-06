@@ -5,7 +5,6 @@ import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
 import it.polimi.se2.clup.data.entities.StoreManager;
 import it.polimi.se2.clup.data.entities.UnregisteredAppCustomer;
 
-import javax.ejb.Local;
 
 public interface UserDataAccessInt {
     RegisteredAppCustomer retrieveUser(String username);
