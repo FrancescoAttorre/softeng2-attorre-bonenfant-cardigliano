@@ -2,11 +2,12 @@ package it.polimi.se2.clup.ticket;
 
 import it.polimi.se2.clup.data.entities.*;
 
+import javax.ejb.Local;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-
+@Local
 public interface TicketManagerInterface {
 
     void acquireStoreManagerTicket(int userID, int buildingID);

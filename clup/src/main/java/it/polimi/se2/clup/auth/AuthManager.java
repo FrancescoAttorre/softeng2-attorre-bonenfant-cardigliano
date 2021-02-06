@@ -8,6 +8,7 @@ import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import java.util.List;
 
 @Stateless
 public class AuthManager implements AuthManagerInt{
@@ -106,8 +107,13 @@ public class AuthManager implements AuthManagerInt{
     }
 
     @Override
-    public int verifyToken(String token, AuthFlag auth) throws TokenException {
-        return tokenManager.verify(token, auth);
+    public int verifyToken(String token, List<AuthFlag> authList) throws TokenException {
+        return tokenManager.verify(token, authList);
+    }
+
+    @Override
+    public AuthFlag getAuthFlag(String token) {
+        return tokenManager.getAuthFlag(token);
     }
 
     @Override

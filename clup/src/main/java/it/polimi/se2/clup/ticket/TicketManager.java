@@ -5,6 +5,7 @@ import it.polimi.se2.clup.data.InvalidDepartmentException;
 import it.polimi.se2.clup.data.TicketDataAccess;
 import it.polimi.se2.clup.data.entities.*;
 
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -16,8 +17,8 @@ import java.util.Map;
 @Stateless
 public class TicketManager implements TicketManagerInterface, TicketValidationInt {
 
-    private TicketDataAccess ticketDataAccess;
-    private BuildingManager buildingManager;
+    @EJB private TicketDataAccess ticketDataAccess;
+    @EJB private BuildingManager buildingManager;
 
     public BuildingManager getBuildingManager() {
         return buildingManager;
