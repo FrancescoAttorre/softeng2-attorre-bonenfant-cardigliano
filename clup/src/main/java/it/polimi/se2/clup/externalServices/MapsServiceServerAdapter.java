@@ -6,7 +6,7 @@ import java.time.Duration;
 
 public interface MapsServiceServerAdapter {
 
-    Duration retrieveTravelTimeToBuilding(MeansOfTransport meansOfTransport, Position customerPosition, Position buildingAddress);
+    Duration retrieveTravelTimeToBuilding(MeansOfTransport meansOfTransport, Position customerPosition, String buildingAddress);
     Position getLocation(String address);
 
 }

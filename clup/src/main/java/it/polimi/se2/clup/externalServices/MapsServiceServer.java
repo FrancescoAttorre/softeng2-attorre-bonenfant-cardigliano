@@ -2,6 +2,7 @@ package it.polimi.se2.clup.externalServices;
 
 import it.polimi.se2.clup.data.entities.MeansOfTransport;
 
+import javax.ejb.Stateless;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
@@ -14,6 +15,7 @@ import java.io.StringReader;
 import java.time.Duration;
 import java.util.List;
 
+@Stateless
 public class MapsServiceServer implements MapsServiceServerAdapter {
 
     private static final String apiKey = "?api_key=5b3ce3597851110001cf6248534e8b28978045ac91bf022ed129b404";
@@ -27,7 +29,9 @@ public class MapsServiceServer implements MapsServiceServerAdapter {
     private static final String spaceChar = "%20";
 
     @Override
-    public Duration retrieveTravelTimeToBuilding (MeansOfTransport meansOfTransport, Position customerPosition, Position buildingPosition) {
+    public Duration retrieveTravelTimeToBuilding (MeansOfTransport meansOfTransport, Position customerPosition, String buildingAddress) {
+
+        Position buildingPosition = getLocation(buildingAddress);
 
         String target = directions;
         switch (meansOfTransport) {

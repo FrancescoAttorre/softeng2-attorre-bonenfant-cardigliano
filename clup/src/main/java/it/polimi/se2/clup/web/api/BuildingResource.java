@@ -5,6 +5,7 @@ import it.polimi.se2.clup.auth.AuthManagerInt;
 import it.polimi.se2.clup.auth.exceptions.TokenException;
 import it.polimi.se2.clup.building.BuildingManagerInterface;
 import it.polimi.se2.clup.data.entities.Building;
+import it.polimi.se2.clup.data.entities.MeansOfTransport;
 import it.polimi.se2.clup.externalServices.Position;
 import it.polimi.se2.clup.web.api.serial.Coordinates;
 import it.polimi.se2.clup.web.api.serial.Message;
@@ -61,7 +62,7 @@ public class BuildingResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getBuildingsByCoordinates(@HeaderParam(HttpHeaders.AUTHORIZATION) String token,
-                                          @PathParam("meansOfTransport") String meansOfTransport,
+                                          @PathParam("meansOfTransport") MeansOfTransport meansOfTransport,
                                           Coordinates coordinates) {
         int id;
         Response response;

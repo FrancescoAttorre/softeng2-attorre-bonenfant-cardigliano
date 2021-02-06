@@ -1,8 +1,6 @@
 package it.polimi.se2.clup.building;
 
-import it.polimi.se2.clup.data.entities.Building;
-import it.polimi.se2.clup.data.entities.Department;
-import it.polimi.se2.clup.data.entities.LineUpDigitalTicket;
+import it.polimi.se2.clup.data.entities.*;
 import it.polimi.se2.clup.externalServices.Position;
 
 import javax.ejb.Local;
@@ -15,13 +13,14 @@ import java.util.Map;
 public interface BuildingManagerInterface {
 
     List<Building> retrieveBuilding(int activityId);
-    List<Building> getAvailableBuildings(Position position, String meansOfTransport);
+    List<Building> getAvailableBuildings(Position position, MeansOfTransport meansOfTransport);
     Map<Department, List<Integer>> getAvailableTimeSlots(int buildingId, LocalDate date, Duration permanenceTime, List<Department> departments);
     boolean checkTicketAvailability(int buildingId, LocalDate date, List<Integer> timeSlots, List<Department> departments);
     boolean customerExit(int buildingId);
+    boolean registeredCustomerExit(int buildingId, BookingDigitalTicket bookingDigitalTicket);
     boolean insertBuilding(int activityId, String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String,Integer> surplus,String code);
     boolean insertInQueue(LineUpDigitalTicket ticket);
-    boolean customerEntry (int ticketID, int buildingID, int userID);
+    boolean customerEntry (int ticketID, int buildingID, int userID, List<BookingDigitalTicket> bookingDigitalTickets);
     void reduceCapacity(int buildingID);
     boolean checkBuildingNotFull (int buildingID);
 

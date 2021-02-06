@@ -32,7 +32,7 @@ public class MapsServiceServerTest {
         Assertions.assertNotNull(buildingPosition.getEastLongitude());
         Assertions.assertNotNull(buildingPosition.getNorthLatitude());
 
-        travelTime = mapsService.retrieveTravelTimeToBuilding(MeansOfTransport.BIKE, customerPosition, buildingPosition);
+        travelTime = mapsService.retrieveTravelTimeToBuilding(MeansOfTransport.BIKE, customerPosition, "Via Palmanova, 69, 20132 Milano");
         if (travelTime != null)
             System.out.println("Travel time computed in minutes: " + travelTime.toMinutes());
     }

@@ -323,7 +323,7 @@ public class BuildingManagerTest {
                 setupTicket.getDate().getMonthValue() != LocalDateTime.now().getMonthValue() ||
                 setupTicket.getDate().getDayOfMonth() != LocalDateTime.now().getDayOfMonth())
 
-            Assertions.assertFalse(bm.customerEntry(setupTicket.getTicketID(), buildingID, regUserId));
+            Assertions.assertFalse(bm.customerEntry(setupTicket.getTicketID(), buildingID, regUserId,tm.getBookingTicketsRegCustomer(regUserId)));
     }
 
     @Test
@@ -354,8 +354,8 @@ public class BuildingManagerTest {
         LineUpDigitalTicket secondTicket = buildingDataAccess.em.createNamedQuery("LineUpDigitalTicket.selectWithUnregID", LineUpDigitalTicket.class)
                 .setParameter("unregID", fourthUserId).getResultList().get(0);
 
-        Assertions.assertTrue(bm.customerEntry(firstTicket.getTicketID(), buildingID, thirdUserId));
-        Assertions.assertTrue(bm.customerEntry(secondTicket.getTicketID(), buildingID, fourthUserId));
+        Assertions.assertTrue(bm.customerEntry(firstTicket.getTicketID(), buildingID, thirdUserId, tm.getBookingTicketsRegCustomer(thirdUserId)));
+        Assertions.assertTrue(bm.customerEntry(secondTicket.getTicketID(), buildingID, fourthUserId,tm.getBookingTicketsRegCustomer(fourthUserId)));
 
     }
 

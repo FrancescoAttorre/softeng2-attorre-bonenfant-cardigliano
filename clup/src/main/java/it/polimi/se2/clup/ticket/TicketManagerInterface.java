@@ -22,7 +22,7 @@ public interface TicketManagerInterface {
     List<LineUpDigitalTicket> getTicketsUnregisteredCustomer (int userID);
     List<LineUpDigitalTicket> getLineUpTicketsStoreManager (int userID);
 
-    void setTicketState(int ticketID, TicketState state);
+    boolean setTicketState(int ticketID, TicketState state);
 
     Map<LineUpDigitalTicket, Duration> getWaitingUpdateRegCustomer(int userID) throws NotInQueueException;
     Map<LineUpDigitalTicket, Duration> getWaitingUpdateSM(int userID) throws NotInQueueException;

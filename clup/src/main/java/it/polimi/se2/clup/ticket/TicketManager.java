@@ -217,8 +217,8 @@ public class TicketManager implements TicketManagerInterface, TicketValidationIn
     }
 
     @Override
-    public void setTicketState(int ticketID, TicketState state) {
-        ticketDataAccess.updateTicketState(ticketID, state);
+    public boolean setTicketState(int ticketID, TicketState state) {
+        return ticketDataAccess.updateTicketState(ticketID, state);
     }
 
 }

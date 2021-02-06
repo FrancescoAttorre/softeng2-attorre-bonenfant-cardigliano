@@ -2,13 +2,17 @@ package it.polimi.se2.clup.building;
 
 import it.polimi.se2.clup.data.BuildingDataAccessInterface;
 import it.polimi.se2.clup.data.entities.*;
+import it.polimi.se2.clup.externalServices.MapsServiceServer;
 import it.polimi.se2.clup.externalServices.Position;
 import it.polimi.se2.clup.ticket.NotInQueueException;
 import it.polimi.se2.clup.ticket.TicketManager;
+import it.polimi.se2.clup.ticket.TicketManagerInterface;
+import it.polimi.se2.clup.ticket.TicketValidationInt;
 
 import javax.ejb.Stateless;
 import javax.ejb.EJB;
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,13 +27,16 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
     @EJB
     protected TimeSlotManager timeSlotManager;
     @EJB
-    protected TicketManager ticketManager;
+    protected TicketValidationInt ticketManager;
+    @EJB
+    protected MapsServiceServer mapsAdapter;
+
 
     public static final int minutesInASlot = 15;
     public static final int expirationTime = 10;
     public static final int defaultWaitingTime = 15;
     public static final int extraTime = 10;
-    public static final int maxDistance = 20;
+    public static final Duration maxDistance = Duration.of(20, ChronoUnit.MINUTES);
     public static final double percentage = 0.4;
 
     @Override
@@ -76,18 +83,10 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
 
         dataAccess.updateLastExitTime(buildingId, lastExitTime); //can be included in updateStatistics
 
-        LineUpDigitalTicket ticket = queueManager.getNext(buildingId);
+        validateNext(buildingId);
 
-        if(ticket != null) {
-            ticketManager.validateTicket(ticket.getTicketID());
-            queueManager.removeFromQueue(ticket.getTicketID());
-            return true;
-        }
-        else {
-            Building building = dataAccess.retrieveBuilding(buildingId);
-            building.setActualCapacity(building.getActualCapacity() + 1);
-        }
-        return false; //false means that no one else is allowed to enter the building?
+        return true;
+        //return false; //false means that no one else is allowed to enter the building?
     }
 
     /**
@@ -96,11 +95,10 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
      * @return true if the customer has a valid ticket
      */
     @Override
-    public boolean customerEntry (int ticketID, int buildingID, int userID) {
+    public boolean customerEntry (int ticketID, int buildingID, int userID, List<BookingDigitalTicket> bookingTickets) {
 
         boolean result = false;
 
-        List<BookingDigitalTicket> bookingTickets = ticketManager.getBookingTicketsRegCustomer(userID);
         BookingDigitalTicket ticket = null;
 
         if (bookingTickets != null) {
@@ -238,25 +236,40 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
     }
 
     @Override
-    public List<Building> getAvailableBuildings(Position position, String meansOfTransport) {
+    public List<Building> getAvailableBuildings(Position position, MeansOfTransport meansOfTransport) {
 
-        //TODO : adapter
+        List<Building> buildings = new ArrayList<>();
 
         for(Building building : dataAccess.retrieveBuildings()){
+            Duration d = mapsAdapter.retrieveTravelTimeToBuilding(meansOfTransport,position,building.getAddress());
 
-            // return of following on DD is time .
-            //if(mapsAdapter.retrieveBuildingDistance(position ,building.getPosition) > maxDistance )
-
-
+            if( d.toMinutes() < maxDistance.toMinutes()){
+                buildings.add(building);
+            }
+            
         }
 
-        return null;
+        return buildings;
     }
 
     @Override
     public List<Building> retrieveBuilding(int activityId) {
         return null;
     }
+
+    @Override
+    public boolean registeredCustomerExit(int buildingId, BookingDigitalTicket ticket){
+
+        if(ticket.getDepartments() == null){
+            //it is a customer that occupied the 40 percent of the capacity.
+
+            validateNext(buildingId);
+        }
+
+        return true;
+        //return false; //false means that no one else is allowed to enter the building?
+    }
+
 
     public QueueManager getQueueManager() {
         return queueManager;
@@ -274,11 +287,11 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
         this.timeSlotManager = timeSlotManager;
     }
 
-    public TicketManager getTicketManager() {
+    public TicketValidationInt getTicketManager() {
         return ticketManager;
     }
 
-    public void setTicketManager(TicketManager ticketManager) {
+    public void setTicketManager(TicketValidationInt ticketManager) {
         this.ticketManager = ticketManager;
     }
 
@@ -302,6 +315,19 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
         Building building = dataAccess.retrieveBuilding(buildingID);
         int actualCapacity = building.getActualCapacity();
         building.setActualCapacity(actualCapacity - 1);
+    }
+
+    private void validateNext(int buildingId){
+        LineUpDigitalTicket nextTicket = queueManager.getNext(buildingId);
+
+        if(nextTicket != null) {
+            ticketManager.validateTicket(nextTicket.getTicketID());
+            queueManager.removeFromQueue(nextTicket.getTicketID());
+        }
+        else {
+            Building building = dataAccess.retrieveBuilding(buildingId);
+            building.setActualCapacity(building.getActualCapacity() + 1);
+        }
     }
 
 }
