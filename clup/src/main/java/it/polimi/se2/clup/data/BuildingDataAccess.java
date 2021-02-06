@@ -30,9 +30,10 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
 
     @Override
     public boolean retrieveBuildingState(int id) throws NoResultException,NonUniqueResultException{
+
         Building building = em.find(Building.class, id);
 
-        return (building.getCapacity() - building.getActualCapacity()) > 0;
+        return building.getActualCapacity() > 0;
     }
 
     @Override

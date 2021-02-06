@@ -244,10 +244,12 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
 
     //methods used by ticket manager
 
+    @Override
     public boolean checkBuildingNotFull (int buildingID) {
-        return dataAccess.retrieveBuilding(buildingID).getActualCapacity() > 0;
+        return dataAccess.retrieveBuildingState(buildingID);
     }
 
+    @Override
     public void reduceCapacity(int buildingID) {
         Building building = dataAccess.retrieveBuilding(buildingID);
         int actualCapacity = building.getActualCapacity();

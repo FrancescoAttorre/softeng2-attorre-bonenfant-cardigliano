@@ -18,4 +18,6 @@ public interface BuildingManagerInterface {
     boolean insertBuilding(int activityId, String name, LocalTime opening, LocalTime closing, String address, int capacity, Map<String,Integer> surplus,String code);
     boolean insertInQueue(LineUpDigitalTicket ticket);
     boolean customerEntry (int ticketID, int buildingID, int userID);
+    void reduceCapacity(int buildingID);
+    boolean checkBuildingNotFull (int buildingID);
 }

@@ -54,13 +54,20 @@ public class MapsServiceServer implements MapsServiceServerAdapter {
                 .get();
 
         JsonObject jsonObject = Json.createReader(new StringReader(response.readEntity(String.class))).readObject();
-        JsonArray internalJson = (JsonArray) jsonObject.get("features");
-        JsonObject internalJsonObj = (JsonObject) internalJson.get(0);
-        JsonObject propertiesJson = (JsonObject) internalJsonObj.get("properties");
-        JsonObject summaryJson = (JsonObject) propertiesJson.get("summary");
-        double decimalDuration = Double.parseDouble(summaryJson.get("duration").toString());
+        try  {
+            JsonArray internalJson = (JsonArray) jsonObject.get("features");
+            JsonObject internalJsonObj = (JsonObject) internalJson.get(0);
+            JsonObject propertiesJson = (JsonObject) internalJsonObj.get("properties");
+            JsonObject summaryJson = (JsonObject) propertiesJson.get("summary");
+            double decimalDuration = Double.parseDouble(summaryJson.get("duration").toString());
 
-        return Duration.ofSeconds((int) decimalDuration);
+            return Duration.ofSeconds((int) decimalDuration);
+        }
+        catch (NullPointerException e) {
+            JsonObject error = (JsonObject) jsonObject.get("error");
+            System.out.println(error.get("message").toString());
+            return null;
+        }
     }
 
     @Override
