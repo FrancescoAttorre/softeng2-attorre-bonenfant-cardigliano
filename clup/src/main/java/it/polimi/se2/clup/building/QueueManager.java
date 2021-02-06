@@ -7,10 +7,11 @@ import javax.ejb.Stateless;
 import java.util.List;
 
 @Stateless
-public class QueueManager {
+public class QueueManager implements QueueManagerInterface{
 
     BuildingDataAccess dataAccess;
 
+    @Override
     public boolean insertInQueue(LineUpDigitalTicket ticket){
         if(ticket.getBuilding() == null)
             throw new IllegalArgumentException("LineUpDigitalTicket's Building not found");
@@ -20,7 +21,7 @@ public class QueueManager {
         return true;
     }
 
-
+    @Override
     public LineUpDigitalTicket getNext(int buildingId){
         List<LineUpDigitalTicket> queue = dataAccess.retrieveTicketsInQueue(buildingId);
         LineUpDigitalTicket ticket;
@@ -31,6 +32,7 @@ public class QueueManager {
             return null;
     }
 
+    @Override
     public void removeFromQueue(int ticketId){
         dataAccess.removeFromQueue(ticketId);
     }

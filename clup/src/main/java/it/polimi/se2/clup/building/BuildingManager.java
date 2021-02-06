@@ -23,9 +23,9 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
     @EJB
     protected BuildingDataAccessInterface dataAccess;
     @EJB
-    protected QueueManager queueManager;
+    protected QueueManagerInterface queueManager;
     @EJB
-    protected TimeSlotManager timeSlotManager;
+    protected TimeSlotManagerInterface timeSlotManager;
     @EJB
     protected TicketValidationInt ticketManager;
     @EJB
@@ -246,7 +246,7 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
             if( d.toMinutes() < maxDistance.toMinutes()){
                 buildings.add(building);
             }
-            
+
         }
 
         return buildings;
@@ -271,7 +271,7 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
     }
 
 
-    public QueueManager getQueueManager() {
+    public QueueManagerInterface getQueueManager() {
         return queueManager;
     }
 
@@ -279,7 +279,7 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
         this.queueManager = queueManager;
     }
 
-    public TimeSlotManager getTimeSlotManager() {
+    public TimeSlotManagerInterface getTimeSlotManager() {
         return timeSlotManager;
     }
 

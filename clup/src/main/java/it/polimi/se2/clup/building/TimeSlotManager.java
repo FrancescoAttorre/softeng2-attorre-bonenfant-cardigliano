@@ -14,11 +14,12 @@ import java.util.List;
 import java.util.Map;
 
 @Stateless
-public class TimeSlotManager {
+public class TimeSlotManager implements TimeSlotManagerInterface{
     private static final int TOTALTIMESLOT = 96;
     private static final int TIMESLOTDURATION = 15;
     BuildingDataAccess dataAccess = new BuildingDataAccess();
-
+    
+    @Override
     public boolean checkTicketAvailability(int buildingId, LocalDate date, List<Integer> timeSlots, List<Department> departments){
         Map<Department, List<Integer>> availableTimeSlots = getAvailableTimeSlots(buildingId,date,Duration.ofMinutes((long) timeSlots.size() * TIMESLOTDURATION ),departments);
 
@@ -35,7 +36,8 @@ public class TimeSlotManager {
 
         return true;
     }
-
+    
+    @Override
     public Map<Department, List<Integer>> getAvailableTimeSlots(int buildingId, LocalDate date, Duration permanenceTime, List<Department> departments) {
         Building building = dataAccess.retrieveBuilding(buildingId);
 
@@ -48,7 +50,7 @@ public class TimeSlotManager {
     }
 
     //compute available time slot of each department
-    private Map<Department,List<Integer>> computeAvailableTimeSlots(Building building, Map<Department,List<Integer>> bookedTimeSlots, List<Department> departments,Duration permanenceTime){
+    public Map<Department,List<Integer>> computeAvailableTimeSlots(Building building, Map<Department, List<Integer>> bookedTimeSlots, List<Department> departments, Duration permanenceTime){
         Map<Department,List<Integer>> availableTimeSlots = new HashMap<>();
 
         for(Department d : departments){
