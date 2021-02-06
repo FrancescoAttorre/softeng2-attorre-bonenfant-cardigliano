@@ -75,7 +75,7 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
     }
 
     @Override
-    public boolean customerExit(int buildingId) {
+    public boolean customerExit(int buildingId, int ticketID) {
 
         LocalTime lastExitTime = LocalTime.now();
 
@@ -85,8 +85,10 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
 
         validateNext(buildingId);
 
-        return true;
-        //return false; //false means that no one else is allowed to enter the building?
+        if (!dataAccess.retrieveTicket(ticketID).getState().equals(TicketState.EXPIRED))
+            ticketManager.setTicketState(ticketID, TicketState.EXPIRED);
+
+        return false;
     }
 
     /**
@@ -108,6 +110,7 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
         }
 
         if (ticket != null) {
+
             int startingMinute = ticket.getTimeSlotID() * minutesInASlot;
             int year = ticket.getDate().getYear();
             int month = ticket.getDate().getMonthValue();
@@ -120,6 +123,8 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
                     Duration.between(LocalTime.of(hour, minute), LocalTime.now()).toMinutes() < expirationTime) {
 
                 ticketManager.validateTicket(ticketID);
+                if (ticket.getDepartments().isEmpty())
+                    reduceCapacity(buildingID);
                 result = true;
             }
             if (Duration.between(LocalTime.of(hour, minute), LocalTime.now()).toMinutes() > expirationTime)
@@ -130,7 +135,8 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
             Building building = dataAccess.retrieveBuilding(buildingID);
             if (building == null)
                 return false;
-            building.setActualCapacity(building.getActualCapacity() - 1);
+
+            reduceCapacity(buildingID);
             result = true;
         }
         return result;
@@ -246,7 +252,7 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
             if( d.toMinutes() < maxDistance.toMinutes()){
                 buildings.add(building);
             }
-            
+
         }
 
         return buildings;

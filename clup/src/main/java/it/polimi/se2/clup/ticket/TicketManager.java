@@ -35,15 +35,24 @@ public class TicketManager implements TicketManagerInterface, TicketValidationIn
         this.ticketDataAccess = ticketDataAccess;
     }
 
+    private int computeNumValidTickets() {
+        int numValidLineUpTickets = 0;
+        for (LineUpDigitalTicket t : ticketDataAccess.retrieveAllLineUpTickets()) {
+
+            if (t.getState().equals(TicketState.VALID))
+                numValidLineUpTickets ++;
+        }
+        return numValidLineUpTickets;
+    }
+
     @Override
     public void acquireStoreManagerTicket(int userID, int buildingID) {
 
         LineUpDigitalTicket newTicket = ticketDataAccess.insertStoreManagerLineUpTicket(userID);
 
-        if (buildingManager.checkBuildingNotFull(buildingID)) {
+        if (buildingManager.checkBuildingNotFull(buildingID) &&
+                computeNumValidTickets() < ticketDataAccess.retrieveCapacity(buildingID))
             validateTicket(newTicket.getTicketID());
-            buildingManager.reduceCapacity(buildingID);
-        }
         else
             buildingManager.insertInQueue(newTicket);
     }
@@ -113,10 +122,9 @@ public class TicketManager implements TicketManagerInterface, TicketValidationIn
 
         LineUpDigitalTicket newTicket = ticketDataAccess.insertRegCustomerLineUpTicket(userID, buildingID);
 
-        if (buildingManager.checkBuildingNotFull(buildingID)) {
+        if (buildingManager.checkBuildingNotFull(buildingID) &&
+                computeNumValidTickets() < ticketDataAccess.retrieveCapacity(buildingID))
             validateTicket(newTicket.getTicketID());
-            buildingManager.reduceCapacity(buildingID);
-        }
         else
             buildingManager.insertInQueue(newTicket);
         return true;
@@ -135,10 +143,9 @@ public class TicketManager implements TicketManagerInterface, TicketValidationIn
 
         LineUpDigitalTicket newTicket = ticketDataAccess.insertUnregCustomerLineUpTicket(userID, buildingID);
 
-        if (buildingManager.checkBuildingNotFull(buildingID)) {
+        if (buildingManager.checkBuildingNotFull(buildingID) &&
+                computeNumValidTickets() < ticketDataAccess.retrieveCapacity(buildingID))
             validateTicket(newTicket.getTicketID());
-            buildingManager.reduceCapacity(buildingID);
-        }
         else
             buildingManager.insertInQueue(newTicket);
         return true;
@@ -170,9 +177,8 @@ public class TicketManager implements TicketManagerInterface, TicketValidationIn
         List<LineUpDigitalTicket> customerLineUpTickets = ticketDataAccess.retrieveLineUpTicketsRegCustomer(userID);
         Map<LineUpDigitalTicket, Duration> lineUpWaitingTimes = new HashMap<>();
 
-        for (LineUpDigitalTicket ticket : customerLineUpTickets) {
+        for (LineUpDigitalTicket ticket : customerLineUpTickets)
             lineUpWaitingTimes.put(ticket, buildingManager.computeWaitingTime(ticket));
-        }
 
         return lineUpWaitingTimes;
     }

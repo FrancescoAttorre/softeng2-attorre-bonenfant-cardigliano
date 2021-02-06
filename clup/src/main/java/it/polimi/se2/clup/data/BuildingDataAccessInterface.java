@@ -2,6 +2,7 @@ package it.polimi.se2.clup.data;
 
 import it.polimi.se2.clup.data.entities.Building;
 import it.polimi.se2.clup.data.entities.Department;
+import it.polimi.se2.clup.data.entities.DigitalTicket;
 import it.polimi.se2.clup.data.entities.LineUpDigitalTicket;
 
 import java.time.LocalDate;
@@ -21,5 +22,6 @@ public interface BuildingDataAccessInterface {
     boolean updateStatistics(int buildingId, LocalTime lastExitTime);
     boolean updateLastExitTime(int buildingId, LocalTime lastExitTime);
 
+    DigitalTicket retrieveTicket(int ticketID);
     void removeFromQueue(int ticketId);
 }

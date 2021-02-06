@@ -179,6 +179,12 @@ public class TicketDataAccess implements TicketDataAccessInterface {
     }
 
     @Override
+    public List<LineUpDigitalTicket> retrieveAllLineUpTickets() {
+
+        return em.createNamedQuery("LineUpDigitalTicket.findAll", LineUpDigitalTicket.class).getResultList();
+    }
+
+    @Override
     public LocalDateTime retrieveAcquisitionTime (LineUpDigitalTicket lineUpTicket) {
         return lineUpTicket.getAcquisitionTime();
     }
@@ -193,5 +199,11 @@ public class TicketDataAccess implements TicketDataAccessInterface {
     public TicketState retrieveTicketState (int ticketID) {
         DigitalTicket ticket = em.find(DigitalTicket.class, ticketID);
         return ticket.getState();
+    }
+
+    @Override
+    public int retrieveCapacity (int buildingID) {
+        Building building = em.find(Building.class, buildingID);
+        return building.getCapacity();
     }
 }
