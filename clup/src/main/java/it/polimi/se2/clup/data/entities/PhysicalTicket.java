@@ -14,7 +14,7 @@ public class PhysicalTicket {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int number;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "ASSOCIATEDDIGITALTICKET_TICKETID", nullable = false)
     private LineUpDigitalTicket associatedDigitalTicket;
 

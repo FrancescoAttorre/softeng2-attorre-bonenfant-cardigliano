@@ -10,10 +10,8 @@ import java.util.Objects;
  * This class represents one of the departments into which a building can be split to optimize its filling
  */
 
-@XmlRootElement
 @Entity
 public class Department {
-    @XmlElement
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int departmentID;
@@ -21,7 +19,6 @@ public class Department {
     @Column
     private int surplusCapacity;
 
-    @XmlElement
     @Column
     private String name;
 

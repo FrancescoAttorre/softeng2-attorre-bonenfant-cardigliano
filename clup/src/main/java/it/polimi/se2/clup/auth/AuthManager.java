@@ -20,6 +20,7 @@ public class AuthManager implements AuthManagerInt{
     private final static long regExpiration = 60 * 1000; //1m
     private final static long unregExpiration = 1000 * 60 * 60 * 24; //24h
     private final static long activityExpiration = 30 * 60 * 1000; //30m
+    private final static long managerExpiration = 24 * 60 * 1000;
 
     @Override
     public boolean registerUser(String username, String password) {
@@ -60,7 +61,7 @@ public class AuthManager implements AuthManagerInt{
         if(id == null)
             throw new CredentialsException("Wrong Access Code");
 
-        return tokenManager.createToken(id, regExpiration, AuthFlag.MANAGER);
+        return tokenManager.createToken(id, managerExpiration, AuthFlag.MANAGER);
     }
 
     public String authenticate(String username, String password) throws CredentialsException {

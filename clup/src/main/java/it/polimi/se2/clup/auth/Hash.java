@@ -5,6 +5,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+/**
+ * Class used to hash passwords.
+ */
 class Hash {
 
     private static final String algorithm = "SHA-512";

@@ -14,7 +14,7 @@ import java.util.List;
         @NamedQuery(name = "Building.retrieveBuildingByName", query = "SELECT u FROM Building u WHERE u.name = :buildingName "),
         @NamedQuery(name = "Building.findAll", query = "SELECT b FROM Building b"),
 })
-@XmlRootElement
+
 public class Building {
 
     @Id
@@ -23,7 +23,6 @@ public class Building {
     private int id;
 
     @Column(unique = true, nullable = false)
-    @XmlElement
     private String name;
 
     @Column(nullable = false)
