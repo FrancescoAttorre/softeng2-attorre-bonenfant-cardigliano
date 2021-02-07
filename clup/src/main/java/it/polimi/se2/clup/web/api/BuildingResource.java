@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 @Path("/buildings")
@@ -77,9 +78,20 @@ public class BuildingResource {
             BigDecimal latitude = new BigDecimal(coordinates.latitude);
             BigDecimal longitude = new BigDecimal(coordinates.longitude);
 
-            List<Building> availableBuildings = bm.getAvailableBuildings(new Position(latitude, longitude), meansOfTransport);
+            Map<Building, Integer> availableBuildings = bm.getAvailableBuildings(new Position(latitude, longitude), meansOfTransport);
 
-            response = Response.status(Response.Status.OK).entity(availableBuildings).build();
+            List<it.polimi.se2.clup.web.api.serial.Building> serialList = new ArrayList<>();
+
+            System.out.println("Found " + availableBuildings.size() + " buildings");
+
+            for(Building b: availableBuildings.keySet()) {
+                it.polimi.se2.clup.web.api.serial.Building serialB = new it.polimi.se2.clup.web.api.serial.Building();
+                serialB.name = b.getName();
+                serialB.id = b.getBuildingID();
+                serialB.waitingTime = availableBuildings.get(b);
+                serialList.add(serialB);
+            }
+            response = Response.status(Response.Status.OK).entity(serialList).build();
         } else
             response = Response.status(Response.Status.BAD_REQUEST).build();
 

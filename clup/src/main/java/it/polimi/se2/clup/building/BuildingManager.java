@@ -3,6 +3,7 @@ package it.polimi.se2.clup.building;
 import it.polimi.se2.clup.data.BuildingDataAccessInterface;
 import it.polimi.se2.clup.data.entities.*;
 import it.polimi.se2.clup.externalServices.MapsServiceServer;
+import it.polimi.se2.clup.externalServices.MapsServiceServerAdapter;
 import it.polimi.se2.clup.externalServices.Position;
 import it.polimi.se2.clup.ticket.NotInQueueException;
 import it.polimi.se2.clup.ticket.TicketValidationInt;
@@ -28,7 +29,7 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
     @EJB
     protected TicketValidationInt ticketManager;
     @EJB
-    protected MapsServiceServer mapsAdapter;
+    protected MapsServiceServerAdapter mapsAdapter;
 
 
     public static final int minutesInASlot = 15;

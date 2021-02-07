@@ -1,6 +1,8 @@
 package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -12,13 +14,16 @@ import java.util.List;
         @NamedQuery(name = "Building.retrieveBuildingByName", query = "SELECT u FROM Building u WHERE u.name = :buildingName "),
         @NamedQuery(name = "Building.findAll", query = "SELECT b FROM Building b"),
 })
+@XmlRootElement
 public class Building {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+
     private int id;
 
     @Column(unique = true, nullable = false)
+    @XmlElement
     private String name;
 
     @Column(nullable = false)
