@@ -14,6 +14,7 @@ import javax.ejb.EJB;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -291,25 +292,29 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
 
     /**
      * Retrieve Buildings that can be reached (travel time distance less than maxDistance minutes) from given Position.
+     * For each building is provided the number of people already in queue for that building
      * @param position User position
      * @param meansOfTransport picked MeansOfTransport to travel to Building
-     * @return list of reachable Building
+     * @return list of reachable Building and for each of them the number of people already in queue
      */
     @Override
-    public List<Building> getAvailableBuildings(Position position, MeansOfTransport meansOfTransport) {
+    public Map<Building,Integer> getAvailableBuildings(Position position, MeansOfTransport meansOfTransport) {
 
-        List<Building> buildings = new ArrayList<>();
+        //TODO: should return number of people before me in queu for each avilable building
+
+        Map<Building,Integer> availableBuilding = new HashMap<>();
 
         for(Building building : dataAccess.retrieveBuildings()){
             Duration d = mapsAdapter.retrieveTravelTimeToBuilding(meansOfTransport,position,building.getAddress());
 
             if( d.toMinutes() < maxDistance.toMinutes()){
-                buildings.add(building);
+                List<LineUpDigitalTicket> tickets = dataAccess.retrieveTicketsInQueue(building.getBuildingID());
+                availableBuilding.put(building,tickets.size());
             }
 
         }
 
-        return buildings;
+        return availableBuilding;
     }
 
     @Override
