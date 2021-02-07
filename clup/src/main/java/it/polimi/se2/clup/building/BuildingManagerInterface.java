@@ -12,7 +12,7 @@ import java.util.Map;
 @Local
 public interface BuildingManagerInterface {
 
-    List<Building> retrieveBuilding(int activityId);
+    List<Building> retrieveBuildingByActivity(int activityId);
     Map<Building,Integer> getAvailableBuildings(Position position, MeansOfTransport meansOfTransport);
     Map<Department, List<Integer>> getAvailableTimeSlots(int buildingId, LocalDate date, Duration permanenceTime, List<Department> departments);
     boolean checkTicketAvailability(int buildingId, LocalDate date, List<Integer> timeSlots, List<Department> departments);

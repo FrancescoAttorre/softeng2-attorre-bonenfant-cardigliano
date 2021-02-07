@@ -17,7 +17,7 @@ public interface TicketManagerInterface {
 
     LineUpDigitalTicket acquireStoreManagerTicket(int userID, int buildingID, boolean buildingIsFull);
 
-    boolean acquireBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength, List<Department> departments) throws Exception;
+    boolean acquireBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID, int timeSlotLength, List<Integer> departments) throws Exception;
 
     LineUpDigitalTicket acquireUnregCustomerLineUpTicket(int userID, int buildingID, boolean buildingIsFull) throws InvalidTicketInsertionException;
 

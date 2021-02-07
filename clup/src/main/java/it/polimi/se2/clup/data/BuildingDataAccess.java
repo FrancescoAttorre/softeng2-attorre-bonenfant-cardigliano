@@ -189,4 +189,13 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
         return em.find(DigitalTicket.class,ticketID);
     }
 
+    @Override
+    public List<Department> retrieveBuildingDepartments(int buildingID) {
+        Building building =  em.find(Building.class,buildingID);
+        if (building != null)
+            return building.getDepartments();
+        else
+            return null;
+    }
+
 }

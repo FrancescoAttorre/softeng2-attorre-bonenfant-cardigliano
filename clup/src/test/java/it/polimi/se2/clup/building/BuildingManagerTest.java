@@ -117,13 +117,16 @@ public class BuildingManagerTest {
 
 
         Building building = buildingDataAccess.retrieveBuilding(buildingID);
+        List<Integer> depIDs = new ArrayList<>();
+        for (Department dep : building.getDepartments())
+            depIDs.add(dep.getDepartmentID());
 
         tm.acquireBookingTicket(registeredAppCustomer.getId(),
                 buildingID,
                 LocalDate.ofInstant(Instant.now(),ZoneId.systemDefault()),
                 48,
                 1,
-                building.getDepartments());
+                depIDs);
 
         em.getTransaction().commit();
     }

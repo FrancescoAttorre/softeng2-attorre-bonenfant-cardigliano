@@ -23,5 +23,6 @@ public interface BuildingDataAccessInterface {
     boolean updateLastExitTime(int buildingId, LocalTime lastExitTime);
 
     DigitalTicket retrieveTicket(int ticketID);
+    List<Department> retrieveBuildingDepartments(int buildingID);
     void removeFromQueue(int ticketId);
 }

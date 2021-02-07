@@ -103,9 +103,9 @@ public class TicketResource {
                 return response;
             }
 
-            if(tm.acquireBookingTicket(id, request.builingID, request.date, request.timeSlotID, request.timeSlotLength, request.departments))
-                response = Response.status(Response.Status.OK).build();
-            else
+            //if(tm.acquireBookingTicket(id, request.builingID, request.date, request.timeSlotID, request.timeSlotLength, request.departments))
+            //    response = Response.status(Response.Status.OK).build();
+            //else
                 response = Response.status(Response.Status.CONFLICT).build();
 
         } else

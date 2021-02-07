@@ -12,6 +12,7 @@ import javax.ejb.Stateless;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,7 +111,7 @@ public class TicketManager implements TicketManagerInterface, TicketValidationIn
      */
     @Override
     public boolean acquireBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID,
-                                        int timeSlotLength, List<Department> departments) throws Exception {
+                                        int timeSlotLength, List<Integer> departments) throws Exception {
 
         if (date == null)
             return false;
@@ -129,7 +130,10 @@ public class TicketManager implements TicketManagerInterface, TicketValidationIn
             }
         }
         try {
-            ticketDataAccess.insertBookingTicket(userID, buildingID, date, timeSlotID, timeSlotLength, departments);
+            List<Department> chosenDepartments = new ArrayList<>();
+            if (departments != null)
+                chosenDepartments = buildingManager.checkDepartments(buildingID, departments);
+            ticketDataAccess.insertBookingTicket(userID, buildingID, date, timeSlotID, timeSlotLength, chosenDepartments);
         }
         catch (InvalidDepartmentException invalidDep) {
             return false;

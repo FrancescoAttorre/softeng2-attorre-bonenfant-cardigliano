@@ -14,7 +14,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.time.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TicketManagerTest {
@@ -297,19 +299,20 @@ public class TicketManagerTest {
                 .setParameter("username","user").getSingleResult();
 
         Building building = bda.retrieveBuilding(buildingID);
+
         Assertions.assertTrue(tm.acquireBookingTicket(registeredAppCustomer.getId(),
                 buildingID,
                 LocalDate.ofInstant(Instant.now(),ZoneId.systemDefault()),
                 48,
                 1,
-                building.getDepartments()));
+                null));
 
         Assertions.assertFalse(tm.acquireBookingTicket(registeredAppCustomer.getId(),
                 buildingID,
                 LocalDate.ofInstant(Instant.now(),ZoneId.systemDefault()),
                 60,
                 1,
-                building.getDepartments()));
+                null));
     }
 
     @Test

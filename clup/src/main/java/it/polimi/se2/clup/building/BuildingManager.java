@@ -1,6 +1,7 @@
 package it.polimi.se2.clup.building;
 
 import it.polimi.se2.clup.data.BuildingDataAccessInterface;
+import it.polimi.se2.clup.data.InvalidDepartmentException;
 import it.polimi.se2.clup.data.entities.*;
 import it.polimi.se2.clup.externalServices.MapsServiceServerAdapter;
 import it.polimi.se2.clup.externalServices.Position;
@@ -300,8 +301,6 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
     @Override
     public Map<Building,Integer> getAvailableBuildings(Position position, MeansOfTransport meansOfTransport) {
 
-        //TODO: should return number of people before me in queu for each avilable building
-
         Map<Building,Integer> availableBuilding = new HashMap<>();
 
         for(Building building : dataAccess.retrieveBuildings()){
@@ -318,7 +317,7 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
     }
 
     @Override
-    public List<Building> retrieveBuilding(int activityId) {
+    public List<Building> retrieveBuildingByActivity(int activityId) {
         List<Building> buildingOfActivity = new ArrayList<>();
         for (Building b : dataAccess.retrieveBuildings()){
             if (b.getActivity().getId() == activityId)
@@ -360,7 +359,27 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
         this.dataAccess = dataAccess;
     }
 
-    //methods used by ticket manager
+
+    @Override
+    public List<Department> checkDepartments (int buildingID, List<Integer> departments) throws InvalidDepartmentException {
+        List<Department> chosenDepartments = new ArrayList<>();
+        List<Department> buildingDepartments = dataAccess.retrieveBuildingDepartments(buildingID);
+        for (int i: departments) {
+            boolean existingDep = false;
+
+            for (Department dep: buildingDepartments) {
+
+                if (dep.getDepartmentID() == i) {
+                    chosenDepartments.add(dep);
+                    existingDep = true;
+                }
+            }
+            if (!existingDep) {
+                throw new InvalidDepartmentException();
+            }
+        }
+        return chosenDepartments;
+    }
 
     @Override
     public boolean checkBuildingNotFull (int buildingID) {
