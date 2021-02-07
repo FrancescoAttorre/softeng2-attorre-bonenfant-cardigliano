@@ -168,7 +168,6 @@ public class Building {
         this.managers = managers;
     }
 
-
     public List<DigitalTicket> getTickets() {
         return tickets;
     }

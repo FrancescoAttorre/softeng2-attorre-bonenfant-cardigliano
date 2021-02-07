@@ -11,12 +11,19 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * TicketDataAccess component which has to add/retrieve to/from the database tickets and the information related to them,
+ * information necessary to the TicketManager
+ */
 @Stateless
 public class TicketDataAccess implements TicketDataAccessInterface {
 
     @PersistenceContext(unitName = "clup")
     public EntityManager em;
 
+    /**
+     * Inserts a line up ticket for the unregistered app customer and building passed as parameters
+     */
     @Override
     public LineUpDigitalTicket insertUnregCustomerLineUpTicket(int userID, int buildingID) throws NoResultException {
         LineUpDigitalTicket newTicket = new LineUpDigitalTicket();
@@ -36,6 +43,9 @@ public class TicketDataAccess implements TicketDataAccessInterface {
         return newTicket;
     }
 
+    /**
+     * Inserts a line up ticket for the registered app customer and building passed as parameters
+     */
     @Override
     public LineUpDigitalTicket insertRegCustomerLineUpTicket(int userID, int buildingID) throws NoResultException {
         LineUpDigitalTicket newTicket = new LineUpDigitalTicket();
@@ -55,6 +65,9 @@ public class TicketDataAccess implements TicketDataAccessInterface {
         return newTicket;
     }
 
+    /**
+     * Inserts a line up ticket for the store manager and building passed as parameter
+     */
     @Override
     public LineUpDigitalTicket insertStoreManagerLineUpTicket(int userID) throws NoResultException {
 
@@ -82,6 +95,10 @@ public class TicketDataAccess implements TicketDataAccessInterface {
         return newTicket;
     }
 
+    /**
+     * Inserts a booking ticket for the registered app customer and building passed as parameter,
+     * having as parameters also all the information necessary to create a new booking ticket
+     */
     @Override
     public BookingDigitalTicket insertBookingTicket(int userID, int buildingID, LocalDate date, int timeSlotID,
                                                     int timeSlotLength, List<Department> chosenDepartments) throws InvalidDepartmentException {
@@ -128,6 +145,10 @@ public class TicketDataAccess implements TicketDataAccessInterface {
         return newTicket;
     }
 
+    /**
+     * Changes the state of the ticket to the value of the state parameter
+     * @return true if the change was successful
+     */
     @Override
     public boolean updateTicketState(int ticketID, TicketState state) {
          DigitalTicket ticketToUpdate = em.createNamedQuery("DigitalTicket.retrieveTicketById", DigitalTicket.class)
@@ -142,6 +163,9 @@ public class TicketDataAccess implements TicketDataAccessInterface {
          return false;
     }
 
+    /**
+     * Retrieves all booking tickets already entered in the dataBase for the registered customer given as parameter
+     */
     @Override
     public List<BookingDigitalTicket> retrieveBookingTicketsRegCustomer(int userID) throws NoResultException {
         RegisteredAppCustomer registeredAppCustomer = em.find(RegisteredAppCustomer.class, userID);
@@ -151,6 +175,9 @@ public class TicketDataAccess implements TicketDataAccessInterface {
             return null;
     }
 
+    /**
+     * Retrieves all line up tickets already entered in the dataBase for the registered customer given as parameter
+     */
     @Override
     public List<LineUpDigitalTicket> retrieveLineUpTicketsRegCustomer(int userID) throws NoResultException {
         RegisteredAppCustomer registeredAppCustomer = em.find(RegisteredAppCustomer.class, userID);
@@ -160,6 +187,9 @@ public class TicketDataAccess implements TicketDataAccessInterface {
             return null;
     }
 
+    /**
+     * Retrieves all line up tickets already entered in the dataBase for the unregistered customer given as parameter
+     */
     @Override
     public List<LineUpDigitalTicket> retrieveTicketsUnregisteredCustomer(int userID) throws NoResultException {
         UnregisteredAppCustomer unregisteredAppCustomer = em.find(UnregisteredAppCustomer.class, userID);
@@ -169,6 +199,9 @@ public class TicketDataAccess implements TicketDataAccessInterface {
             return null;
     }
 
+    /**
+     * Retrieves all line up tickets already entered in the dataBase for the store manager given as parameter
+     */
     @Override
     public List<LineUpDigitalTicket> retrieveLineUpTicketsStoreManager(int userID) throws NoResultException {
         StoreManager storeManager = em.find(StoreManager.class, userID);
@@ -178,6 +211,9 @@ public class TicketDataAccess implements TicketDataAccessInterface {
             return null;
     }
 
+    /**
+     * Retrieves all line up tickets present in the dataBase for a given building
+     */
     @Override
     public List<LineUpDigitalTicket> retrieveAllLineUpTickets(int buildingID) {
 
@@ -186,23 +222,28 @@ public class TicketDataAccess implements TicketDataAccessInterface {
                 .getResultList();
     }
 
-    @Override
-    public LocalDateTime retrieveAcquisitionTime (LineUpDigitalTicket lineUpTicket) {
-        return lineUpTicket.getAcquisitionTime();
-    }
 
+    /**
+     * Retrieves the validationTime of a given ticket
+    */
     @Override
     public LocalDateTime retrieveValidationTime (int ticketID) {
         DigitalTicket ticket = em.find(DigitalTicket.class, ticketID);
         return ticket.getValidationTime();
     }
 
+    /**
+     * Retrieves the state of a given ticket
+     */
     @Override
     public TicketState retrieveTicketState (int ticketID) {
         DigitalTicket ticket = em.find(DigitalTicket.class, ticketID);
         return ticket.getState();
     }
 
+    /**
+     * Retrieves the capacity of a given building
+     */
     @Override
     public int retrieveCapacity (int buildingID) {
         Building building = em.find(Building.class, buildingID);

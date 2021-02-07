@@ -11,6 +11,10 @@ import java.util.List;
                 query = "select t from BookingDigitalTicket t where t.owner.id = :regID"),
         @NamedQuery(name = "BookingDigitalTicket.findAll", query = "SELECT b FROM BookingDigitalTicket b  "),
 })
+
+/**
+ *  Booking ticket owned exclusively by registered customers, with a date, time slot and optionally departments
+ */
 public class BookingDigitalTicket extends DigitalTicket{
 
     public BookingDigitalTicket() {

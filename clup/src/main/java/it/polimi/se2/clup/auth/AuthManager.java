@@ -17,9 +17,9 @@ public class AuthManager implements AuthManagerInt{
 
     TokenManager tokenManager = new TokenManager();
 
-    private final long regExpiration = 60 * 1000; //1m
-    private final long unregExpiration = 1000 * 60 * 60 * 24; //24h
-    private final long activityExpiration = 30 * 60 * 1000; //30m
+    private final static long regExpiration = 60 * 1000; //1m
+    private final static long unregExpiration = 1000 * 60 * 60 * 24; //24h
+    private final static long activityExpiration = 30 * 60 * 1000; //30m
 
     @Override
     public boolean registerUser(String username, String password) {

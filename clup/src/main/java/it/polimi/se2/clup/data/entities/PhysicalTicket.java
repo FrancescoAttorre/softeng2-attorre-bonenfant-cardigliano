@@ -2,6 +2,11 @@ package it.polimi.se2.clup.data.entities;
 
 import javax.persistence.*;
 
+/**
+ * PhysicalTicket with a specific number, owned by customers physically present on site and related to
+ * a line up digital ticket
+ */
+
 @Entity
 public class PhysicalTicket {
 

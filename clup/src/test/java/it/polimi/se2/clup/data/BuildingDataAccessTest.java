@@ -31,7 +31,7 @@ public class BuildingDataAccessTest {
         dm.em.getTransaction().begin();
 
         //creation of EsselungaStore
-        UserDataAccessImpl userDataAccess  = new UserDataAccessImpl();
+        UserDataAccess userDataAccess  = new UserDataAccess();
         userDataAccess.em = dm.em;
 
         userDataAccess.insertActivity("EsselungaActivity","PIVAEsselunga","EsselungaPassword");

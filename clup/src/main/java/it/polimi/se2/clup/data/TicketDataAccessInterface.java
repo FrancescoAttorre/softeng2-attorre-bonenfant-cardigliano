@@ -9,6 +9,9 @@ import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Interface implemented by TicketDataAccess to add/retrieve to/from the database tickets and the information related to them
+ */
 public interface TicketDataAccessInterface {
 
     LineUpDigitalTicket insertUnregCustomerLineUpTicket(int userID, int buildingID);
@@ -23,7 +26,6 @@ public interface TicketDataAccessInterface {
     List<LineUpDigitalTicket> retrieveLineUpTicketsStoreManager(int userID);
 
     List<LineUpDigitalTicket> retrieveAllLineUpTickets(int buildingID);
-    LocalDateTime retrieveAcquisitionTime (LineUpDigitalTicket lineUpTicket);
     LocalDateTime retrieveValidationTime (int ticketID);
     TicketState retrieveTicketState (int ticketID);
     int retrieveCapacity (int buildingID);

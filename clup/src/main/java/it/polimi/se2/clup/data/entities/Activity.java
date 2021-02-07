@@ -13,6 +13,9 @@ import java.util.List;
 
 })
 
+/**
+ * Activity class, which owns one or more buildings
+ */
 @Entity
 public class Activity {
     @Id

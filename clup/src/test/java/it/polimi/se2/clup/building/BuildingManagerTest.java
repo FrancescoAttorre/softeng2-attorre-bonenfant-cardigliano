@@ -3,7 +3,7 @@ package it.polimi.se2.clup.building;
 import it.polimi.se2.clup.auth.AuthManager;
 import it.polimi.se2.clup.data.BuildingDataAccess;
 import it.polimi.se2.clup.data.TicketDataAccess;
-import it.polimi.se2.clup.data.UserDataAccessImpl;
+import it.polimi.se2.clup.data.UserDataAccess;
 import it.polimi.se2.clup.data.entities.*;
 import it.polimi.se2.clup.ticket.InvalidTicketInsertionException;
 import it.polimi.se2.clup.ticket.TicketManager;
@@ -24,7 +24,7 @@ public class BuildingManagerTest {
     static TimeSlotManager tsm;
     static AuthManager am;
     static BuildingDataAccess buildingDataAccess;
-    static UserDataAccessImpl userDataAccess;
+    static UserDataAccess userDataAccess;
 
     private int buildingID;
     private int regUserId;
@@ -45,7 +45,7 @@ public class BuildingManagerTest {
         buildingDataAccess.em = em;
         bm.setDataAccess(buildingDataAccess);
 
-        userDataAccess = new UserDataAccessImpl();
+        userDataAccess = new UserDataAccess();
         am = new AuthManager();
         userDataAccess.em = em;
         am.setUserDAO(userDataAccess);

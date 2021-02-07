@@ -9,13 +9,13 @@ import javax.persistence.*;
 
 public class UserDataAccessImplTest {
 
-    private static UserDataAccessImpl dm;
+    private static UserDataAccess dm;
 
     @BeforeEach
     public void setup() {
 
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("clupTest");
-        dm = new UserDataAccessImpl();
+        dm = new UserDataAccess();
         dm.em = emf.createEntityManager();
 
         removeAllFromDatabase(dm.em);

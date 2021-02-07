@@ -8,6 +8,11 @@ import java.util.List;
         @NamedQuery(name="StoreManager.findAll", query="Select sm from StoreManager sm"),
 })
 @DiscriminatorValue("STORE_MANAGER")
+
+/**
+ * Managers of a particular building, subclass of user. They can take line up tickets related to physical ones
+ * with a specific number
+ */
 @Entity
 public class StoreManager extends User {
 

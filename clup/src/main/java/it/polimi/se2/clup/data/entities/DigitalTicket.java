@@ -8,6 +8,11 @@ import java.time.LocalDateTime;
 @NamedQueries({
         @NamedQuery(name = "DigitalTicket.retrieveTicketById", query = "SELECT dt FROM DigitalTicket dt WHERE dt.ticketID = :ticketID "),
 })
+
+/**
+ * Superclass of digital tickets from which inherit LineUpDigitalTicket and BookingDigitalTicket,
+ * they both have a unique ID (key), a state and a related building and validationTime
+ */
 public class DigitalTicket {
 
     @Id

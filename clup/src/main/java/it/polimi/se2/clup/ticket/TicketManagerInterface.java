@@ -7,6 +7,11 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+
+/**
+ * Interface implemented by TicketManager with methods related to managing tickets, acquiring a new one, obtaining existing ones,
+ * changing their status, validate them.
+ */
 @Local
 public interface TicketManagerInterface {
 
@@ -22,8 +27,6 @@ public interface TicketManagerInterface {
     List<LineUpDigitalTicket> getLineUpTicketsRegCustomer (int userID);
     List<LineUpDigitalTicket> getTicketsUnregisteredCustomer (int userID);
     List<LineUpDigitalTicket> getLineUpTicketsStoreManager (int userID);
-
-    boolean setTicketState(int ticketID, TicketState state);
 
     Map<LineUpDigitalTicket, Duration> getWaitingUpdateRegCustomer(int userID) throws NotInQueueException;
     Map<LineUpDigitalTicket, Duration> getWaitingUpdateSM(int userID) throws NotInQueueException;

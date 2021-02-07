@@ -6,13 +6,21 @@ import javax.ejb.Stateless;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * UserDataAcces component has to has to add/retrieve to/from the database tickets and the information related to them,
+ * information necessary to the TicketManager
+ */
 @Stateless
-public class UserDataAccessImpl implements UserDataAccessInt{
+public class UserDataAccess implements UserDataAccessInt {
 
-    //TODO: set to protected? (public for test pusposes)
+    //public for test purposes
     @PersistenceContext(unitName = "clup")
     public EntityManager em;
 
+    /**
+     * Retrieves a registered app customer from the database, given its username as parameter
+     * @return registered app customer
+     */
     @Override
     public RegisteredAppCustomer retrieveUser(String username) {
 
@@ -29,12 +37,19 @@ public class UserDataAccessImpl implements UserDataAccessInt{
         return rac;
     }
 
+    /**
+     * Creates a new registered app customer, given username and password, and makes it persist in the database
+     * @return true if the insertion was successful
+     */
     @Override
     public boolean insertUser(String username, String password) {
 
         boolean result = true;
 
         System.out.println("Adding user " + username);
+
+        if (username == null || password == null)
+            return false;
 
         if(em.createNamedQuery("RegisteredAppCustomer.findUserByUsername").setParameter("username", username).getResultList().size() > 0)
             result = false;
@@ -53,7 +68,10 @@ public class UserDataAccessImpl implements UserDataAccessInt{
     }
 
 
-
+    /**
+     * Creates a new activity, given its name, pIva and password, and makes it persist in the database
+     * @return true if the insertion was successful
+     */
     @Override
     public boolean insertActivity(String name, String pIva, String password) {
         boolean result = true;
@@ -74,6 +92,10 @@ public class UserDataAccessImpl implements UserDataAccessInt{
         return result;
     }
 
+    /**
+     * Creates a new store manager, given the accessCode of the building he's related to, and makes it persist in the database
+     * @return true if the insertion was successful
+     */
     @Override
     public Integer insertStoreManager(String accessCode) {
         StoreManager sm = new StoreManager();
@@ -95,6 +117,10 @@ public class UserDataAccessImpl implements UserDataAccessInt{
         return id;
     }
 
+    /**
+     * Retrieves an activity give its pIva as parameter
+     * @throws NonUniqueResultException thrown if it has been found more than an activity with the same pIva
+     */
     @Override
     public Activity retrieveActivity(String pIva) throws NonUniqueResultException {
 
@@ -111,11 +137,18 @@ public class UserDataAccessImpl implements UserDataAccessInt{
         return  activity;
     }
 
+    /**
+     * @return a store manager given as parameter his id
+     */
     @Override
     public StoreManager retrieveStoreManager(int id) {
         return em.find(StoreManager.class, id);
     }
 
+    /**
+     * Creates a new unregistered app customer, and makes it persist in the database
+     * @return the id of the new unregistered app customer
+     */
     @Override
     public Integer insertUnregisteredAppCustomer() {
 
