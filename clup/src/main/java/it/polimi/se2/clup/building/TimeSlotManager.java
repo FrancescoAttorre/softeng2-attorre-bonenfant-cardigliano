@@ -18,7 +18,8 @@ public class TimeSlotManager implements TimeSlotManagerInterface{
     private static final int TOTALTIMESLOT = 96;
     private static final int TIMESLOTDURATION = 15;
     BuildingDataAccess dataAccess = new BuildingDataAccess();
-    
+
+
     @Override
     public boolean checkTicketAvailability(int buildingId, LocalDate date, List<Integer> timeSlots, List<Department> departments){
         Map<Department, List<Integer>> availableTimeSlots = getAvailableTimeSlots(buildingId,date,Duration.ofMinutes((long) timeSlots.size() * TIMESLOTDURATION ),departments);
@@ -49,7 +50,14 @@ public class TimeSlotManager implements TimeSlotManagerInterface{
 
     }
 
-    //compute available time slot of each department
+
+    /**
+     * Utility method able to compute available time slot for each department using other utility method of the manager.
+     * @param bookedTimeSlots List of booked time slot for a specific building and date
+     * @param departments List of departments chosen for which a ticket want to be acquired
+     * @param permanenceTime Duration of minutes for which a ticket want to be acquired
+     * @return a Map with key Department and value a List of the available time slots
+     */
     public Map<Department,List<Integer>> computeAvailableTimeSlots(Building building, Map<Department, List<Integer>> bookedTimeSlots, List<Department> departments, Duration permanenceTime){
         Map<Department,List<Integer>> availableTimeSlots = new HashMap<>();
 
@@ -73,6 +81,9 @@ public class TimeSlotManager implements TimeSlotManagerInterface{
         return availableTimeSlots;
     }
 
+    /**
+     * Utility method able to remove all time slots that will exceed surplus of departments if picked.
+     */
     private void removeTimeSlotsOfFullDepartment(Map<Integer, Integer> occurrencesOfTimeSlots, List<Integer> freeTimeSlots, int surplusCapacity) {
         for(Integer timeSlot : occurrencesOfTimeSlots.keySet()){
             if(occurrencesOfTimeSlots.get(timeSlot) >= surplusCapacity)
@@ -80,6 +91,12 @@ public class TimeSlotManager implements TimeSlotManagerInterface{
         }
     }
 
+    /**
+     * Utility method able to compute number of book for a specific time slot.
+     * Surplus capacity should be respected for each departments and time slot
+     * @param bookedForDepartment List of time slots booked for a department
+     * @return a Map of time slot identifier and occurrences of that time slot
+     */
     private Map<Integer, Integer> computeOccurrences(List<Integer> bookedForDepartment) {
         Map<Integer,Integer> occurrencesOfTimeSlots = new HashMap<>();
 
@@ -93,8 +110,10 @@ public class TimeSlotManager implements TimeSlotManagerInterface{
         return occurrencesOfTimeSlots;
     }
 
-    //remove all time slots that do not respect opening and closing time of Buildings
-
+    /**
+     * Utility method able to remove all time slot that do not respect opening and closing time of building
+     * @return List of TimeSlots, without closed hours timeSlots
+     */
     private List<Integer> stripTimeSlots(Building building){
         //number of TS before opening
         int beforeTS =  building.getOpening().get(ChronoField.MINUTE_OF_DAY) / TIMESLOTDURATION;
@@ -109,8 +128,14 @@ public class TimeSlotManager implements TimeSlotManagerInterface{
     }
 
 
-    //remove all time slots that do not have a sequence of duration equal to the required one
 
+    /**
+     * Utility method able to remove all time slot that do not respect the required duration.
+     * a sequence of time slot of a required length should be present in the list returned
+     * @param permanenceTime Duration in minutes of the visit
+     * @param timeSlots TimeSlot that wants to be cleared
+     */
+    //remove all time slots that do not have a sequence of duration equal to the required one
     private List<Integer> removeSmallerThanPermanence(Duration permanenceTime, List<Integer> timeSlots){
         int requiredSlots = (int) (permanenceTime.toMinutes() / 15);
 

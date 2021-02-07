@@ -39,15 +39,38 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
     public static final Duration maxDistance = Duration.of(20, ChronoUnit.MINUTES);
     public static final double percentage = 0.4;
 
+    /**
+     * Get time slots available for each department.
+     * TimeSlotManager would proceed to compute available time slots for selected departments with duration equal to permanence time.
+     * should not be called if departments are not selected, because in the latter case the availability of a ticket
+     * is given by the percentage of already booked ticket for the same time slot
+     * @param permanenceTime minutes Duration
+     * @param departments departments which want to be booked, null if there is no preference on departments
+     * @return Map of time slots for each department, null if cannot look for the slots
+     */
     @Override
     public Map<Department, List<Integer>> getAvailableTimeSlots(int buildingId, LocalDate date, Duration permanenceTime, List<Department> departments) {
-        //add malformed
+        if( date == null || permanenceTime == null) return null;
+
         if(departments != null)
             return timeSlotManager.getAvailableTimeSlots(buildingId, date, permanenceTime, departments);
         else
-            return timeSlotManager.getAvailableTimeSlots(buildingId, date, permanenceTime, dataAccess.retrieveBuilding(buildingId).getDepartments());
+            //return null because should not be requested time slots for a ticket with no departments choosen
+            return null;
+
+
     }
 
+    /**
+     * Check if a ticket can be acquired with specified parameters
+     * A ticket with chosen departments is available if selected timeSlots are available in each departments, this computation is executed by building manager
+     * A ticket with not provided departments will occupy a spot in Building capacity (for at most a maximum percentage)
+     * The number of booking tickets with time slot occupied equals to time slot required must be less than or equal the maximum percentage * building capacity
+     * if this not happens means that exist a time slot for which the capacity is surmounted.
+     * @param timeSlots List of chosen timeSlots
+     * @param departments List of Departments for which time slots want to be acquired, null if no preferences is provided
+     * @return true if can be acquired a ticket with provided parameters, else false
+     */
     @Override
     public boolean checkTicketAvailability(int buildingId, LocalDate date, List<Integer> timeSlots, List<Department> departments) {
         if( date == null || timeSlots == null) return false; //malformed
@@ -66,16 +89,42 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
                 Building building = dataAccess.retrieveBuilding(buildingId);
 
                 List<DigitalTicket> tickets = building.getTickets();
+
                 tickets.removeIf(t -> t.getClass() != LineUpDigitalTicket.class);
 
-                return tickets.size() < percentage * building.getCapacity();
+                boolean isAvailable = true;
+                for(Integer slot : timeSlots){
+                    int occurrence = 0;
+                    for(DigitalTicket ticket : tickets){
+                        BookingDigitalTicket bookingDigitalTicket = (BookingDigitalTicket)ticket;
+                        int startingSlot = bookingDigitalTicket.getTimeSlotID();
+                        int lastSlot = startingSlot + bookingDigitalTicket.getTimeSlotLength() - 1;
+
+                        if(slot >= startingSlot || slot <= lastSlot) occurrence++;
+
+                        if(occurrence > percentage*building.getCapacity()){
+                            isAvailable = false;
+                            break;
+                        }
+                    }
+                }
+
+
+
+                return isAvailable;
 
             }
 
     }
 
+    /**
+     * To be called when a customer exit a building.
+     * Building statistics are updated, in order to compute a more precise waiting time for next request.
+     * A free spot is for sure available in the Building, so the next ticket in Queue (if present) can be validated.
+     * with help of utility method the new ticket is removed from queue and validated to let the User enter.
+     */
     @Override
-    public boolean customerExit(int buildingId, int ticketID) {
+    public void customerExit(int buildingId, int ticketID) {
 
         LocalTime lastExitTime = LocalTime.now();
 
@@ -88,7 +137,6 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
         if (!dataAccess.retrieveTicket(ticketID).getState().equals(TicketState.EXPIRED))
             ticketManager.setTicketState(ticketID, TicketState.EXPIRED);
 
-        return false;
     }
 
     /**
@@ -241,6 +289,12 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
         return newWaitingTime;
     }
 
+    /**
+     * Retrieve Buildings that can be reached (travel time distance less than maxDistance minutes) from given Position.
+     * @param position User position
+     * @param meansOfTransport picked MeansOfTransport to travel to Building
+     * @return list of reachable Building
+     */
     @Override
     public List<Building> getAvailableBuildings(Position position, MeansOfTransport meansOfTransport) {
 
@@ -260,11 +314,24 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
 
     @Override
     public List<Building> retrieveBuilding(int activityId) {
-        return null;
+        List<Building> buildingOfActivity = new ArrayList<>();
+        for (Building b : dataAccess.retrieveBuildings()){
+            if (b.getActivity().getId() == activityId)
+                buildingOfActivity.add(b);
+        }
+        return buildingOfActivity;
+
     }
 
+    /**
+     * When a RegisteredAppCustomer exit from a Building,
+     * if it had set a preference on departments nothing happen, instead a new Customer can enter
+     * Utility method validateNext will get the next ticket in Queue (if exist) and validate it, in order to let the user enter
+     * @param ticket BookingDigitalTicket provided to StoreManager when exiting
+     * @return
+     */
     @Override
-    public boolean registeredCustomerExit(int buildingId, BookingDigitalTicket ticket){
+    public void registeredCustomerExit(int buildingId, BookingDigitalTicket ticket){
 
         if(ticket.getDepartments() == null){
             //it is a customer that occupied the 40 percent of the capacity.
@@ -272,8 +339,7 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
             validateNext(buildingId);
         }
 
-        return true;
-        //return false; //false means that no one else is allowed to enter the building?
+        //to be updated with RegisteredAppCustomer personal statistics updates
     }
 
 
