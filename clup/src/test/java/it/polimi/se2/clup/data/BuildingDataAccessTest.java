@@ -78,14 +78,6 @@ public class BuildingDataAccessTest {
         em.getTransaction().commit();
     }
 
-    @Test
-    public void shouldCreateStatistics(){
-        dm.em.getTransaction().begin();
-
-
-
-        dm.em.getTransaction().commit();
-    }
 
     @Test
     public void shouldKeepStatisticsUpToDate(){
@@ -107,7 +99,6 @@ public class BuildingDataAccessTest {
         Duration newDelta = building.getDeltaExitTime();
         LocalTime newLastExitTime = building.getLastExitTime();
 
-        //TODO:
         Assertions.assertNotEquals(oldDelta,newDelta);
 
     }

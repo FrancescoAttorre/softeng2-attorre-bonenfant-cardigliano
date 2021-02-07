@@ -26,6 +26,8 @@ public class TicketManager implements TicketManagerInterface, TicketValidationIn
     @EJB private TicketDataAccessInterface ticketDataAccess;
     @EJB private WaitingTimeInt buildingManager;
 
+    private static final double percentageOfBooking = 0.4;
+
     public void setBuildingManager(BuildingManager buildingManager) {
         this.buildingManager = buildingManager;
     }
@@ -45,6 +47,7 @@ public class TicketManager implements TicketManagerInterface, TicketValidationIn
             if (t.getState().equals(TicketState.VALID))
                 numValidLineUpTickets ++;
         }
+
         return numValidLineUpTickets;
     }
 
@@ -60,7 +63,7 @@ public class TicketManager implements TicketManagerInterface, TicketValidationIn
         LineUpDigitalTicket newTicket = ticketDataAccess.insertStoreManagerLineUpTicket(userID);
 
         if (!buildingIsFull &&
-                computeNumValidTickets(buildingID) < ticketDataAccess.retrieveCapacity(buildingID)) {
+                computeNumValidTickets(buildingID) < (int) ((1-percentageOfBooking) * ticketDataAccess.retrieveCapacity(buildingID))) {
             validateTicket(newTicket.getTicketID());
             return null;
         }
@@ -99,6 +102,10 @@ public class TicketManager implements TicketManagerInterface, TicketValidationIn
      * Method to acquire a booking ticket given date, a time slot id to indicate the start of the reservation
      * throughout the day, the number of slots to indicate the permanence time and optionally the specific departments
      * chosen to visit
+     *
+     * The method checks also whether there's already a booking of the given user for the same building, or in the
+     * same day for another building but with overlaps of time
+     *
      * @return true if the acquisition was successful
      */
     @Override
@@ -113,9 +120,7 @@ public class TicketManager implements TicketManagerInterface, TicketValidationIn
 
             for (BookingDigitalTicket ticket : bookingTickets) {
 
-                if (ticket.getBuilding().getBuildingID() == buildingID &&
-                        (ticket.getDate().getDayOfMonth() == date.getDayOfMonth() && ticket.getDate().getMonth() == date.getMonth()
-                        && ticket.getDate().getYear() == date.getYear()))
+                if (ticket.getBuilding().getBuildingID() == buildingID)
                     return false;
 
                 if (ticket.getDate().getDayOfMonth() == date.getDayOfMonth() && ticket.getDate().getMonth() == date.getMonth()
@@ -149,7 +154,8 @@ public class TicketManager implements TicketManagerInterface, TicketValidationIn
 
             for (LineUpDigitalTicket ticket : lineUpTickets) {
 
-                if (ticket.getBuilding().getBuildingID() == buildingID && !ticket.getState().equals(TicketState.EXPIRED))
+                if (ticket.getBuilding().getBuildingID() == buildingID &&
+                        !ticket.getState().equals(TicketState.EXPIRED))
                     throw new InvalidTicketInsertionException();
             }
         }
@@ -157,7 +163,7 @@ public class TicketManager implements TicketManagerInterface, TicketValidationIn
         LineUpDigitalTicket newTicket = ticketDataAccess.insertRegCustomerLineUpTicket(userID, buildingID);
 
         if (!buildingIsFull &&
-                computeNumValidTickets(buildingID) < ticketDataAccess.retrieveCapacity(buildingID)) {
+                computeNumValidTickets(buildingID) < (int) ((1-percentageOfBooking) * ticketDataAccess.retrieveCapacity(buildingID))){
             validateTicket(newTicket.getTicketID());
             return null;
         }
@@ -174,12 +180,15 @@ public class TicketManager implements TicketManagerInterface, TicketValidationIn
      * @throws InvalidTicketInsertionException whether is already present a ticket for the same building, of the same user
      */
     @Override
-    public LineUpDigitalTicket acquireUnregCustomerLineUpTicket(int userID, int buildingID, boolean buildingIsFull) throws InvalidTicketInsertionException {
+    public LineUpDigitalTicket acquireUnregCustomerLineUpTicket(int userID, int buildingID, boolean buildingIsFull)
+            throws InvalidTicketInsertionException {
 
         List<LineUpDigitalTicket> lineUpTickets = ticketDataAccess.retrieveTicketsUnregisteredCustomer(userID);
         if (lineUpTickets != null) {
             for (LineUpDigitalTicket ticket : lineUpTickets) {
-                if (ticket.getBuilding().getBuildingID() == buildingID)
+
+                if (ticket.getBuilding().getBuildingID() == buildingID &&
+                        !ticket.getState().equals(TicketState.EXPIRED))
                     throw new InvalidTicketInsertionException();
             }
         }
@@ -187,7 +196,7 @@ public class TicketManager implements TicketManagerInterface, TicketValidationIn
         LineUpDigitalTicket newTicket = ticketDataAccess.insertUnregCustomerLineUpTicket(userID, buildingID);
 
         if (!buildingIsFull &&
-                computeNumValidTickets(buildingID) < ticketDataAccess.retrieveCapacity(buildingID)) {
+                computeNumValidTickets(buildingID) < (int) ((1-percentageOfBooking) * ticketDataAccess.retrieveCapacity(buildingID))) {
             validateTicket(newTicket.getTicketID());
             return null;
         }

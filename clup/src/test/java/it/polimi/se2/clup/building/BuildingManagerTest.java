@@ -87,7 +87,7 @@ public class BuildingManagerTest {
                 LocalTime.of(8, 0, 0),
                 LocalTime.of(21, 0, 0),
                 "via Roma,1",
-                2,
+                4,
                 surplus,
                 "AccessCODE");
 

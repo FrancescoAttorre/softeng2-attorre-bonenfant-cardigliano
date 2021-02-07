@@ -3,6 +3,7 @@ package it.polimi.se2.clup.data;
 import it.polimi.se2.clup.building.BuildingManager;
 import it.polimi.se2.clup.data.entities.*;
 import it.polimi.se2.clup.data.entities.Queue;
+import it.polimi.se2.clup.ticket.TicketManager;
 
 import javax.ejb.Stateless;
 import javax.persistence.*;
@@ -99,7 +100,7 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
         building.setClosing(closing);
         building.setAddress(address);
         building.setCapacity(capacity);
-        building.setActualCapacity(capacity);
+        building.setActualCapacity((int) ((1- BuildingManager.percentage) * capacity));
         building.setAccessCode(accessCode);
         building.setQueue(queue);
         building.setDeltaExitTime(Duration.ZERO);

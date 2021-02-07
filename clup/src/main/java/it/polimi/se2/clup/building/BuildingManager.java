@@ -2,7 +2,6 @@ package it.polimi.se2.clup.building;
 
 import it.polimi.se2.clup.data.BuildingDataAccessInterface;
 import it.polimi.se2.clup.data.entities.*;
-import it.polimi.se2.clup.externalServices.MapsServiceServer;
 import it.polimi.se2.clup.externalServices.MapsServiceServerAdapter;
 import it.polimi.se2.clup.externalServices.Position;
 import it.polimi.se2.clup.ticket.NotInQueueException;
@@ -109,8 +108,6 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
                     }
                 }
 
-
-
                 return isAvailable;
 
             }
@@ -171,8 +168,8 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
                     Duration.between(LocalTime.of(hour, minute), LocalTime.now()).toMinutes() < expirationTime) {
 
                 ticketManager.validateTicket(ticketID);
-                if (ticket.getDepartments().isEmpty())
-                    reduceCapacity(buildingID);
+                //if (ticket.getDepartments().isEmpty())
+                //    reduceCapacity(buildingID);
                 result = true;
             }
             if (Duration.between(LocalTime.of(hour, minute), LocalTime.now()).toMinutes() > expirationTime)
@@ -330,26 +327,6 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
         return buildingOfActivity;
 
     }
-
-    /**
-     * When a RegisteredAppCustomer exit from a Building,
-     * if it had set a preference on departments nothing happen, instead a new Customer can enter
-     * Utility method validateNext will get the next ticket in Queue (if exist) and validate it, in order to let the user enter
-     * @param ticket BookingDigitalTicket provided to StoreManager when exiting
-     * @return
-     */
-    @Override
-    public void registeredCustomerExit(int buildingId, BookingDigitalTicket ticket){
-
-        if(ticket.getDepartments() == null){
-            //it is a customer that occupied the 40 percent of the capacity.
-
-            validateNext(buildingId);
-        }
-
-        //to be updated with RegisteredAppCustomer personal statistics updates
-    }
-
 
     public QueueManagerInterface getQueueManager() {
         return queueManager;
