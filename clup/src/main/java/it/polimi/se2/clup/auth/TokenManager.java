@@ -12,7 +12,11 @@ import it.polimi.se2.clup.auth.exceptions.TokenException;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Class using a third party JWT library. Creates JSON Web Tokens
+ */
 class TokenManager {
+
     private final String SECRET = "secretCode";
     private final String ISSUER = "clup";
 

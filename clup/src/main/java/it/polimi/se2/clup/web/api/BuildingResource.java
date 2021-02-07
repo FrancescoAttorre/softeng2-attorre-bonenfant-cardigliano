@@ -5,14 +5,16 @@ import it.polimi.se2.clup.auth.AuthManagerInt;
 import it.polimi.se2.clup.auth.exceptions.TokenException;
 import it.polimi.se2.clup.building.BuildingManagerInterface;
 import it.polimi.se2.clup.data.entities.Building;
+import it.polimi.se2.clup.data.entities.Department;
 import it.polimi.se2.clup.data.entities.MeansOfTransport;
 import it.polimi.se2.clup.externalServices.Position;
+import it.polimi.se2.clup.web.api.serial.BuildingJSON;
 import it.polimi.se2.clup.web.api.serial.Coordinates;
+import it.polimi.se2.clup.web.api.serial.DepartmentJSON;
 import it.polimi.se2.clup.web.api.serial.Message;
 
 import javax.ejb.EJB;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -20,7 +22,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 @Path("/buildings")
 public class BuildingResource {
@@ -80,14 +81,25 @@ public class BuildingResource {
 
             Map<Building, Integer> availableBuildings = bm.getAvailableBuildings(new Position(latitude, longitude), meansOfTransport);
 
-            List<it.polimi.se2.clup.web.api.serial.Building> serialList = new ArrayList<>();
+            List<BuildingJSON> serialList = new ArrayList<>();
 
             System.out.println("Found " + availableBuildings.size() + " buildings");
 
             for(Building b: availableBuildings.keySet()) {
-                it.polimi.se2.clup.web.api.serial.Building serialB = new it.polimi.se2.clup.web.api.serial.Building();
+                BuildingJSON serialB = new BuildingJSON();
                 serialB.name = b.getName();
                 serialB.id = b.getBuildingID();
+
+                for(Department dep : b.getDepartments()) {
+                    DepartmentJSON depJSON = new DepartmentJSON();
+                    depJSON.departmentID = dep.getDepartmentID();
+                    depJSON.name = dep.getName();
+                    serialB.departments = new ArrayList<>();
+                    serialB.departments.add(depJSON);
+                }
+
+                //serialB.departments = b.getDepartments();
+
                 serialB.waitingTime = availableBuildings.get(b);
                 serialList.add(serialB);
             }

@@ -1,15 +1,18 @@
 package it.polimi.se2.clup.building;
 
 import it.polimi.se2.clup.data.BuildingDataAccess;
+import it.polimi.se2.clup.data.BuildingDataAccessInterface;
 import it.polimi.se2.clup.data.entities.LineUpDigitalTicket;
 
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import java.util.List;
 
 @Stateless
 public class QueueManager implements QueueManagerInterface{
 
-    BuildingDataAccess dataAccess;
+    @EJB
+    BuildingDataAccessInterface dataAccess;
 
     @Override
     public boolean insertInQueue(LineUpDigitalTicket ticket){
@@ -35,10 +38,6 @@ public class QueueManager implements QueueManagerInterface{
     @Override
     public void removeFromQueue(int ticketId){
         dataAccess.removeFromQueue(ticketId);
-    }
-
-    public BuildingDataAccess getDataAccess() {
-        return dataAccess;
     }
 
     public void setDataAccess(BuildingDataAccess dataAccess) {

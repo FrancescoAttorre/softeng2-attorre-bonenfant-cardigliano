@@ -41,6 +41,8 @@ public class BuildingDataAccess implements BuildingDataAccessInterface{
     public boolean insertInQueue(LineUpDigitalTicket ticket){
         int buildingId = ticket.getBuilding().getBuildingID();
 
+        ticket = em.merge(ticket);
+
         Queue queue = em.find(Queue.class, buildingId);
 
         if(queue == null) return false;

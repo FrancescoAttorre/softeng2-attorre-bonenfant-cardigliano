@@ -10,9 +10,9 @@ import java.util.List;
 
 @XmlRootElement
 public class BookingRequest {
-    @XmlElement(required = true) public int builingID;
+    @XmlElement(required = true) public int buildingID;
     @XmlElement(required = true) public LocalDate date;
     @XmlElement(required = true) public int timeSlotID;
     @XmlElement(required = true) public int timeSlotLength;
-    @XmlList public List<Department> departments;
+    @XmlList public List<Integer> departments;
 }

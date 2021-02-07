@@ -43,12 +43,19 @@ public interface AuthManagerInt {
     String createDailyToken();
 
     /**
-     * Verifies a token and the Authorization claim it contains
+     * Verifies a token
+     * @param token Token to verify
+     * @param authList List of user types authorized
      * @return id contained in the token
      * @throws TokenException
      */
     int verifyToken(String token, List<AuthFlag> authList) throws TokenException;
 
+    /**
+     * Get the Auth flag in a token
+     * @param token
+     * @return
+     */
     AuthFlag getAuthFlag(String token);
 
 
