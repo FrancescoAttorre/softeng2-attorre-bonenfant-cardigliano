@@ -15,6 +15,9 @@ import java.io.StringReader;
 import java.time.Duration;
 import java.util.List;
 
+/**
+ * Implementation of MapsServiceServerAdapter using as external service OpenRouteService
+ */
 @Stateless
 public class MapsServiceServer implements MapsServiceServerAdapter {
 
@@ -28,6 +31,12 @@ public class MapsServiceServer implements MapsServiceServerAdapter {
     private static final String endingCoordinates = "&end=";
     private static final String spaceChar = "%20";
 
+    /**
+     * This method exploits the "directions" service of OpenRouteService
+     * @param meansOfTransport value of the enum of means of transport that can be chosen by the customer
+     * @param customerPosition position of the customer which can be obtained calling getLocation method or by GPS
+     * @return the travel time to reach the building from the current position of the customer
+     */
     @Override
     public Duration retrieveTravelTimeToBuilding (MeansOfTransport meansOfTransport, Position customerPosition, String buildingAddress) {
 
@@ -74,6 +83,9 @@ public class MapsServiceServer implements MapsServiceServerAdapter {
         }
     }
 
+    /**
+     * Method which returns a position of coordinates from an address passed as string parameter
+     */
     @Override
     public Position getLocation(String address) {
 

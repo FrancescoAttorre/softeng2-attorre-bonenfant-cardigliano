@@ -6,6 +6,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * This class represents one of the departments into which a building can be split to optimize its filling
+ */
+
 @XmlRootElement
 @Entity
 public class Department {

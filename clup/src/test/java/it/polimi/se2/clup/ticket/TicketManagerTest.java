@@ -4,7 +4,7 @@ import it.polimi.se2.clup.building.BuildingManager;
 import it.polimi.se2.clup.building.QueueManager;
 import it.polimi.se2.clup.data.BuildingDataAccess;
 import it.polimi.se2.clup.data.TicketDataAccess;
-import it.polimi.se2.clup.data.UserDataAccessImpl;
+import it.polimi.se2.clup.data.UserDataAccess;
 import it.polimi.se2.clup.data.entities.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +20,7 @@ import java.util.Map;
 public class TicketManagerTest {
     static TicketManager tm;
     static BuildingDataAccess bda;
-    static UserDataAccessImpl uda;
+    static UserDataAccess uda;
     static TicketDataAccess tda;
     static QueueManager qm;
     static BuildingManager bm;
@@ -40,7 +40,7 @@ public class TicketManagerTest {
         tm = new TicketManager();
 
         bda = new BuildingDataAccess();
-        uda = new UserDataAccessImpl();
+        uda = new UserDataAccess();
         tda = new TicketDataAccess();
         qm = new QueueManager();
         bm = new BuildingManager();
@@ -155,20 +155,23 @@ public class TicketManagerTest {
         ticket.setState(TicketState.EXPIRED);
         Assertions.assertFalse(tm.validityCheck(ticket.getTicketID()));
     }
-    /*
+
     /**
      * This test checks that the waiting time is computed correctly during the waiting in queue,
      * without anyone entering/leaving the building
-
+    */
     @Test
     public void correctWaitingTimeInQueue() throws NotInQueueException, InvalidTicketInsertionException {
 
         //Creation of  3 lineUp tickets
         //-----------------------------
 
-        tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID, false);
-        tm.acquireUnregCustomerLineUpTicket(unregID2, buildingID, false);
-        tm.acquireUnregCustomerLineUpTicket(unregID3, buildingID, true);
+        LineUpDigitalTicket firstTicket = tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID, true);
+        LineUpDigitalTicket secondTicket = tm.acquireUnregCustomerLineUpTicket(unregID2, buildingID, true);
+        LineUpDigitalTicket thirdTicket = tm.acquireUnregCustomerLineUpTicket(unregID3, buildingID, true);
+        bm.insertInQueue(firstTicket);
+        bm.insertInQueue(secondTicket);
+        bm.insertInQueue(thirdTicket);
 
         //Setting the delta exit time, all tickets are related to the same building
 
@@ -213,8 +216,10 @@ public class TicketManagerTest {
         //Creation of  4 lineUp tickets, one for each unregistered customer
         tm.acquireUnregCustomerLineUpTicket(unregID1, buildingID, false);
         tm.acquireUnregCustomerLineUpTicket(unregID2, buildingID, false);
-        tm.acquireUnregCustomerLineUpTicket(unregID3, buildingID, true);
-        tm.acquireUnregCustomerLineUpTicket(unregID4, buildingID, true);
+        LineUpDigitalTicket thirdTicket = tm.acquireUnregCustomerLineUpTicket(unregID3, buildingID, true);
+        LineUpDigitalTicket fourthTicket = tm.acquireUnregCustomerLineUpTicket(unregID4, buildingID, true);
+        bm.insertInQueue(thirdTicket);
+        bm.insertInQueue(fourthTicket);
 
         em.getTransaction().commit();
 
@@ -239,7 +244,7 @@ public class TicketManagerTest {
         Assertions.assertEquals(tm.getWaitingUpdateUnregCustomer(unregID3).get(tm.getTicketsUnregisteredCustomer(unregID3).get(0)),
                 Duration.ZERO);
         Assertions.assertEquals(tm.getTicketsUnregisteredCustomer(unregID3).get(0).getState(), TicketState.VALID);
-    }*/
+    }
 
     @Test
     public void bookingsMustNotOverlap () throws Exception {

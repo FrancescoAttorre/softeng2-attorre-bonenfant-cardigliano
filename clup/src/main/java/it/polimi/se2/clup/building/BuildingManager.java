@@ -5,8 +5,6 @@ import it.polimi.se2.clup.data.entities.*;
 import it.polimi.se2.clup.externalServices.MapsServiceServer;
 import it.polimi.se2.clup.externalServices.Position;
 import it.polimi.se2.clup.ticket.NotInQueueException;
-import it.polimi.se2.clup.ticket.TicketManager;
-import it.polimi.se2.clup.ticket.TicketManagerInterface;
 import it.polimi.se2.clup.ticket.TicketValidationInt;
 
 import javax.ejb.Stateless;
@@ -221,9 +219,9 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
     }
 
     /**
-     * ComputeWaitingTime sets the waiting time to zero for valid tickets, changes their state to
-     * expired when the ticket are valid from more than 10 minutes,
-     * for non valid tickets, instead, it updates the estimated waiting time, basing on the last exit
+     * ComputeWaitingTime sets the waiting time to zero for valid tickets,
+     * changes tickets state to expired when the ticket are valid from more than 10 minutes,
+     * for non valid tickets, it updates the estimated waiting time, basing on the last exit
      * from the ticket's building while in queue, the current time and the medium waiting time for that building
      *
      * In case of delays, the waiting time is fixed to the default waiting time
@@ -250,6 +248,10 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
             case INVALID:
                 Duration additionalTime = Duration.ofMinutes(extraTime);
                 LocalTime now = LocalTime.now();
+
+                Queue queue = ticket.getQueue();
+                if (queue == null)
+                    throw  new NotInQueueException();
 
                 int positionInQueue = ticket.getQueue().getQueueTickets().indexOf(ticket);
 
@@ -398,7 +400,7 @@ public class BuildingManager implements BuildingManagerInterface, WaitingTimeInt
         }
         else {
             Building building = dataAccess.retrieveBuilding(buildingId);
-            building.setActualCapacity(building.getActualCapacity() + 1);
+            building.increaseActualCapacity();
         }
     }
 

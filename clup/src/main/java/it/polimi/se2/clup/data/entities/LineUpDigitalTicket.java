@@ -18,6 +18,10 @@ import java.time.LocalDateTime;
                 "where t.building.id = :buildingID"),
 })
 
+/**
+ * Ticket owned by customers in queue, with an acquisitionTime, eventually a PhysicalTicket associated, a queue
+ * and an owner which could be unregistered customer, registered customer or store manager in mutual exclusion
+ */
 @Entity
 public class LineUpDigitalTicket extends DigitalTicket {
 

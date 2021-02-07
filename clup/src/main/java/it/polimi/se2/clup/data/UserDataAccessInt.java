@@ -5,7 +5,9 @@ import it.polimi.se2.clup.data.entities.RegisteredAppCustomer;
 import it.polimi.se2.clup.data.entities.StoreManager;
 import it.polimi.se2.clup.data.entities.UnregisteredAppCustomer;
 
-
+/**
+ * Interface implemented by UserDataAccess, to retrieve/enter users from/to the database
+ */
 public interface UserDataAccessInt {
     RegisteredAppCustomer retrieveUser(String username);
     boolean insertUser(String username, String password);

@@ -8,6 +8,9 @@ import java.util.List;
 @NamedQueries({
         @NamedQuery(name = "Queue.selectTicketInQueueByBuildingId", query = "SELECT t FROM Queue q JOIN q.queueTickets t WHERE q.building.id = :buildingId ORDER BY t.acquisitionTime"),
 })
+/**
+ * Queue related to a particular building, with a list of digital tickets of customers in queue for it
+ */
 public class Queue {
     @Id
     @OneToOne

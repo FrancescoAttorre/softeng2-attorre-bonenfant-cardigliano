@@ -9,6 +9,10 @@ import java.util.List;
         @NamedQuery(name = "RegisteredAppCustomer.findUserByUsername", query = "SELECT u FROM RegisteredAppCustomer u WHERE u.username = :username"),
         @NamedQuery(name = "RegisteredAppCustomer.findAll", query = "SELECT u FROM RegisteredAppCustomer u "),
 })
+
+/**
+ * Subclass of user, customers registered in the app through username and password
+ */
 public class RegisteredAppCustomer extends User {
 
     @Column(unique = true, nullable = false)
@@ -23,14 +27,6 @@ public class RegisteredAppCustomer extends User {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner",orphanRemoval = true, cascade = CascadeType.ALL)
     private List<BookingDigitalTicket> bookingDigitalTickets = new ArrayList<>();
 
-    @Column
-    private String position;
-
-    @Column
-    private boolean GPSPreference;
-
-    @Column
-    private String meansOfTransport;
 
     public void addLineUpTicket(LineUpDigitalTicket lineUpTicket){
         this.lineUpDigitalTickets.add(lineUpTicket);
@@ -38,30 +34,6 @@ public class RegisteredAppCustomer extends User {
 
     public void addBookingTicket(BookingDigitalTicket bookingTicket){
         this.bookingDigitalTickets.add(bookingTicket);
-    }
-
-    public String getPosition() {
-        return position;
-    }
-
-    public void setPosition(String position) {
-        this.position = position;
-    }
-
-    public boolean isGPSPreference() {
-        return GPSPreference;
-    }
-
-    public void setGPSPreference(boolean GPSPreference) {
-        this.GPSPreference = GPSPreference;
-    }
-
-    public String getMeansOfTransport() {
-        return meansOfTransport;
-    }
-
-    public void setMeansOfTransport(String meansOfTransport) {
-        this.meansOfTransport = meansOfTransport;
     }
 
     public RegisteredAppCustomer() {

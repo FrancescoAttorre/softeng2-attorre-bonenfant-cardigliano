@@ -30,7 +30,7 @@ public class TicketDataAccessTest {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("clupTest");
         EntityManager em = emf.createEntityManager();
 
-        UserDataAccessImpl uda = new UserDataAccessImpl();
+        UserDataAccess uda = new UserDataAccess();
         bdm = new BuildingDataAccess();
 
         dm = new TicketDataAccess();
@@ -42,7 +42,7 @@ public class TicketDataAccessTest {
 
         em.getTransaction().begin();
 
-        UserDataAccessImpl userDataAccess  = new UserDataAccessImpl();
+        UserDataAccess userDataAccess  = new UserDataAccess();
         userDataAccess.em = dm.em;
         userDataAccess.insertActivity("EsselungaActivity","PIVAEsselunga","EsselungaPassword");
         activityId = userDataAccess.retrieveActivity("PIVAEsselunga").getId();
