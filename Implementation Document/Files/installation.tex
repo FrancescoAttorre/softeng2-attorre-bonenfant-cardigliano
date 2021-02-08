@@ -1,0 +1,29 @@
+\renewcommand{\thesubsection}{\Alph{subsection}}
+%Installation Instructions
+\subsection {Installation Instructions}
+The required softwares for the installation are mySQL and TomEE Plume 8.0.6. \\ First thing, modify tomee.xml in TomEE/conf/tomee.xml (TomEE is the directory where TomEE is installed) as written below:\\\\
+<?xml version="1.0" encoding="UTF-8"?>
+<tomee>\\
+<Resource id="clupDS" type="javax.sql.DataSource">\\
+ JdbcDriver = com.mysql.cj.jdbc.Driver\\
+JdbcUrl = jdbc:mysql://localhost:3306/clup\\
+ UserName = vostrouser\\
+ Password = password\\
+</Resource>\\
+<Resource id="clupDSUnmanaged" type="javax.sql.DataSource">\\
+JdbcDriver = com.mysql.cj.jdbc.Driver\\
+JdbcUrl = jdbc:mysql://localhost:3306/clup\\
+UserName = vostroUser\\
+ Password = password\\
+JtaManaged = false\\
+</Resource>\\
+</tomee>\\
+\\
+Configure username, password and port, then create CLup schema with mySQL.\\
+Before executing, tomcat-users.xml file has to be modified adding username and password.\\
+Then, run TomCat and uncomment the following rows:\\
+<role rolename="tomee-admin" />\\
+ <user username="tomee" password="tomee" roles="tomee-admin,manager-gui" />\\
+\\
+ After that, go to localhost:8080/manager page and load the WAR file, then click on Deploy.
+

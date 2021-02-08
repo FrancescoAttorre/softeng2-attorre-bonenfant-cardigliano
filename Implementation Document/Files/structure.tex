@@ -1,0 +1,13 @@
+\renewcommand{\thesubsection}{\Alph{subsection}}
+%Structure
+\subsection {Source Code Structure}
+The source code is a Maven project divided in packages, which represent the main parts into which the program is divided. They are:
+
+\begin {itemize}
+	\item auth: includes the component AuthManager's class and interface
+	\item building: includes the Building Manager class and interface, modularized adding two more classes which are QueueManager and TimeSlotManager
+	\item data: contains the DataAccess component splitted in Building, Ticket and User Data Access in order to isolate the interactions with the database of the related Managers. In this way each DataAccess object retrieves information of a particular category. It communicates directly with the DBMS Service, exploiting also queries by JPQL. It contains entity classes mapped on auto generated database, used also by all the other components. 
+	\item externalServices: this package contains the Adapter interface, which acts as an intermediate between the system and the external maps service. In our implementation, we exploited OpenRouteService, but, thanks to the adapter interface, an eventual change of external service wouldn't represent a problem. In fact, this would lead only to a different implementation of interface's methods.
+	\item ticket: includes Ticket Manager class and interface, which interacts with the related TicketDataAccess class
+	\item web: includes HTTP endpoints that access Auth Manager, Building Manager, Ticket Manager interfaces. It contains also the Dispatcher component.
+\end{itemize}

@@ -1,0 +1,27 @@
+\renewcommand{\thesubsection}{\Alph{subsection}}
+%Testing
+\subsection {Testing}
+Informations about testing can be found in the section B of the DD, "Integration and test plan". We used a bottom-up approach, we started testing DataAccess components, during the implementation they have been divided in TicketDataAccess, BuildingDataAccess and UserDataAccess in order to better modularize the methods and usage of the dataBase. After that, we proceeded implementing and testing the AuthManager, responsible for creating users and tokens to be used for a limited time, using also Mockito tools in order to simulate the UserDataAccess with which it communicates. Then, it was the turn of implementing and testing Ticket, Building and User Managers. We added also a QueueManager and TimeSlotManager, implementing their specific interfaces in order to modularize BuildingManager tasks. As shown in the Design Document, MapsService component have been developed and tested apart from the rest, verifying the correct use of our external maps service OpenRouteService. It has been integrated in a second moment with the rest of the system, in particular with BuildingManager which exploits its functionalities. Finally, the Dispatcher component. has been implemented.
+
+
+The main test cases developed are:
+
+BuildingManagetTest
+\begin {itemize}
+	\item shouldValidateNextTicket() - when a customer exits it is created a new spot and next ticket in queue should be validated
+	\item shouldRemoveFromQueueNextTicket() - starting from a full building, when a customer exits the next ticket in queue should be removed from it.
+	\item shouldRemoveClosedHoursTimeSlots() - time slot provided to the RegisteredAppCustomer should not include time slots preceding 8.00 opening nor time slots following 21.00 closing
+	\item shouldNotReturnTimeSlotOfFullDepartment() - a sample department has already reached its surplus in time slot 48, then after a request of 2 time slots the 48th and 47th should be not be contained in the available timeslots provided to the user
+	\item shouldPreventCustomerWithInvalidBookingTicketToEnter() - customerEntry method is called with a BookingDigitalTicket with reserved time slot not corresponding to actual time, it should return false to avoid him entering
+	\item bookingDigitalTicketShouldBeAvailable() - occupied time slot 48, then requesting for time slot 36(for all departments) should return true as availability
+	\item bookingDigitalTicketShouldNotBeAvailable() - occupied time slot 48, then requesting for time slot 48 (for all departments) should return false as availability 
+\end{itemize}
+
+TicketManagerTest
+\begin {itemize}
+	\item checkTicketExpired() - after validating a ticket, this test checks whether, with a validation time older than the the time interval in which a ticket remains valid, the ticket became correctly expired and the waiting time associated set to zero
+	\item correctWaitingTimeInQueue() - after acquiring 3 LineUpDigitalTicket in queue, should check whether their waiting time is computed correctly during the waiting in queue, without anyone entering/leaving the building
+	\item waitingTimeAfterExit() - considering an empty building (with actualCapacity = capacity), creates 4 line up tickets, two of them will enter and two will be set in queue, then it ensures that when a customer exits the building the waiting times are updated correctly
+	\item bookingsMustNotOverlap() - creating more different booking tickets for the same customer, this test ensures that if the time slots of the tickets overlap the method will return false
+	\item sameCustomerCannotAcquire2TicketsSameBuildingSameDay() 
+\end{itemize}
