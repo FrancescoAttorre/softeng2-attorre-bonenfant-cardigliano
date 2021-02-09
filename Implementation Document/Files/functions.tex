@@ -1,0 +1,30 @@
+\renewcommand{\thesubsection}{\Alph{subsection}}
+In the developed software all the main features and functions of CLup have been implemented, leaving aside additional features that could be easily added at a later time, on the base structure already existent.
+We present below a list of the implemented features:
+\begin{itemize}
+	\item Registration of an Activity to CLup, after providing username, password and P.IVA, and log in of such Activity in order to insert its buildings.
+	\item Buildings insertion, providing name, address, a capacity, opening times and optionally departments with surplus of capacity.
+	\item Generation of a building access code for each building, to allow store managers to sign up for a building.
+	\item Registration of customers after providing username and password, in order to make a booking.
+	\item Login of customers after providing correct credentials.
+	\item Providing clients a list of buildings among which to choose the one to queue or book for, avoiding buildings too far from the customer.
+	\item Provide an estimated travel time depending on the means of transport chosen by the customer, using an external maps service.
+	\item Computation of estimated waiting times in queue for each line up ticket, basing on building's statistics.
+	\item Discovery requests to keep the estimated waiting time as updated as possible.
+	\item Giving physical customers the possibility to acquire a line up ticket having the store manager as an intermediary.
+	\item Queue management.
+	\item Use of departments for each building with additional capacity in order to increase the number of people allowed if directed only to those departments.
+	\item Acquisition of a booking digital ticket, after providing a date, a slot of time, a permanence time and optionally departments.
+	\item Provide a list of available time slots, multiple of 15 minutes, to a customer who wish to book for a building.
+	\item Providing a positive/negative result after a check by the store manager to decide whether a customer can enter or not.
+	\item Making tickets become expired 10 minutes after their validation.
+	\item Allowing store managers to register customer's exits.
+\end{itemize}
+Other features have been discarded since they have been considered of minor importance. They are for instance:
+\begin{itemize}
+	\item Notification to leave for a building when TravelTime <= WaitingTime, this feature can be developed by the client, once having the information provided by the server and by the external maps service.
+	\item Alternatives of time slots or buildings, which is an additional feature, not one of the main ones necessary for the application to work properly. 
+	\item Generation of QR codes with ticket's informations.
+	\item Computation of the estimated permanence time for registered customers, basing on their previous visits to the building, additional feature.
+\end{itemize}
+All these features are suggested for a better effectiveness of the application, except the generation of QR code which is particularly critical for the practical use.

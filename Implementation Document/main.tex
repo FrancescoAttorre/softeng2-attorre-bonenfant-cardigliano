@@ -1,0 +1,116 @@
+\input{commandsFile}
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage{listings}
+
+\usepackage{multirow}
+
+\begin{document}
+
+%TITLE PAGE
+
+\begin{titlepage}
+
+
+%LOGO
+
+\begin{center}
+    \includegraphics[height=5cm]{Logo_Polimi}\\
+    \vspace{7cm}
+      \begin{huge}
+        \textbf{CLup - Customer Line Up}\\
+      \end{huge}
+      \vspace{0.3cm}
+      \begin{large}
+        \textit{Software Engineering 2 Project 2020/21}\\
+      \end{large}
+      
+      \vfill
+      \begin{author}
+        \textbf{\Large Authors}\\
+        \begin{itemize}
+          \item Francesco Attorre - \textit{10618456}\\
+          \item Thomas Jean Bernard Bonenfant - \textit{10597564}\\
+          \item Veronica Cardigliano - \textit{10627267}\\
+        \end{itemize}
+      \end{author}
+
+    \end{center}
+  
+  \end{titlepage}
+
+%Define deliverable specific info
+%Replace cell contents where needed
+\begin{table}[h!]
+\begin{tabu} to \textwidth { X[0.3,r,p] X[0.7,l,p] }
+\hline
+
+\textbf{Deliverable:} & I\&T\\
+\textbf{Title:} & Implementation and Testing Document \\
+\textbf{Authors:} & Francesco Attorre, Thomas Jean Bernard Bonenfant, Veronica Cardigliano \\
+\textbf{Version:} & 1.0 \\ 
+\textbf{Date:} & 07-February-2021 \\
+\textbf{Installation page:} & https://github.com/FrancescoAttorre/softeng2-attorre-bonenfant-cardigliano \\
+\textbf{Source code:} & https://github.com/FrancescoAttorre/softeng2-attorre-bonenfant-cardigliano/tree/main/clup \\
+\textbf{Copyright:} & Copyright © 2021, Francesco Attorre, Thomas Jean Bernard Bonenfant, Veronica Cardigliano - All rights reserved \\
+\hline
+\end{tabu}
+\end{table}
+
+\setcounter{page}{2}
+
+
+%------------------------------------------------------------------------------------------------------------------------------------------------
+%Table Of Contents
+\newpage
+
+\addcontentsline{toc}{section}{Table of Contents}
+\hypersetup{linkcolor = black}
+\tableofcontents
+
+\newpage
+
+%------------------------------------------------------------------------------------------------------------------------------------------------
+%Structure
+\clearpage
+{\color{Cerulean}{\section{Introduction}}}
+\label{sect:introduction}
+\input{Files/introduction}
+
+%------------------------------------------------------------------------------------------------------------------------------------------------
+%Functions
+\clearpage
+{\color{Cerulean}{\section{Functions Implemented}}}
+\label{sect:functions}
+\input{Files/functions}
+%------------------------------------------------------------------------------------------------------------------------------------------------
+%Frameworks
+\clearpage
+{\color{Cerulean}{\section{Frameworks}}}
+\label{sect:frameworks}
+\input{Files/frameworks}
+%------------------------------------------------------------------------------------------------------------------------------------------------
+%Structure
+\clearpage
+{\color{Cerulean}{\section{Source Code Structure}}}
+\label{sect:structure}
+\input{Files/structure}
+%------------------------------------------------------------------------------------------------------------------------------------------------
+%Testing
+\clearpage
+{\color{Cerulean}{\section{Testing}}}
+\label{sect:testing}
+\input{Files/testing}
+%------------------------------------------------------------------------------------------------------------------------------------------------
+%Installation
+\clearpage
+{\color{Cerulean}{\section{Installation}}}
+\label{sect:installation}
+\input{Files/installation}
+%------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+\end{document}

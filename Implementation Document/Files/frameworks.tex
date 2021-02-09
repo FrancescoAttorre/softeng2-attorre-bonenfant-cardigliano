@@ -1,0 +1,28 @@
+\renewcommand{\thesubsection}{\Alph{subsection}}
+%Development Frameworks
+\subsection{Development Frameworks}
+The main frameworks used are JEE (Java Enterprise Edition) and JPA (Java Persistence API). In the section "Source Code Structure" is better explained the specific structure of the implementation, however the main specifications used have been Enterprise Java Beans, servlets, RESTful Web Services. The EJBs used in the specific are the stateless session beans ones, and each component have been developed as a stateless Bean. 
+Servlets have been used to manage HTTP requests done through the webApp. RESTful Web Services have been used, instead, for the MobileApp, exploiting JAX-RS, also in this case to manage HTTP requests.
+As explained in section G of the DD document, we used for this implementation many patterns, such as adapter for the external MapsService, a facade pattern with the use of a dispatcher and an MVC architecture.
+JPA, instead, has been used to develop in a fast and easy way the needed Entities, performing ORM (Object Relational Mapping) in an efficient way.
+We used as implementation EclipseLink, since the middleware used is TomEE Plume 8.0.6.
+
+\subsubsection{Adopted programming languages}
+The programming languages used in the implementation have been Java and a little of Javascript.
+The main advantages of using in Java are Object-Oriented programming, allowing to write standard and reusable code, being platform-independent and makes it easy to write, compile and debug.
+\subsubsection{Middleware adopted}
+The middleware adopted is TomEE, in particular it has been used the TomeEE Plume 8.0.6 version as application web server.
+\subsubsection{Other API}
+Others APIs used are :
+\begin {itemize}
+	\item JTA (Java Transaction API):  one of the JavaEE API used to manage DataBase transactions.
+	\item JAX-RS (Java RESTful Web Services): JavaEE API for creating web services, exploiting REST architectural pattern, as stated in the DD, section G.
+\end{itemize}
+
+\subsubsection{Authentication Method}
+To authenticate the different types of users, we have used JWT (JSON Web Tokens), in order to give users digitally signed tokens providing to each of them the authorization to request the proper services. Each token contains the ID of the user, and a string to identify the type of customer related to it.
+
+\newpage
+
+
+
